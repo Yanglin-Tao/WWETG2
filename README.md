@@ -29,3 +29,36 @@ ALTER DATABASE "whatweeatapp" OWNER TO "[your_name]";
 SELECT * FROM user_profiles;
 ```
 Notice that I used 'yanglintao' in main.py in the backend folder. To avoid merging issues, it's better to use the same name. You can create a new role named 'yanglintao' and set passwords. But feel free to change to your role name as long as you do not commit that change.
+
+## The HelloWorld example
+In `/WWETG2/wwetg2app/wwetg2app/controllers/root.py`, define an API endpoint named 'helloworld'
+```
+class RootController(BaseController):
+    # ...
+    # some other endpoints
+    # ...
+
+    @expose('json')
+    def helloworld(self):
+        """Simple Hello World endpoint."""
+        return {"message": "Hello, World!"}
+```
+In `wwe-frontend/src/App.js`, the message is rendered by fetching JSON reponse from "http://localhost:8080/helloworld".
+```
+function App() {
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    // Fetch data from TG2 backend
+    fetch("http://localhost:8080/helloworld")
+      .then(response => response.json())
+      .then(data => setMessage(data.message));
+  }, []);
+
+  return (
+    <div>
+        {message}
+    </div>
+  );
+}
+```
