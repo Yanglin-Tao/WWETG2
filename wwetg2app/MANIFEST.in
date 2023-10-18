@@ -1,0 +1,4 @@
+recursive-include wwetg2app/public *
+include wwetg2app/public/favicon.ico
+recursive-include wwetg2app/i18n *
+recursive-include wwetg2app/templates *
