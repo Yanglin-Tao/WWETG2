@@ -3,7 +3,7 @@ This repository is migrated from https://github.com/Yanglin-Tao/WWEFastAPI.
 ## Backend
 ### Set up 
 TurboGears2 (assume you already installed pip tool and python virtual env), also make sure you have Python 3.11.
-Ideally you shouldn't be installing any dependencies since they are specified in Pipfile.
+Ideally you shouldn't be installing any dependencies since they are already specified in Pipfile.
 ### To run backend:
 1. Make sure you are in `/WWETG2/wwetg2app` directory
 2. Run `gearbox serve --reload --debug`
@@ -11,7 +11,6 @@ Ideally you shouldn't be installing any dependencies since they are specified in
 ## Frontend
 ### Set up 
 React (assuming you already installed React)
-1. npm install axios
 ### To run fronend:
 1. Make sure your backend server is up and running
 2. Make sure you are in `/WWETG2/wwe-frontend` directory
