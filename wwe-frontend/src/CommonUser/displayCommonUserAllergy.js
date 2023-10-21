@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import MuiDrawer from '@mui/material/Drawer';
@@ -113,6 +114,24 @@ function DisplayCommonUserAllergy() {
   const login = () => {
     window.open("/login", "_self");
   };
+
+  const [isEditable, setIsEditable] = useState(false);
+  const [allergies, setAllergies] = useState([
+    'Milk',
+    'Eggs',
+    'Fish',
+    'Crustacean shellfish',
+    'Peanuts'
+  ]);
+
+  const handleDelete = (allergyToRemove) => () => {
+    setAllergies(allergies.filter(allergy => allergy !== allergyToRemove));
+  };
+
+  const toggleEdit = () => {
+    setIsEditable(!isEditable);
+  };
+
   return (
     <ThemeProvider theme={defaultTheme}>
       <Box sx={{ display: 'flex' }}>
@@ -217,19 +236,23 @@ function DisplayCommonUserAllergy() {
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
                   <Title>My Food Allergies</Title>
                   <Stack direction="row" spacing={1}>
-                    <Chip label="Milk" variant="outlined" />
-                    <Chip label="Eggs" variant="outlined" />
-                    <Chip label="Fish" variant="outlined" />
-                    <Chip label="Crustacean shellfish" variant="outlined" />
-                    <Chip label="Peanuts" variant="outlined" />
+                  {allergies.map(allergy => (
+                    <Chip 
+                      key={allergy}
+                      label={allergy}
+                      variant="outlined"
+                      onDelete={isEditable ? handleDelete(allergy) : undefined}
+                    />
+                  ))}
                   </Stack>
                   <Button
                     type="submit"
                     fullWidth
                     variant="contained"
                     sx={{ mt: 3, mb: 2 }}
+                    onClick={toggleEdit}
                   >
-                    Edit My Food Allergies
+                    {isEditable ? 'Done' : 'Edit My Food Allergies'}
                   </Button>
                 </Paper>
               </Grid>
