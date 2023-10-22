@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -95,6 +96,23 @@ function DisplayCommonUserFoodPreference() {
     const login = () => {
       window.open("/login", "_self");
     };
+
+    const [isEditable, setIsEditable] = useState(false);
+    const [preferences, setPreferences] = useState([
+      'Halal',
+      'Vegetarian',
+      'Gluten Free',
+      'Balanced'
+    ]);
+
+    const handleDelete = (preferenceToRemove) => () => {
+      setPreferences(preferences.filter(preference => preference !== preferenceToRemove));
+    };
+  
+    const toggleEdit = () => {
+      setIsEditable(!isEditable);
+    };
+
     return (
       <ThemeProvider theme={defaultTheme}>
         <Box sx={{ display: 'flex' }}>
@@ -175,18 +193,23 @@ function DisplayCommonUserFoodPreference() {
                   <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
                   <Title>My Food Preferences</Title>
                   <Stack direction="row" spacing={1}>
-                    <Chip label="Halal" variant="outlined" />
-                    <Chip label="Vegetarian" variant="outlined" />
-                    <Chip label="Gluten Free" variant="outlined" />
-                    <Chip label="Balanced" variant="outlined" />
+                  {preferences.map(preference => (
+                    <Chip 
+                      key={preference}
+                      label={preference}
+                      variant="outlined"
+                      onDelete={isEditable ? handleDelete(preference) : undefined}
+                    />
+                  ))}
                   </Stack>
                   <Button
                   type="submit"
                   fullWidth
                   variant="contained"
                   sx={{ mt: 3, mb: 2 }}
+                  onClick={toggleEdit}
                   >
-                  Edit My Food Preferences
+                  {isEditable ? 'Done' : 'Edit My Food Preferences'}
                   </Button>
                   </Paper>
                 </Grid>
