@@ -25,6 +25,7 @@ import Title from './Title';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
+import { Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 /* TODO: This component should display common user's food preference
 */
 // TODO remove, this demo shouldn't need to reset the theme.
@@ -104,9 +105,18 @@ function DisplayCommonUserFoodPreference() {
       'Gluten Free',
       'Balanced'
     ]);
+    const [selectedPreference, setSelectedPreference] = useState('');
+    const possiblePreferences = ['Halal', 'Vegetarian', 'Gluten Free', 'Balanced', 'Vegan', 'Pescatarian']; 
 
     const handleDelete = (preferenceToRemove) => () => {
       setPreferences(preferences.filter(preference => preference !== preferenceToRemove));
+    };
+
+    const handleAddPreference = () => {
+      if (selectedPreference && !preferences.includes(selectedPreference)) {
+        setPreferences([...preferences, selectedPreference]);
+        setSelectedPreference('');
+      }
     };
   
     const toggleEdit = () => {
@@ -202,6 +212,30 @@ function DisplayCommonUserFoodPreference() {
                     />
                   ))}
                   </Stack>
+                  {isEditable && (
+                    <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
+                      <FormControl variant="outlined" style={{ flex: 1 }}>
+                        <InputLabel>Select Preference</InputLabel>
+                        <Select
+                          value={selectedPreference}
+                          onChange={(e) => setSelectedPreference(e.target.value)}
+                          label="Select Preference"
+                        >
+                          {possiblePreferences.filter(p => !preferences.includes(p)).map(preference => (
+                            <MenuItem key={preference} value={preference}>
+                              {preference}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                      <Button
+                        variant="contained"
+                        onClick={handleAddPreference}
+                      >
+                        Add Preference
+                      </Button>
+                    </Stack>
+                  )}
                   <Button
                   type="submit"
                   fullWidth

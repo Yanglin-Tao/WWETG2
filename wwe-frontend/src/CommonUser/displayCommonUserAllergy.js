@@ -28,6 +28,9 @@ import Title from './Title';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert'; 
 
 /* TODO: This component should display common user's allergy. */
 
@@ -123,6 +126,21 @@ function DisplayCommonUserAllergy() {
     'Crustacean shellfish',
     'Peanuts'
   ]);
+  const [newAllergy, setNewAllergy] = useState('');
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+
+  const handleAddAllergy = () => {
+    if (newAllergy && !allergies.includes(newAllergy)) {
+        setAllergies(prevAllergies => [...prevAllergies, newAllergy]);
+        setNewAllergy(''); 
+    } else {
+        setOpenSnackbar(true);  
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+  };
 
   const handleDelete = (allergyToRemove) => () => {
     setAllergies(allergies.filter(allergy => allergy !== allergyToRemove));
@@ -245,6 +263,33 @@ function DisplayCommonUserAllergy() {
                     />
                   ))}
                   </Stack>
+                  <Snackbar 
+                      open={openSnackbar} 
+                      autoHideDuration={6000} 
+                      onClose={handleCloseSnackbar}
+                      anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                  >
+                      <Alert onClose={handleCloseSnackbar} severity="warning" variant="filled">
+                          This allergy already exists!
+                      </Alert>
+                  </Snackbar>
+                  {isEditable && (
+                    <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
+                      <TextField
+                        variant="outlined"
+                        placeholder="Enter food allergy"
+                        fullWidth
+                        value={newAllergy}
+                        onChange={(e) => setNewAllergy(e.target.value)}
+                      />
+                      <Button
+                        variant="contained"
+                        onClick={handleAddAllergy}
+                      >
+                        Add
+                      </Button>
+                    </Stack>
+                  )}
                   <Button
                     type="submit"
                     fullWidth
