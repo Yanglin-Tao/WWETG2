@@ -20,6 +20,12 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Link from '@mui/material/Link';
+import Title from './Title';
+import Paper from '@mui/material/Paper';
+import Divider from '@mui/material/Divider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import DashboardLayout from './DashboardLayout';
 
 /* TODO: This component should display a shopping cart interface to users. 
     The component should display a list of foot item names and quantities. 
@@ -39,21 +45,6 @@ function Copyright() {
         </Typography>
     );
 }
-
-const cards = [
-    {
-        id: 1,
-        name: 'Food Item 1',
-        calories: 300,
-        imageUrl: 'https://source.unsplash.com/random?food1',
-    },
-    {
-        id: 2,
-        name: 'Food Item 2',
-        calories: 450,
-        imageUrl: 'https://source.unsplash.com/random?food2',
-    },
-];
 
 const drawerWidth = 240;
 
@@ -75,31 +66,20 @@ const AppBar = styled(MuiAppBar, {
     }),
 }));
 
-const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
-    ({ theme, open }) => ({
-        '& .MuiDrawer-paper': {
-            position: 'relative',
-            whiteSpace: 'nowrap',
-            width: drawerWidth,
-            transition: theme.transitions.create('width', {
-                easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.enteringScreen,
-            }),
-            boxSizing: 'border-box',
-            ...(!open && {
-                overflowX: 'hidden',
-                transition: theme.transitions.create('width', {
-                    easing: theme.transitions.easing.sharp,
-                    duration: theme.transitions.duration.leavingScreen,
-                }),
-                width: theme.spacing(7),
-                [theme.breakpoints.up('sm')]: {
-                    width: theme.spacing(9),
-                },
-            }),
-        },
-    }),
-);
+const cards = [
+    {
+        id: 1,
+        name: 'Food Item 1',
+        calories: 300,
+        imageUrl: 'https://source.unsplash.com/random?food1',
+    },
+    {
+        id: 2,
+        name: 'Food Item 2',
+        calories: 450,
+        imageUrl: 'https://source.unsplash.com/random?food2',
+    },
+];
 
 function BrowseDailyMenu() {
     const [open, setOpen] = React.useState(true);
@@ -134,141 +114,122 @@ function BrowseDailyMenu() {
 
     return (
         <ThemeProvider theme={createTheme()}>
-            <CssBaseline />
-            <AppBar position="absolute" open={open}>
-                <Toolbar
-                    sx={{
-                        pr: '24px', // keep right padding when drawer closed
-                    }}
-                >
-                    <IconButton
-                        edge="start"
-                        color="inherit"
-                        aria-label="open drawer"
-                        onClick={toggleDrawer}
-                        sx={{
-                            marginRight: '36px',
-                            ...(open && { display: 'none' }),
-                        }}
-                    >
-                        <MenuIcon />
-                    </IconButton>
-                    <Typography
-                        component="h1"
-                        variant="h6"
-                        color="inherit"
-                        noWrap
-                        sx={{ flexGrow: 1 }}
-                    >
-                        Shopping Cart
-                    </Typography>
-                    <IconButton color="inherit" onClick={dashboard}>
-                        <WidgetsIcon />
-                    </IconButton>
-                </Toolbar>
-            </AppBar>
-            <main>
+            <Box sx={{ display: 'flex' }}>
+                <CssBaseline />
+                <DashboardLayout title = 'Shopping Cart'/>
                 <Box
+                    component="main"
                     sx={{
-                        bgcolor: 'background.paper',
-                        pt: 8,
-                        pb: 6,
+                        backgroundColor: (theme) =>
+                            theme.palette.mode === 'light'
+                                ? theme.palette.grey[100]
+                                : theme.palette.grey[900],
+                        flexGrow: 1,
+                        height: '100vh',
+                        overflow: 'auto',
                     }}
                 >
-                    <Container maxWidth="sm">
-                        <Typography
-                            component="h1"
-                            variant="h2"
-                            align="center"
-                            color="text.primary"
-                        >
-                            Shopping Cart
-                        </Typography>
-                    </Container>
+                    <Toolbar />
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+                            <Grid container spacing={3}>
+                                <Grid item xs={12}>
+                                    <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+                                        <Title>Shopping Cart</Title>
+                                        <Box sx={{ width: '100%', bgcolor: 'background.paper' }}>
+                                            <Box sx={{ my: 3, mx: 2 }}>
+                                                <Grid container alignItems="center">
+                                                    <Grid item xs>
+                                                        <Typography gutterBottom variant="h4" component="div">
+                                                            Food Items:
+                                                        </Typography>
+                                                    </Grid>
+                                                    {/* Display the Shopping Cart using Cards */}
+                                                    <Grid container spacing={4}>
+                                                        {cartItems.map((item) => (
+                                                            <Grid item key={item.id} xs={12} sm={6} md={4}>
+                                                                <Card
+                                                                    sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+                                                                >
+                                                                    <CardMedia
+                                                                        component="div"
+                                                                        sx={{
+                                                                            // 16:9
+                                                                            pt: '56.25%',
+                                                                        }}
+                                                                        image="https://source.unsplash.com/random?food"
+                                                                    />
+                                                                    <CardContent sx={{ flexGrow: 1 }}>
+                                                                        <Typography variant="h5" component="div">
+                                                                            {item.name}
+                                                                        </Typography>
+                                                                        <Typography variant="body2" color="text.secondary">
+                                                                            {item.calories} calories
+                                                                        </Typography>
+                                                                    </CardContent>
+                                                                    <CardActions>
+                                                                        <Button size="small" color="primary" onClick={() => handleRemoveFromCart(item.id)}>
+                                                                            Remove from Cart
+                                                                        </Button>
+                                                                    </CardActions>
+                                                                </Card>
+                                                            </Grid>
+                                                        ))}
+                                                    </Grid>
+                                                </Grid>
+                                            </Box>
+                                            <Divider variant="middle" />
+                                            <Box sx={{ m: 2 }}>
+                                                <p>Total Calories: {totalCalories}</p>
+                                            </Box>
+                                        </Box>
+                                        {/* Display available Food Items */}
+                                        <Grid container spacing={4}>
+                                            {cards.map((card) => (
+                                                <Grid item key={card.id} xs={12} sm={6} md={4}>
+                                                    <Card
+                                                        sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+                                                    >
+                                                        <CardMedia
+                                                            component="div"
+                                                            sx={{
+                                                                // 16:9
+                                                                pt: '56.25%',
+                                                            }}
+                                                            image="https://source.unsplash.com/random?food"
+                                                        />
+                                                        <CardContent sx={{ flexGrow: 1 }}>
+                                                            <Typography variant="h5" component="div">
+                                                                {card.name}
+                                                            </Typography>
+                                                            <Typography variant="body2" color="text.secondary">
+                                                                {card.calories} calories
+                                                            </Typography>
+                                                        </CardContent>
+                                                        <CardActions>
+                                                            <Button size="small" color="primary" onClick={() => handleAddToCart(card)}>
+                                                                Add to Cart
+                                                            </Button>
+                                                        </CardActions>
+                                                    </Card>
+                                                </Grid>
+                                            ))}
+                                        </Grid>
+                                        <Button
+                                            type="submit"
+                                            fullWidth
+                                            variant="contained"
+                                            sx={{ mt: 3, mb: 2 }}
+                                        >
+                                            Check Out
+                                        </Button>
+                                    </Paper>
+                                </Grid>
+                            </Grid>
+                            <Copyright sx={{ pt: 4 }} />
+                        </Container>
+                    </LocalizationProvider>
                 </Box>
-
-                <Container sx={{ py: 1 }} maxWidth="md">
-                    {/* Display the Shopping Cart using Cards */}
-                    <Grid container spacing={4}>
-                        {cartItems.map((item) => (
-                            <Grid item key={item.id} xs={12} sm={6} md={4}>
-                                <Card
-                                    sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-                                >
-                                    <CardMedia
-                                        component="div"
-                                        sx={{
-                                            // 16:9
-                                            pt: '56.25%',
-                                        }}
-                                        image="https://source.unsplash.com/random?wallpapers"
-                                    />
-                                    <CardContent sx={{ flexGrow: 1 }}>
-                                        <Typography variant="h5" component="div">
-                                            {item.name}
-                                        </Typography>
-                                        <Typography variant="body2" color="text.secondary">
-                                            {item.calories} calories
-                                        </Typography>
-                                    </CardContent>
-                                    <CardActions>
-                                        <Button size="small" color="primary" onClick={() => handleRemoveFromCart(item.id)}>
-                                            Remove from Cart
-                                        </Button>
-                                    </CardActions>
-                                </Card>
-                            </Grid>
-                        ))}
-                    </Grid>
-                    <p>Total Calories: {totalCalories}</p>
-                    {/* Display available Food Items */}
-                    <Grid container spacing={4}>
-                        {cards.map((card) => (
-                            <Grid item key={card.id} xs={12} sm={6} md={4}>
-                                <Card
-                                    sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-                                >
-                                    <CardMedia
-                                        component="div"
-                                        sx={{
-                                            // 16:9
-                                            pt: '56.25%',
-                                        }}
-                                        image="https://source.unsplash.com/random?wallpapers"
-                                    />
-                                    <CardContent sx={{ flexGrow: 1 }}>
-                                        <Typography variant="h5" component="div">
-                                            {card.name}
-                                        </Typography>
-                                        <Typography variant="body2" color="text.secondary">
-                                            {card.calories} calories
-                                        </Typography>
-                                    </CardContent>
-                                    <CardActions>
-                                        <Button size="small" color="primary" onClick={() => handleAddToCart(card)}>
-                                            Add to Cart
-                                        </Button>
-                                    </CardActions>
-                                </Card>
-                            </Grid>
-                        ))}
-                    </Grid>
-                </Container>
-            </main>
-            <Box sx={{ bgcolor: 'background.paper', p: 6 }} component="footer">
-                <Typography variant="h6" align="center" gutterBottom>
-                    Footer
-                </Typography>
-                <Typography
-                    variant="subtitle1"
-                    align="center"
-                    color="text.secondary"
-                    component="p"
-                >
-                    Something here to give the footer a purpose!
-                </Typography>
-                <Copyright />
-                {/* Display the shopping cart */}
             </Box>
         </ThemeProvider>
     );
