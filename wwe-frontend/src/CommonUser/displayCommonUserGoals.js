@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -24,6 +25,11 @@ import Title from './Title';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import TextField from '@mui/material/TextField';
+import dayjs from 'dayjs';
 
 /* TODO: This component should display common user's dietary goals
 */
@@ -97,6 +103,16 @@ function DisplayCommonUserGoals() {
     const login = () => {
       window.open("/login", "_self");
     };
+
+    const [isEditable, setIsEditable] = useState(false);
+    const [startDate, setStartDate] = useState(dayjs('2023-01-01'));
+    const [endDate, setEndDate] = useState(dayjs('2023-12-31'));
+    const [calories, setCalories] = useState(2000);
+
+    const toggleEdit = () => {
+      setIsEditable(!isEditable);
+  };
+
     return (
       <ThemeProvider theme={defaultTheme}>
         <Box sx={{ display: 'flex' }}>
@@ -171,6 +187,7 @@ function DisplayCommonUserGoals() {
             }}
           >
             <Toolbar />
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
             <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
               <Grid container spacing={3}>
                 <Grid item xs={12}>
@@ -185,9 +202,17 @@ function DisplayCommonUserGoals() {
                             </Typography>
                         </Grid>
                         <Grid item>
+                          {isEditable ? (
+                            <TextField
+                              type="number"
+                              value={calories}
+                              onChange={(e) => setCalories(e.target.value)}
+                            />
+                          ) : (
                             <Typography gutterBottom variant="h6" component="div">
-                            2,000 cal per day
+                              {calories} cal per day
                             </Typography>
+                          )}
                         </Grid>
                         </Grid>
                         <Typography color="text.secondary" variant="body2">
@@ -196,36 +221,55 @@ function DisplayCommonUserGoals() {
                         </Typography>
                     </Box>
                     <Divider variant="middle" />
-                    <Box sx={{ m: 2 }}>
-                        <Typography gutterBottom variant="body1">
-                        Start Date
-                        </Typography>
-                        <Stack direction="row" spacing={1}>
-                        <Chip label="2023-01-01" />
-                        </Stack>
                     </Box>
-                    <Box sx={{ m: 2 }}>
-                        <Typography gutterBottom variant="body1">
-                        End Date
-                        </Typography>
-                        <Stack direction="row" spacing={1}>
-                        <Chip label="2023-12-31" />
-                        </Stack>
-                    </Box>
-                    </Box>
+                    {isEditable ? (
+                      <>
+                        <DatePicker
+                          label="Start Date"
+                          value={startDate}
+                          onChange={(newValue) => setStartDate(newValue)}
+                          renderInput={(params) => <TextField {...params} />}
+                          sx={{ mt: 2 }}
+                        />
+                        <DatePicker
+                          label="End Date"
+                          value={endDate}
+                          onChange={(newValue) => setEndDate(newValue)}
+                          renderInput={(params) => <TextField {...params} />}
+                          sx={{ mt: 2 }}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <Box sx={{ m: 2 }}>
+                          <Typography gutterBottom variant="body1">
+                          Start Date
+                          </Typography>
+                          <Chip label={startDate.format('YYYY-MM-DD')} />
+                        </Box>
+                        <Box sx={{ m: 2 }}>
+                          <Typography gutterBottom variant="body1">
+                          End Date
+                          </Typography>
+                          <Chip label={endDate.format('YYYY-MM-DD')} />
+                        </Box>
+                      </>
+                    )}
                   <Button
                   type="submit"
                   fullWidth
                   variant="contained"
                   sx={{ mt: 3, mb: 2 }}
+                  onClick={toggleEdit}
                   >
-                  Edit My Goals
+                  {isEditable ? 'Save My Goals' : 'Edit My Goals'}
                   </Button>
                   </Paper>
                 </Grid>
               </Grid>
               <Copyright sx={{ pt: 4 }} />
             </Container>
+            </LocalizationProvider>
           </Box>
         </Box>
       </ThemeProvider>
