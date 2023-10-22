@@ -15,7 +15,16 @@ from tgext.admin.controller import AdminController
 from wwetg2app.lib.base import BaseController
 from wwetg2app.controllers.error import ErrorController
 
+import psycopg2
+import json
+
 __all__ = ['RootController']
+
+conn = psycopg2.connect(database="whatweeatapp",
+                        host="localhost",
+                        user="yanglintao",
+                        password="admin",
+                        port="5432")
 
 
 class RootController(BaseController):
@@ -118,7 +127,11 @@ class RootController(BaseController):
         flash(_('We hope to see you soon!'))
         return HTTPFound(location=came_from)
     
-    @expose('json')
-    def helloworld(self):
-        """Simple Hello World endpoint."""
-        return {"message": "Hello, World!"}
+    # THESE LINES ARE USED TO TEST THE DATABASE CONNECTION ONLY
+    # @expose('json')
+    # def helloworld(self):
+    #     """Simple Hello World endpoint."""
+    #     cursor = conn.cursor()
+    #     cursor.execute("SELECT email FROM user_profiles")
+    #     data = cursor.fetchall()[0][0]
+    #     return {"message": data}
