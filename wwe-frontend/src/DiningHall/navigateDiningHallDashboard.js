@@ -13,27 +13,35 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 /* TODO: This component is a list of items for dining hall users to navigate their dashboards.
 */
 
+const dashboard = () => {
+  window.open("/displayDiningHallDashboard", "_self");
+};
+
+const menu = () => {
+  window.open("/displayDailyMenu", "_self");
+};
+
 export const mainListItems = (
   <React.Fragment>
-    <ListItemButton>
+    <ListItemButton onClick={dashboard}>
       <ListItemIcon>
         <DashboardIcon />
       </ListItemIcon>
       <ListItemText primary="Dashboard" />
     </ListItemButton>
-    <ListItemButton>
+    <ListItemButton onClick={menu}>
       <ListItemIcon>
         <ShoppingCartIcon />
       </ListItemIcon>
       <ListItemText primary="Today's Menu" />
     </ListItemButton>
-    <ListItemButton>
+    <ListItemButton onClick={dashboard}>
       <ListItemIcon>
         <PeopleIcon />
       </ListItemIcon>
       <ListItemText primary="Upload Menu" />
     </ListItemButton>
-    <ListItemButton>
+    <ListItemButton onClick={dashboard}>
       <ListItemIcon>
         <BarChartIcon />
       </ListItemIcon>
@@ -47,7 +55,7 @@ export const secondaryListItems = (
     <ListSubheader component="div" inset>
       Settings
     </ListSubheader>
-    <ListItemButton>
+    <ListItemButton onClick={dashboard}>
       <ListItemIcon>
         <AssignmentIcon />
       </ListItemIcon>
