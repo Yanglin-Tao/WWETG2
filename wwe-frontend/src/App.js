@@ -47,6 +47,7 @@ import RegisterInstitution from "./Institution/registerInstitution";
 import MealShoppingCart from "./CommonUser/mealShoppingCart";
 import CreateDailyMenu from "./Menu/createDailyMenu";
 import DisplayDiningHallAccount from "./DiningHall/displayDininghallAccount";
+import DisplayCommonUserAccount from "./CommonUser/displayCommonUserAccount";
 
 function App() {
     const [data, setData] = useState(null);
@@ -98,6 +99,7 @@ function App() {
                     <Route path="/displayCommonUserFoodPreference" element={<DisplayCommonUserFoodPreference />} />
                     <Route path="/displayCommonUserAllergy" element={<DisplayCommonUserAllergy />} />
                     <Route path="/displayCommonUserGoals" element={<DisplayCommonUserGoals />} />
+                    <Route path="/displayCommonUserAccount" element={<DisplayCommonUserAccount />} />
                     <Route path="/mealShoppingCart" element={<MealShoppingCart />} />
                     {/* Dining Hall route */}
                     <Route path="/loginDiningHall" element={<LoginDiningHall />} />
