@@ -1,14 +1,8 @@
 import * as React from 'react';
 import Button from '@mui/material/Button';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
-import MuiDrawer from '@mui/material/Drawer';
-import MuiAppBar from '@mui/material/AppBar';
-import IconButton from '@mui/material/IconButton';
-import WidgetsIcon from '@mui/icons-material/Widgets';
-import CameraIcon from '@mui/icons-material/PhotoCamera';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import Badge from '@mui/material/Badge';
 import Card from '@mui/material/Card';
-import MenuIcon from '@mui/icons-material/Menu';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
@@ -46,38 +40,19 @@ function Copyright() {
     );
 }
 
-const drawerWidth = 240;
-
-const AppBar = styled(MuiAppBar, {
-    shouldForwardProp: (prop) => prop !== 'open',
-})(({ theme, open }) => ({
-    zIndex: theme.zIndex.drawer + 1,
-    transition: theme.transitions.create(['width', 'margin'], {
-        easing: theme.transitions.easing.sharp,
-        duration: theme.transitions.duration.leavingScreen,
-    }),
-    ...(open && {
-        marginLeft: drawerWidth,
-        width: `calc(100% - ${drawerWidth}px)`,
-        transition: theme.transitions.create(['width', 'margin'], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
-    }),
-}));
-
 const cards = [
     {
         id: 1,
         name: 'Food Item 1',
         calories: 300,
-        imageUrl: 'https://source.unsplash.com/random?food1',
+        imageUrl: 'https://source.unsplash.com/random?food&1',
+        
     },
     {
         id: 2,
         name: 'Food Item 2',
         calories: 450,
-        imageUrl: 'https://source.unsplash.com/random?food2',
+        imageUrl: 'https://source.unsplash.com/random?food&2',
     },
 ];
 
@@ -87,19 +62,50 @@ function BrowseDailyMenu() {
     const [totalCalories, setTotalCalories] = React.useState(0);
 
     const handleAddToCart = (foodItem) => {
-        // Add the selected food item to the cart
-        setCartItems([...cartItems, foodItem]);
-        // Update the total calories
-        setTotalCalories(totalCalories + foodItem.calories);
+        setCartItems((prevCartItems) => {
+            const itemIndex = prevCartItems.findIndex(item => item.id === foodItem.id);
+            let newCartItems;
+            if (itemIndex > -1) {
+                // If the item is already in the cart, increment the count
+                newCartItems = [...prevCartItems];
+                newCartItems[itemIndex].count += 1;
+            } else {
+                // If the item is not in the cart, add it with a count of 1
+                // Include the imageUrl in the food item data
+                newCartItems = [...prevCartItems, { ...foodItem, count: 1, imageUrl: `https://source.unsplash.com/random?food&${foodItem.id}` }];
+            }
+            // Update the total calories
+            const newTotalCalories = newCartItems.reduce((acc, curr) => acc + (curr.calories * curr.count), 0);
+            setTotalCalories(newTotalCalories);
+    
+            return newCartItems;
+        });
     };
+    
 
     const handleRemoveFromCart = (foodId) => {
-        const updatedCart = cartItems.filter(item => item.id !== foodId);
-        setCartItems(updatedCart);
-        // Update the total calories
-        const newTotalCalories = updatedCart.reduce((acc, curr) => acc + curr.calories, 0);
-        setTotalCalories(newTotalCalories);
+        setCartItems((prevCartItems) => {
+            const itemIndex = prevCartItems.findIndex(item => item.id === foodId);
+
+            // If the item is not found, do nothing
+            if (itemIndex === -1) return prevCartItems;
+            const newCartItems = [...prevCartItems];
+            const item = newCartItems[itemIndex];
+            // If the count is greater than 1, decrement the count
+            if (item.count > 1) {
+                newCartItems[itemIndex].count -= 1;
+            } else {
+                // If the count is 1, remove the item from the cart
+                newCartItems.splice(itemIndex, 1);
+            }
+            // Update the total calories
+            const newTotalCalories = newCartItems.reduce((acc, curr) => acc + (curr.calories * curr.count), 0);
+            setTotalCalories(newTotalCalories);
+
+            return newCartItems;
+        });
     };
+
 
     const dashboard = () => {
         window.open("/displayCommonUserDashboard", "_self");
@@ -116,7 +122,7 @@ function BrowseDailyMenu() {
         <ThemeProvider theme={createTheme()}>
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
-                <DashboardLayout title = 'Shopping Cart'/>
+                <DashboardLayout title='Shopping Cart' />
                 <Box
                     component="main"
                     sx={{
@@ -148,31 +154,30 @@ function BrowseDailyMenu() {
                                                     <Grid container spacing={4}>
                                                         {cartItems.map((item) => (
                                                             <Grid item key={item.id} xs={12} sm={6} md={4}>
-                                                                <Card
-                                                                    sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-                                                                >
-                                                                    <CardMedia
-                                                                        component="div"
-                                                                        sx={{
-                                                                            // 16:9
-                                                                            pt: '56.25%',
-                                                                        }}
-                                                                        image="https://source.unsplash.com/random?food"
-                                                                    />
-                                                                    <CardContent sx={{ flexGrow: 1 }}>
-                                                                        <Typography variant="h5" component="div">
-                                                                            {item.name}
-                                                                        </Typography>
-                                                                        <Typography variant="body2" color="text.secondary">
-                                                                            {item.calories} calories
-                                                                        </Typography>
-                                                                    </CardContent>
-                                                                    <CardActions>
-                                                                        <Button size="small" color="primary" onClick={() => handleRemoveFromCart(item.id)}>
-                                                                            Remove from Cart
-                                                                        </Button>
-                                                                    </CardActions>
-                                                                </Card>
+                                                                <Badge badgeContent={item.count} color="primary" anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
+                                                                    <Card sx={{ width: { xs: '100%', sm: '335px' }, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                                                                        <CardMedia
+                                                                            component="div"
+                                                                            sx={{
+                                                                                pt: '56.25%',
+                                                                            }}
+                                                                            image={item.imageUrl}
+                                                                        />
+                                                                        <CardContent sx={{ flexGrow: 1 }}>
+                                                                            <Typography variant="h5" component="div">
+                                                                                {item.name}
+                                                                            </Typography>
+                                                                            <Typography variant="body2" color="text.secondary">
+                                                                                {item.calories} calories
+                                                                            </Typography>
+                                                                        </CardContent>
+                                                                        <CardActions>
+                                                                            <Button size="small" color="primary" onClick={() => handleRemoveFromCart(item.id)}>
+                                                                                Remove from Cart
+                                                                            </Button>
+                                                                        </CardActions>
+                                                                    </Card>
+                                                                </Badge>
                                                             </Grid>
                                                         ))}
                                                     </Grid>
@@ -196,7 +201,7 @@ function BrowseDailyMenu() {
                                                                 // 16:9
                                                                 pt: '56.25%',
                                                             }}
-                                                            image="https://source.unsplash.com/random?food"
+                                                            image = {card.imageUrl}
                                                         />
                                                         <CardContent sx={{ flexGrow: 1 }}>
                                                             <Typography variant="h5" component="div">
