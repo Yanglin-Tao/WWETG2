@@ -45,6 +45,7 @@ import DisplayMenuItem from "./Menu/displayMenuItem"
 import DisplayDailyMenu from "./Menu/displayDailyMenu";
 import RegisterInstitution from "./Institution/registerInstitution";
 import MealShoppingCart from "./CommonUser/mealShoppingCart";
+import CreateDailyMenu from "./Menu/createDailyMenu";
 
 function App() {
     const [data, setData] = useState(null);
@@ -105,6 +106,7 @@ function App() {
                     {/* Menu route */}
                     <Route path="/displayDailyMenu" element={<DisplayDailyMenu />} />
                     <Route path="/displayMenuItem" element={<DisplayMenuItem />} />
+                    <Route path="/createDailyMenu" element={<CreateDailyMenu />} />
                 </Routes>
             </BrowserRouter>
         </>
