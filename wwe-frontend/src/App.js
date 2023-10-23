@@ -46,6 +46,7 @@ import DisplayDailyMenu from "./Menu/displayDailyMenu";
 import RegisterInstitution from "./Institution/registerInstitution";
 import MealShoppingCart from "./CommonUser/mealShoppingCart";
 import CreateDailyMenu from "./Menu/createDailyMenu";
+import DisplayDiningHallAccount from "./DiningHall/displayDininghallAccount";
 
 function App() {
     const [data, setData] = useState(null);
@@ -103,6 +104,7 @@ function App() {
                     <Route path="/registerDiningHall" element={<RegisterDiningHall />} />
                     <Route path="/forgetDiningHallPassword" element={<ForgetDiningHallPassword />} />
                     <Route path="/displayDiningHallDashboard" element={<DisplayDiningHallDashboard />} />
+                    <Route path="/displayDiningHallAccount" element={<DisplayDiningHallAccount />} />
                     {/* Menu route */}
                     <Route path="/displayDailyMenu" element={<DisplayDailyMenu />} />
                     <Route path="/displayMenuItem" element={<DisplayMenuItem />} />
