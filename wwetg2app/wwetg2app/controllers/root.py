@@ -24,11 +24,8 @@ from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Date,
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 
-<<<<<<< Updated upstream
-=======
 # repoze for user authentication 
 # from repoze.what.predicates import not_anonymous
->>>>>>> Stashed changes
 
 __all__ = ['RootController']
 
