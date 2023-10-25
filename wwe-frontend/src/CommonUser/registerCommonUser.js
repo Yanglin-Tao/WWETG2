@@ -1,5 +1,5 @@
 import axios from 'axios';
-import * as React from 'react';
+import React, { useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -19,152 +19,125 @@ import { Link } from 'react-router-dom';
 */
 
 function Copyright(props) {
-    return (
-      <Typography variant="body2" color="text.secondary" align="center" {...props}>
-        {'Copyright © '}
-        <Link color="inherit" to="/">
-          What We Eat
-        </Link>{' '}
-        {new Date().getFullYear()}
-        {'.'}
-      </Typography>
-    );
-  }
+  return (
+    <Typography variant="body2" color="text.secondary" align="center" {...props}>
+      {'Copyright © '}
+      <Link color="inherit" to="/">
+        What We Eat
+      </Link>{' '}
+      {new Date().getFullYear()}
+      {'.'}
+    </Typography>
+  );
+}
 
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
 function RegisterCommonUser() {
-    // const [email, setEmail] = useState("");
-    // const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
 
-    // const handleSubmit = async () => {
-    //     const payload = { email, password };
-    //     console.log("Sending request with payload:", payload);
-    //     try {
-    //         const response = await axios.post('http://localhost:8000/register-common-user', { email, password });
-    //         console.log(response.data);
-    //     } catch (error) {
-    //         console.error("Error creating user:", error);
-    //     }
-    // };
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        console.log({
-          email: data.get('email'),
-          password: data.get('password'),
-        });
-    };
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData({ ...formData, [name]: value });
+  };
 
-    return (
-        // <div>
-        //     <div>
-        //         <input 
-        //             value={email} 
-        //             onChange={(e) => setEmail(e.target.value)} 
-        //             placeholder="Email" 
-        //         />
-        //     </div>
-        //     <div>
-        //         <input 
-        //             type="password"
-        //             value={password} 
-        //             onChange={(e) => setPassword(e.target.value)} 
-        //             placeholder="Password" 
-        //         />
-        //     </div>
-        //     <button onClick={handleSubmit}>Register Common User</button>
-        // </div>
-        <ThemeProvider theme={defaultTheme}>
-          <Container component="main" maxWidth="xs">
-            <CssBaseline />
-            <Box
-              sx={{
-                marginTop: 8,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-              }}
-            >
-              <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                <LockOutlinedIcon />
-              </Avatar>
-              <Typography component="h1" variant="h5">
-                Sign up
-              </Typography>
-              <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      autoComplete="given-name"
-                      name="firstName"
-                      required
-                      fullWidth
-                      id="firstName"
-                      label="First Name"
-                      autoFocus
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      required
-                      fullWidth
-                      id="lastName"
-                      label="Last Name"
-                      name="lastName"
-                      autoComplete="family-name"
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      required
-                      fullWidth
-                      id="email"
-                      label="Email Address"
-                      name="email"
-                      autoComplete="email"
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      required
-                      fullWidth
-                      name="password"
-                      label="Password"
-                      type="password"
-                      id="password"
-                      autoComplete="new-password"
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <FormControlLabel
-                      control={<Checkbox value="allowExtraEmails" color="primary" />}
-                      label="I want to receive inspiration, marketing promotions and updates via email."
-                    />
-                  </Grid>
-                </Grid>
-                <Button
-                  type="submit"
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    console.log("Sending request with payload:", formData);
+    try {
+      const response = await axios.post('/register_user', {
+        email: formData.email,
+        password: formData.password,
+        // You might need to adjust the key names according to your backend API
+      });
+      const message = response.data.message;
+      console.log(response.data);
+      // You can add additional feedback to the user here
+      // For example, if registration is successful, you might redirect them to a login page or show a success message
+    } catch (error) {
+      console.error("Error creating user:", error.response ? error.response.data : error.message);
+      // Handle error and provide feedback to the user
+    }
+  };
+
+  return (
+    <ThemeProvider theme={defaultTheme}>
+      <Container component="main" maxWidth="xs">
+        <CssBaseline />
+        <Box
+          sx={{
+            marginTop: 8,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+            <LockOutlinedIcon />
+          </Avatar>
+          <Typography component="h1" variant="h5">
+            Sign up
+          </Typography>
+          <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  required
                   fullWidth
-                  variant="contained"
-                  sx={{ mt: 3, mb: 2 }}
-                >
-                  Sign Up
-                </Button>
-                <Grid container justifyContent="flex-end">
-                  <Grid item>
-                    <Link to="/loginCommonUser" variant="body2">
-                      Already have an account? Sign in
-                    </Link>
-                  </Grid>
-                </Grid>
-              </Box>
-            </Box>
-            <Copyright sx={{ mt: 5 }} />
-          </Container>
-        </ThemeProvider>
-      );
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  autoComplete="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  name="password"
+                  label="Password"
+                  type="password"
+                  id="password"
+                  autoComplete="new-password"
+                  value={formData.password}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <FormControlLabel
+                  control={<Checkbox value="allowExtraEmails" color="primary" />}
+                  label="I want to receive inspiration, marketing promotions and updates via email."
+                />
+              </Grid>
+            </Grid>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{ mt: 3, mb: 2 }}
+              
+            >
+              Sign Up
+            </Button>
+            <Grid container justifyContent="flex-end">
+              <Grid item>
+                <Link to="/loginCommonUser" variant="body2">
+                  Already have an account? Sign in
+                </Link>
+              </Grid>
+            </Grid>
+          </Box>
+        </Box>
+        <Copyright sx={{ mt: 5 }} />
+      </Container>
+    </ThemeProvider>
+  );
 }
 
 export default RegisterCommonUser;
