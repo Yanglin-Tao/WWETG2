@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Main Controller"""
 
+import hashlib
 from tg import expose, flash, require, url, lurl
 from tg import request, redirect, tmpl_context
 from tg.i18n import ugettext as _, lazy_ugettext as l_
@@ -23,7 +24,7 @@ from sqlalchemy import create_engine
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Date, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
-import hashlib
+
 
 # repoze for user authentication 
 from repoze.what.predicates import not_anonymous
@@ -305,9 +306,61 @@ def register_common(email, userID, password):
         session.add(new_common)
         session.commit()
         return {"message": "Registration success"}
+
+# Register for dining hall
+#   Assume: 1) the pw has been checked in front end
+#   Input: name, password, institution_id - provided by the dining hall user
+#   Report error if: 1) name already exists 2) the institution doesn't exist --> return msg
+#   If success: add the new dining hall to the table -->return msg
+def register_dininghall(name, institution_id, password):
+    name_exist = session.query(DiningHall).filter_by(name=name).first()
+    institution_exist = session.query(DiningHall).filter_by(institutionID=institution_id).first()
+
+    if name_exist:
+        return {"message": "The dining hall name already exists."}
+
+    elif not institution_exist:
+        return {"message": "The institution doens't exist. "}
+            
+    else:
+        # Generate unique dining hall ID:
+        diningHall_id = session.query(DiningHall).count() +1
+        # Hash password
+        hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
+        # Insert rows
+        new_hall = DiningHall(
+            diningHallID = diningHall_id,
+            institutionID = institution_id,
+            name = name,
+            password = hashed_password
+        )
+        session.add(new_hall)
+        session.commit()
+        return {"message": "Dining Hall register success"}
     
+
+# Register for Institution
+# After registering, generate unique id, and add the new institution to table.
+# No login, password for it
+def register_institution(name):
+    institution_exist = session.query(Institution).filter_by(name=name).first()
+    if institution_exist:
+        return {"message": "The institution name already exists."}
+    else:
+        # Generate unique institution ID:
+        institution_id = session.query(Institution).count() +1
+        # Insert rows
+        new_insti = Institution(
+            institutionID = institution_id,
+            name = name,
+        )
+        session.add(new_insti)
+        session.commit()
+        return {"message": "Institution register success"}
+
+
 # Tests
-# email = "125@nyu.edu"
+# email = "124@nyu.edu"
 # userID = 123
 # password = "WhatWeEat"
 # register_common(email, userID, password)
