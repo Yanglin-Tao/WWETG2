@@ -38,9 +38,6 @@ function Copyright() {
 }
 
 function DisplayMenuItem() {
-    const shop = () => {
-        window.open("/mealShoppingCart", "_self");
-    };
     const menu = () => {
         window.open("/displayDailyMenu", "_self");
     };
@@ -108,9 +105,6 @@ function DisplayMenuItem() {
                                                     Back to Menu
                                                 </Button>
                                             </Box>
-                                            <Button size="large" color="primary" onClick={shop}>
-                                                Add to Shopping Cart
-                                            </Button>
                                         </CardActions>
                                     </Card>
 

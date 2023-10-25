@@ -69,9 +69,6 @@ const DashboardLayout = ({title}) => {
     const toggleDrawer = () => {
         setOpen(!open);
     };
-    const shop = () => {
-        window.open("/mealShoppingCart", "_self");
-    };
     const handleMenu = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -108,12 +105,6 @@ const DashboardLayout = ({title}) => {
                     >
                         {title}
                     </Typography>
-                    <IconButton size="large" color="inherit" onClick={shop}>
-                        {/* <Badge badgeContent={4} color="secondary">
-                <NotificationsIcon />
-              </Badge> */}
-                        <ShoppingCartIcon />
-                    </IconButton>
                     {auth && (
                         <div>
                             <IconButton
