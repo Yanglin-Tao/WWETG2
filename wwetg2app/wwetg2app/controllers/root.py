@@ -23,6 +23,7 @@ from sqlalchemy import create_engine
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Date, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
+import hashlib
 
 # repoze for user authentication 
 # from repoze.what.predicates import not_anonymous
@@ -216,32 +217,32 @@ class RootController(BaseController):
         flash(_('We hope to see you soon!'))
         return HTTPFound(location=came_from)
     
-
+Session = sessionmaker(bind = engine)
 session = Session()
 
 def register_common(email, userID, password):
     user_email = session.query(UserProfile).filter_by(email=email).first()
-    user_ID = session.query(UserProfile).filter_by(userID=userID).first()
 
     if user_email:
-        flash('This email has already been registered', 'error')
-
-    elif user_ID:
-        flash('User_ID already exists', 'error')
-            
+        flash(email)
+        return {"message": "This email has already been registered"}
     else:
         # Insert rows
+        user_num = session.query(UserProfile).count()
+        flash(user_num)
+        hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
         new_common = UserProfile(
-            userID = userID,
+            userID = user_num + 1,
             email = email,
-            password = password
+            password = hashed_password
         )
+        flash(userID, email, password)
         session.add(new_common)
         session.commit()
-        flash('Registration success', 'success')
-
+        return {"message": "Registration success"}
+    
 # Tests
-# email = "124@nyu.edu"
+# email = "125@nyu.edu"
 # userID = 123
 # password = "WhatWeEat"
 # register_common(email, userID, password)
