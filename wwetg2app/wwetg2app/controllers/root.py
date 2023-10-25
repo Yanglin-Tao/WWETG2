@@ -24,6 +24,8 @@ from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Date,
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 
+# repoze for user authentication 
+from repoze.what.predicates import not_anonymous
 
 __all__ = ['RootController']
 
@@ -34,9 +36,13 @@ __all__ = ['RootController']
 #                         password="admin",
 #                         port="5432")
 
+# connect to database
 DATABASE_URL = "postgresql://yanglintao:admin@localhost:5432/whatweeatapp"
 engine = create_engine(DATABASE_URL)
 connection = engine.connect()
+# create a new session to interact with the database
+Session = sessionmaker(bind=engine)
+session = Session()
 
 Base = declarative_base()
 
@@ -90,6 +96,67 @@ class UserProfile(Base):
     foodPreferences = Column(String)
     foodAllergies = Column(String)
     dietPlan = Column(String)
+
+# Implement password
+    def set_password(self, password):
+        self.password = password
+    def get_password(self):
+        return self.password
+    
+    # password = property(get_password, set_password)
+class AuthController(BaseController):
+
+    @expose('wwetg2app.templates.login')
+    def login(self, came_from='/'):
+        return dict(came_from=came_from)
+
+    @expose()
+    #@validate({'email': validators.Email(), 'password': validators.NotEmpty()})
+    def post_login(self, email, password, came_from='/'):
+        user = DBSession.query(UserProfile).filter_by(email=email).first()
+
+        if user and user.get_password() == password:
+            # Perform your login logic here, create a session, etc.
+            flash('Welcome back, %s!' % email)
+            redirect(came_from)
+            # success:
+                # return message to front end
+            # false:
+                # return "user dne" or "invalid pw"
+            
+        else:
+            flash('Wrong credentials', 'error')
+            redirect('/login')
+
+
+    @expose()
+    def post_logout(self):
+        # Handle logout, invalidate the session, etc.
+        flash('You have been logged out')
+        redirect('/')
+
+
+    @expose('wwetg2app.templates.register')
+    def register(self):
+        # False message in registration:
+            # Already registered (user name OR email): sign 1
+            # return message (str)
+        # success:
+            # return message success (str)
+        return {}
+    
+
+    @expose()
+    #@validate({'email': validators.Email(), 'password': validators.NotEmpty()})
+    def post_register(self, email, password):
+        user = UserProfile(email=email)
+        user.set_password(password)
+        DBSession.add(user)
+        # Commit the transaction to save the user to the database
+        DBSession.commit()
+        
+        flash('Registration successful')
+        redirect('/login')
 
 class MonthlyReport(Base):
     __tablename__ = 'monthly_reports'
