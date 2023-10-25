@@ -24,6 +24,11 @@ from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Date,
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 
+<<<<<<< Updated upstream
+=======
+# repoze for user authentication 
+# from repoze.what.predicates import not_anonymous
+>>>>>>> Stashed changes
 
 __all__ = ['RootController']
 
@@ -113,7 +118,6 @@ def init_db():
     Base.metadata.create_all(bind=engine)
 
 init_db()
-
 
 class RootController(BaseController):
     """
@@ -215,3 +219,32 @@ class RootController(BaseController):
         flash(_('We hope to see you soon!'))
         return HTTPFound(location=came_from)
     
+
+session = Session()
+
+def register_common(email, userID, password):
+    user_email = session.query(UserProfile).filter_by(email=email).first()
+    user_ID = session.query(UserProfile).filter_by(userID=userID).first()
+
+    if user_email:
+        flash('This email has already been registered', 'error')
+
+    elif user_ID:
+        flash('User_ID already exists', 'error')
+            
+    else:
+        # Insert rows
+        new_common = UserProfile(
+            userID = userID,
+            email = email,
+            password = password
+        )
+        session.add(new_common)
+        session.commit()
+        flash('Registration success', 'success')
+
+# Tests
+# email = "124@nyu.edu"
+# userID = 123
+# password = "WhatWeEat"
+# register_common(email, userID, password)
