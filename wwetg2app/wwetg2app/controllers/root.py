@@ -43,6 +43,8 @@ engine = create_engine(DATABASE_URL)
 connection = engine.connect()
 
 Base = declarative_base()
+Session = sessionmaker(bind=engine)
+session = Session()
 
 # For checking only
 # class CheckConnection(Base):
@@ -84,6 +86,7 @@ class DiningHall(Base):
     diningHallID = Column(Integer, primary_key=True)
     institutionID = Column(Integer, ForeignKey('institutions.institutionID'))
     name = Column(String)
+    password = Column(String)
 
 class UserProfile(Base):
     __tablename__ = 'user_profiles'
@@ -114,7 +117,9 @@ class MenuItem(Base):
     calories = Column(Float)
 
 def init_db():
+    Base.metadata.drop_all(engine)
     Base.metadata.create_all(bind=engine)
+
 
 init_db()
 
@@ -140,6 +145,7 @@ class RootController(BaseController):
     def _before(self, *args, **kw):
         tmpl_context.project_name = "wwetg2app"
 
+   
     @expose('wwetg2app.templates.index')
     def index(self):
         """Handle the front-page."""
@@ -217,7 +223,30 @@ class RootController(BaseController):
         """
         flash(_('We hope to see you soon!'))
         return HTTPFound(location=came_from)
+        
     
+    @expose()
+    def register_common(self,email, userID, password):
+        user_email = session.query(UserProfile).filter_by(email=email).first()
+
+        if user_email:
+            flash(email)
+            return {"message": "This email has already been registered"}
+        else:
+            # Insert rows
+            user_num = session.query(UserProfile).count()
+            flash(user_num)
+            hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
+            new_common = UserProfile(
+                userID = user_num + 1,
+                email = email,
+                password = hashed_password
+            )
+            flash(userID, email, password)
+            session.add(new_common)
+            session.commit()
+            return {"message": "Registration success"}
+        
 Session = sessionmaker(bind = engine)
 session = Session()
 
@@ -241,21 +270,23 @@ def register_common(email, userID, password):
         session.add(new_common)
         session.commit()
         return {"message": "Registration success"}
-
 # Register for dining hall
 #   Assume: 1) the pw has been checked in front end
 #   Input: name, password, institution_id - provided by the dining hall user
 #   Report error if: 1) name already exists 2) the institution doesn't exist --> return msg
 #   If success: add the new dining hall to the table -->return msg
+
 def register_dininghall(name, institution_id, password):
     name_exist = session.query(DiningHall).filter_by(name=name).first()
-    institution_exist = session.query(DiningHall).filter_by(institutionID=institution_id).first()
+    institution_exist = session.query(Institution).filter_by(institutionID=institution_id).first()
 
     if name_exist:
+        flash(_('The dining hall name already exists.'), 'error')
         return {"message": "The dining hall name already exists."}
 
     elif not institution_exist:
-        return {"message": "The institution doens't exist. "}
+        flash(_('The institution does not exist. '), 'error')
+        return {"message": "The institution doesn't exist. "}
             
     else:
         # Generate unique dining hall ID:
@@ -271,15 +302,16 @@ def register_dininghall(name, institution_id, password):
         )
         session.add(new_hall)
         session.commit()
+        flash(_('Dining Hall registration success '), 'warning')
         return {"message": "Dining Hall register success"}
     
-
 # Register for Institution
 # After registering, generate unique id, and add the new institution to table.
 # No login, password for it
 def register_institution(name):
     institution_exist = session.query(Institution).filter_by(name=name).first()
     if institution_exist:
+        flash(_('The institution name already exists.'), 'error')
         return {"message": "The institution name already exists."}
     else:
         # Generate unique institution ID:
@@ -291,11 +323,15 @@ def register_institution(name):
         )
         session.add(new_insti)
         session.commit()
+        flash(_('Registration sucess.'), 'warning')
         return {"message": "Institution register success"}
 
 
+
 # Tests
-# email = "124@nyu.edu"
-# userID = 123
-# password = "WhatWeEat"
-# register_common(email, userID, password)
+# name = "College C"
+# register_institution(name)
+# name = "DiningHall_A"
+# institution_id = 3
+# password = "pw"
+# register_dininghall(name, institution_id, password)
