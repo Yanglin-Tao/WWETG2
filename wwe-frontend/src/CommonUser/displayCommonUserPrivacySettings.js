@@ -1,37 +1,19 @@
 import * as React from 'react';
-import { useState } from 'react';
-import Avatar from '@mui/material/Avatar';
-import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
-import MuiDrawer from '@mui/material/Drawer';
-import MuiAppBar from '@mui/material/AppBar';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import Badge from '@mui/material/Badge';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Link from '@mui/material/Link';
-import MenuIcon from '@mui/icons-material/Menu';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import AccountCircle from '@mui/icons-material/AccountCircle';
-import MenuItem from '@mui/material/MenuItem';
-import Menu from '@mui/material/Menu';
-import PersonIcon from '@mui/icons-material/Person';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import { mainListItems, secondaryListItems } from './navigateCommonUserDashboard';
 import Title from './Title';
-import Button from '@mui/material/Button';
-import Chip from '@mui/material/Chip';
-import Stack from '@mui/material/Stack';
-import TextField from '@mui/material/TextField';
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert'; 
 import DashboardLayout from './DashboardLayout';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Switch from '@mui/material/Switch';
+
 /* TODO: This component should display common user's privacy settings
 */
 function Copyright(props) {
@@ -77,6 +59,13 @@ function DisplayCommonUserPrivacySettings() {
                 <Grid container spacing={3}>
                 <Grid item xs={12}>
                     <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+                    <Title>Privacy Settings</Title>
+                    Authorize dining halls to collect the following data:
+                    <FormGroup>
+                    <FormControlLabel control={<Switch defaultChecked />} label="Food allergies data" />
+                    <FormControlLabel control={<Switch defaultChecked />} label="Food preferences data" />
+                    <FormControlLabel control={<Switch defaultChecked />} label="Other account data" />
+                    </FormGroup>
                     </Paper>
                 </Grid>
                 </Grid>

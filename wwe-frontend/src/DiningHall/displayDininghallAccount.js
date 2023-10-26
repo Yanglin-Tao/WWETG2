@@ -1,12 +1,8 @@
 import React from 'react';
 import { useState } from 'react';
 import Toolbar from '@mui/material/Toolbar';
-import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
-import List from '@mui/material/List';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import Badge from '@mui/material/Badge';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
@@ -42,6 +38,15 @@ function DisplayDiningHallAccount() {
     const toggleEdit = () => {
         setIsEditable(!isEditable);
     };
+
+    const current_institution = "New York University";
+    const current_dining_hall = "NYU Jasper Kane Dining Hall";
+    const contact_email = "askcampusservices@nyu.edu";
+    const [address, setAddress] = useState("6 MetroTech Center, Brooklyn, NY 11201");
+    
+    const handleAddressChange = (e) => {
+        setAddress(e.target.value);
+    };
     
     return (
       <ThemeProvider theme={createTheme()}>
@@ -66,20 +71,29 @@ function DisplayDiningHallAccount() {
                 <Grid item xs={12}>
                   <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
                   <Title>Current Institution</Title>
-                  New York University
+                  {current_institution}
                   <Title>Current Dining Hall</Title>
-                  NYU Jasper Kane Dining Hall
+                  {current_dining_hall}
                   <Title>Contact Email</Title>
-                  askcampusservices@nyu.edu
+                  {contact_email}
                   <Title>Address</Title>
-                  6 MetroTech Center, Brooklyn, NY 11201
+                  { isEditable ? (
+                      <input 
+                          type="text"
+                          value={address}
+                          onChange={handleAddressChange}
+                      />
+                  ) : (
+                      address
+                  )}
                   <Button
                     type="submit"
                     fullWidth
                     variant="contained"
                     sx={{ mt: 3, mb: 2 }}
+                    onClick={toggleEdit}
                   >
-                    Edit Dining Hall Profile
+                    {isEditable ? 'Save Changes' : 'Edit Dining Hall Profile'}
                   </Button>
                   </Paper>
                 </Grid>

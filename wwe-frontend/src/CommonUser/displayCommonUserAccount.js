@@ -1,36 +1,16 @@
 import * as React from 'react';
 import { useState } from 'react';
-import Avatar from '@mui/material/Avatar';
-import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
-import MuiDrawer from '@mui/material/Drawer';
-import MuiAppBar from '@mui/material/AppBar';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import Badge from '@mui/material/Badge';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Link from '@mui/material/Link';
-import MenuIcon from '@mui/icons-material/Menu';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import AccountCircle from '@mui/icons-material/AccountCircle';
-import MenuItem from '@mui/material/MenuItem';
-import Menu from '@mui/material/Menu';
-import PersonIcon from '@mui/icons-material/Person';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import { mainListItems, secondaryListItems } from './navigateCommonUserDashboard';
 import Title from './Title';
 import Button from '@mui/material/Button';
-import Chip from '@mui/material/Chip';
-import Stack from '@mui/material/Stack';
-import TextField from '@mui/material/TextField';
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert'; 
 import DashboardLayout from './DashboardLayout';
 /* TODO: This component should display common user's email and institution.
 */
@@ -56,6 +36,19 @@ function DisplayCommonUserAccount() {
     const login = () => {
         window.open("/login", "_self");
     };
+    const [isEditable, setIsEditable] = useState(false);
+    const toggleEdit = () => {
+        setIsEditable(!isEditable);
+    };
+
+    const current_institution = "New York University";
+    const user_email = "janedoe@nyu.edu";
+    const [password, setPassword] = useState("1234567890letMeIn");
+    
+    const handlePasswordChange = (e) => {
+        setPassword(e.target.value);
+    };
+    
     return (
         <ThemeProvider theme={createTheme()}>
         <Box sx={{ display: 'flex' }}>
@@ -79,18 +72,27 @@ function DisplayCommonUserAccount() {
                 <Grid item xs={12}>
                     <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
                     <Title>Current Institution</Title>
-                    New York University
-                    <Title>Username</Title>
-                    Jane Doe
+                    {current_institution}
                     <Title>User Email</Title>
-                    janedoe@nyu.edu
+                    {user_email}
+                    <Title>Password</Title>
+                    { isEditable ? (
+                      <input 
+                            type="text"
+                            value={password}
+                            onChange={handlePasswordChange}
+                        />
+                    ) : (
+                        '*********'
+                    )}
                     <Button
                         type="submit"
                         fullWidth
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
+                        onClick={toggleEdit}
                     >
-                        Edit Common User Profile
+                        {isEditable ? 'Save Changes' : 'Edit Common User Profile'}
                     </Button>
                     </Paper>
                 </Grid>
