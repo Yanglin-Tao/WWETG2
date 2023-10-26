@@ -1,6 +1,8 @@
 import * as React from 'react';
 import Button from '@mui/material/Button';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 import Badge from '@mui/material/Badge';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -20,6 +22,7 @@ import Divider from '@mui/material/Divider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import DashboardLayout from './DashboardLayout';
+import Rating from './rating';
 
 /* TODO: This component should display a shopping cart interface to users. 
     The component should display a list of foot item names and quantities. 
@@ -40,13 +43,17 @@ function Copyright() {
     );
 }
 
+const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
 const cards = [
     {
         id: 1,
         name: 'Food Item 1',
         calories: 300,
         imageUrl: 'https://source.unsplash.com/random?food&1',
-        
+
     },
     {
         id: 2,
@@ -57,9 +64,49 @@ const cards = [
 ];
 
 function BrowseDailyMenu() {
-    const [open, setOpen] = React.useState(true);
     const [cartItems, setCartItems] = React.useState([]);
     const [totalCalories, setTotalCalories] = React.useState(0);
+    const [modalOpen, setModalOpen] = React.useState(false);
+    const [open, setOpen] = React.useState(false);
+    const [ratingMessage, setRatingMessage] = React.useState(false);
+
+    const handleMessage = (event, reason) => {  // New handleClose function
+        if (reason === 'clickaway') {
+            setRatingMessage(false);
+        }
+
+        setRatingMessage(false);
+    };
+
+    const handleClose = (event, reason) => {  // New handleClose function
+        if (reason === 'clickaway') {
+            setOpen(false);
+        }
+
+        setOpen(false);
+    };
+
+    const handleCheckout = () => {
+        setOpen(true);
+        setModalOpen(true); // Open the modal when the checkout button is clicked
+    }
+
+    const handleCloseModal = () => {
+        setModalOpen(false); // Close the modal
+        setRatingMessage(true);
+    }
+
+    const handleRatingComplete = () => {
+        setCartItems([]); // Clears the cart
+        setTotalCalories(0); // Clears the calories
+        handleCloseModal(); // Close the rating modal
+    }
+
+    // const submitRatings = () => {
+    //     // TODO: Submit the ratings and complete the checkout process
+    //     console.log('Ratings submitted:', cartItems);
+    //     setModalOpen(false);
+    // }
 
     const handleAddToCart = (foodItem) => {
         setCartItems((prevCartItems) => {
@@ -77,11 +124,11 @@ function BrowseDailyMenu() {
             // Update the total calories
             const newTotalCalories = newCartItems.reduce((acc, curr) => acc + (curr.calories * curr.count), 0);
             setTotalCalories(newTotalCalories);
-    
+
             return newCartItems;
         });
     };
-    
+
 
     const handleRemoveFromCart = (foodId) => {
         setCartItems((prevCartItems) => {
@@ -113,9 +160,6 @@ function BrowseDailyMenu() {
 
     const shop = () => {
         window.open("/mealShoppingCart", "_self");
-    };
-    const toggleDrawer = () => {
-        setOpen(!open);
     };
 
     return (
@@ -201,7 +245,7 @@ function BrowseDailyMenu() {
                                                                 // 16:9
                                                                 pt: '56.25%',
                                                             }}
-                                                            image = {card.imageUrl}
+                                                            image={card.imageUrl}
                                                         />
                                                         <CardContent sx={{ flexGrow: 1 }}>
                                                             <Typography variant="h5" component="div">
@@ -225,9 +269,35 @@ function BrowseDailyMenu() {
                                             fullWidth
                                             variant="contained"
                                             sx={{ mt: 3, mb: 2 }}
+                                            disabled={cartItems.length === 0}
+                                            onClick={() => handleCheckout()}
                                         >
                                             Check Out
                                         </Button>
+                                        <Snackbar
+                                            open={open}
+                                            autoHideDuration={6000}
+                                            onClose={handleClose}
+                                        >
+                                            <Alert onClose={handleClose} severity="info" sx={{ width: '100%' }}>
+                                                Total Calories for this meal: {totalCalories}!
+                                            </Alert>
+                                        </Snackbar>
+                                        <Rating
+                                            openModel={modalOpen}
+                                            handleClose={handleCloseModal}
+                                            cartItems={cartItems}
+                                            handleRatingComplete={handleRatingComplete}
+                                        />
+                                        <Snackbar
+                                            open={ratingMessage}
+                                            autoHideDuration={6000}
+                                            onClose={handleMessage}
+                                        >
+                                            <Alert onClose={handleMessage} severity="success" sx={{ width: '100%' }}>
+                                                Thank you for Rating!
+                                            </Alert>
+                                        </Snackbar>
                                     </Paper>
                                 </Grid>
                             </Grid>

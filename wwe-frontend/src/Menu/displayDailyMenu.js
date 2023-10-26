@@ -44,21 +44,6 @@ const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 function DisplayDailyMenu() {
-    const [cartItems, setCartItems] = React.useState([]);
-    const [totalCalories, setTotalCalories] = React.useState(0);
-
-    const handleAddToCart = (foodItem) => {
-        // Add the selected food item to the cart
-        setCartItems([...cartItems, foodItem]);
-        // Update the total calories
-        setTotalCalories(totalCalories + foodItem.calories);
-    };
-    const dashboard = () => {
-        window.open("/displayCommonUserDashboard", "_self");
-    };
-    const shop = () => {
-        window.open("/mealShoppingCart", "_self");
-    };
     const item = () => {
         window.open("/displayMenuItem", "_self");
     };
@@ -106,7 +91,7 @@ function DisplayDailyMenu() {
                                                                             // 16:9
                                                                             pt: '56.25%',
                                                                         }}
-                                                                        image="https://source.unsplash.com/random?food"
+                                                                        image={`https://source.unsplash.com/random?food&${card}`}
                                                                     />
                                                                     <CardContent sx={{ flexGrow: 1 }}>
                                                                         <Typography gutterBottom variant="h5" component="h2">
@@ -119,12 +104,6 @@ function DisplayDailyMenu() {
                                                                     <CardActions>
                                                                         <Button size="small" onClick={item}>View Details</Button>
                                                                         <Button size="small">Edit</Button>
-                                                                        <Button
-                                                                            size="small"
-                                                                            onClick={() => handleAddToCart({ name: 'Food Item Name', calories: 300 })}
-                                                                        >
-                                                                            Add to Cart
-                                                                        </Button>
                                                                     </CardActions>
                                                                 </Card>
                                                             </Grid>

@@ -121,3 +121,9 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);
 
 export default App;
+
+//pipenv shell
+//gearbox serve --reload --debug
+//netstat -ano | findstr "8080"
+//taskkill /PID 5172 /F
+//npm start
