@@ -73,6 +73,7 @@ class Institution(Base):
 
 class DiningHall(Base):
     __tablename__ = 'dining_halls'
+    email = Column(String)
     diningHallID = Column(Integer, primary_key=True)
     institutionID = Column(Integer, ForeignKey('institutions.institutionID'))
     name = Column(String)
@@ -104,6 +105,29 @@ class UserProfile(Base):
     foodAllergies = Column(String)
     dietPlan = Column(String)
 
+class MonthlyReport(Base):
+    __tablename__ = 'monthly_reports'
+    userID = Column(Integer, ForeignKey('user_profiles.userID'), primary_key=True)
+    date = Column(Date, primary_key=True)
+    dietGoal = Column(Float)
+    actualIntake = Column(Float)
+    accompPercent = Column(Float)
+
+class MenuItem(Base):
+    __tablename__ = 'menu_items'
+    dishID = Column(Integer, primary_key=True)
+    name = Column(String)
+    category = Column(String)
+    ingredients = Column(String)
+    allergens = Column(String)
+    dietaryTags = Column(String)
+    calories = Column(Float)
+
+def init_db():
+    Base.metadata.drop_all(engine)
+    Base.metadata.create_all(bind=engine)
+
+init_db()
 
 class AuthController(BaseController):
 
@@ -159,30 +183,6 @@ class AuthController(BaseController):
         flash('Registration successful')
         redirect('/login')
 
-class MonthlyReport(Base):
-    __tablename__ = 'monthly_reports'
-    userID = Column(Integer, ForeignKey('user_profiles.userID'), primary_key=True)
-    date = Column(Date, primary_key=True)
-    dietGoal = Column(Float)
-    actualIntake = Column(Float)
-    accompPercent = Column(Float)
-
-class MenuItem(Base):
-    __tablename__ = 'menu_items'
-    dishID = Column(Integer, primary_key=True)
-    name = Column(String)
-    category = Column(String)
-    ingredients = Column(String)
-    allergens = Column(String)
-    dietaryTags = Column(String)
-    calories = Column(Float)
-
-def init_db():
-    Base.metadata.drop_all(engine)
-    Base.metadata.create_all(bind=engine)
-
-
-init_db()
 
 class RootController(BaseController):
     """
@@ -337,34 +337,7 @@ def register_common(email, password):
 #   Report error if: 1) name already exists 2) the institution doesn't exist --> return msg
 #   If success: add the new dining hall to the table -->return msg
 
-def register_dininghall(name, institution_id, password):
-    name_exist = session.query(DiningHall).filter_by(name=name).first()
-    institution_exist = session.query(Institution).filter_by(institutionID=institution_id).first()
 
-    if name_exist:
-        flash(_('The dining hall name already exists.'), 'error')
-        return {"message": "The dining hall name already exists."}
-
-    elif not institution_exist:
-        flash(_('The institution does not exist. '), 'error')
-        return {"message": "The institution doesn't exist. "}
-            
-    else:
-        # Generate unique dining hall ID:
-        diningHall_id = session.query(DiningHall).count() +1
-        # Hash password
-        hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
-        # Insert rows
-        new_hall = DiningHall(
-            diningHallID = diningHall_id,
-            institutionID = institution_id,
-            name = name,
-            password = hashed_password
-        )
-        session.add(new_hall)
-        session.commit()
-        flash(_('Dining Hall registration success '), 'warning')
-        return {"message": "Dining Hall register success"}
     
 # Register for Institution
 # After registering, generate unique id, and add the new institution to table.
@@ -386,6 +359,42 @@ def register_institution(name):
         session.commit()
         flash(_('Registration sucess.'), 'warning')
         return {"message": "Institution register success"}
+    
+
+def register_dininghall(email, name, institution_id, password):
+    dining_email = session.query(DiningHall).filter_by(email=email).first()
+    name_exist = session.query(DiningHall).filter_by(name=name).first()
+    institution_exist = session.query(Institution).filter_by(institutionID=institution_id).first()
+
+    if dining_email:
+        # flash("This email has already be used by a dining hall account")
+        return {"message": "This email has already be used by a dining hall account."}
+    
+    if name_exist:
+        # flash(_('The dining hall name already exists.'), 'error')
+        return {"message": "The dining hall name already exists."}
+
+    if not institution_exist:
+        # flash(_('The institution does not exist. '), 'error')
+        return {"message": "The institution doesn't exist. "}
+            
+    else:
+        # Generate unique dining hall ID:
+        diningHall_id = session.query(DiningHall).count() +1
+        # Hash password
+        hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
+        # Insert rows
+        new_hall = DiningHall(
+            email = email, 
+            diningHallID = diningHall_id,
+            institutionID = institution_id,
+            name = name,
+            password = hashed_password
+        )
+        session.add(new_hall)
+        session.commit()
+        flash(_('Dining Hall registration success '), 'warning')
+        return {"message": "Dining Hall register success"}
 
 # Tests
 # name = "College C"
@@ -403,7 +412,7 @@ def login(emailID, pwd, role):
     if role == "common":
         user_email = session.query(UserProfile).filter_by(email=emailID).first()
         if not user_email:
-            return {"message":"user_email or password not correct"}
+            return {"message":"user email or password not correct"}
         else:
             password = session.query(UserProfile).filter_by(email=emailID).first().password
             if hashlib.sha256(pwd.encode('utf-8')).hexdigest() == password:
@@ -411,20 +420,17 @@ def login(emailID, pwd, role):
             else:
                 return {"message":"user email or password not correct"}
     if role == "dining":
-        if not emailID.isnumeric():
-            return  {"message":"Dining ID or password not correct"}
-        
-        dining_ID = session.query(DiningHall).filter_by(diningHallID=int(emailID)).first()
-        if not dining_ID:
-            return {"message":"Dining ID or password not correct"}
+        dining_email = session.query(DiningHall).filter_by(email=emailID).first()
+        if not dining_email:
+            # flash("dining hall email or password not correct")
+            return {"message":"dining hall email or password not correct"}
         else:
-            password = session.query(DiningHall).filter_by(diningHallID=int(emailID)).first().password
+            password = session.query(DiningHall).filter_by(email = emailID).first().password
             if hashlib.sha256(pwd.encode('utf-8')).hexdigest() == password:
+                # flash("login success for a dining hall user")
                 return {"message": "login success for a dining hall user"}
             else:
-                flash("Dining ID or password not correct")
+                # flash("Dining ID or password not correct")
                 return {"message":"Dining ID or password not correct"}
 # Tests
-# register_institution("NYU")
-# register_dininghall("Jasper Kane", "1", "135")
-# login("1", "1a", "dining")
+# login("123@nyu.edu", "123", "dining")
