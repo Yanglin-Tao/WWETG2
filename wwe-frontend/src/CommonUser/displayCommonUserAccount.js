@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -47,6 +47,53 @@ function DisplayCommonUserAccount() {
     
     const handlePasswordChange = (e) => {
         setPassword(e.target.value);
+        // update password
+    };
+
+    const [userData, setUserData] = useState({email: '', institution: ''});
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await fetch('http://localhost:8080/get_user_account');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                setUserData(data);
+            } catch (error) {
+                console.error('There was a problem with the fetch operation:', error.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+        // fetchUserData();
+    }, []);
+
+    const updatePassword = async () => {
+        try {
+            const response = await fetch('http://localhost:8080/set_user_password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: userData.email, 
+                    newPassword: password,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const responseData = await response.json();
+            // handle the response data 
+
+        } catch (error) {
+            console.error('There was a problem updating the password:', error.message);
+        }
     };
     
     return (
