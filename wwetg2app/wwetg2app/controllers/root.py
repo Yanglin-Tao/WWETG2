@@ -27,7 +27,7 @@ from sqlalchemy.orm import relationship, sessionmaker
 
 
 # repoze for user authentication 
-from repoze.what.predicates import not_anonymous
+# from repoze.what.predicates import not_anonymous
 
 __all__ = ['RootController']
 
@@ -55,20 +55,6 @@ session = Session()
 #     __tablename__ = 'check_connection'
 #     check1 = Column(Integer, primary_key=True)
 
-class DailyMenu(Base):
-    __tablename__ = 'daily_menus'
-    menuID = Column(Integer, primary_key=True)
-    date = Column(Date)
-    diningHallID = Column(Integer, ForeignKey('dining_halls.diningHallID'))
-    dishesID = Column(Integer) # This might need a relationship if dishes are stored in another table
-
-class DiningHallReport(Base):
-    __tablename__ = 'dining_hall_reports'
-    diningHallID = Column(Integer, primary_key=True)
-    date = Column(Date)
-    dietPreferences = Column(String)
-    top10PriorityFoodAllergies = Column(String)
-    top10HighestRatedDishes = Column(String)
 
 class MealTracking(Base):
     __tablename__ = 'meal_trackings'
@@ -92,6 +78,22 @@ class DiningHall(Base):
     name = Column(String)
     password = Column(String)
 
+class DiningHallReport(Base):
+    __tablename__ = 'dining_hall_reports'
+    diningHallID = Column(Integer, primary_key=True)
+    date = Column(Date)
+    dietPreferences = Column(String)
+    top10PriorityFoodAllergies = Column(String)
+    top10HighestRatedDishes = Column(String)
+
+class DailyMenu(Base):
+    __tablename__ = 'daily_menus'
+    menuID = Column(Integer, primary_key=True)
+    date = Column(Date)
+    diningHallID = Column(Integer, ForeignKey('dining_halls.diningHallID'))
+    dishesID = Column(Integer) # This might need a relationship if dishes are stored in another table
+
+
 class UserProfile(Base):
     __tablename__ = 'user_profiles'
     userID = Column(Integer, primary_key=True)
@@ -102,13 +104,7 @@ class UserProfile(Base):
     foodAllergies = Column(String)
     dietPlan = Column(String)
 
-# Implement password
-    def set_password(self, password):
-        self.password = password
-    def get_password(self):
-        return self.password
-    
-    # password = property(get_password, set_password)
+
 class AuthController(BaseController):
 
     @expose('wwetg2app.templates.login')
@@ -315,23 +311,23 @@ class RootController(BaseController):
 Session = sessionmaker(bind = engine)
 session = Session()
 
-def register_common(email, userID, password):
+def register_common(email, password):
     user_email = session.query(UserProfile).filter_by(email=email).first()
 
     if user_email:
-        flash(email)
+        #flash(email)
         return {"message": "This email has already been registered"}
     else:
         # Insert rows
         user_num = session.query(UserProfile).count()
-        flash(user_num)
+        #flash(user_num)
         hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
         new_common = UserProfile(
             userID = user_num + 1,
             email = email,
             password = hashed_password
         )
-        flash(userID, email, password)
+        # flash(userID, email, password)
         session.add(new_common)
         session.commit()
         return {"message": "Registration success"}
@@ -391,8 +387,6 @@ def register_institution(name):
         flash(_('Registration sucess.'), 'warning')
         return {"message": "Institution register success"}
 
-
-
 # Tests
 # name = "College C"
 # register_institution(name)
@@ -400,3 +394,37 @@ def register_institution(name):
 # institution_id = 3
 # password = "pw"
 # register_dininghall(name, institution_id, password)
+
+
+# Common users login with their emails and passwords.
+# Dining hall users login with their dining hall IDs and passwords.
+# Type: email ID -- string, pwd -- string, role -- string ("common" or "dining")
+def login(emailID, pwd, role):   
+    if role == "common":
+        user_email = session.query(UserProfile).filter_by(email=emailID).first()
+        if not user_email:
+            return {"message":"user_email or password not correct"}
+        else:
+            password = session.query(UserProfile).filter_by(email=emailID).first().password
+            if hashlib.sha256(pwd.encode('utf-8')).hexdigest() == password:
+                return {"message": "login success for a common user"}
+            else:
+                return {"message":"user email or password not correct"}
+    if role == "dining":
+        if not emailID.isnumeric():
+            return  {"message":"Dining ID or password not correct"}
+        
+        dining_ID = session.query(DiningHall).filter_by(diningHallID=int(emailID)).first()
+        if not dining_ID:
+            return {"message":"Dining ID or password not correct"}
+        else:
+            password = session.query(DiningHall).filter_by(diningHallID=int(emailID)).first().password
+            if hashlib.sha256(pwd.encode('utf-8')).hexdigest() == password:
+                return {"message": "login success for a dining hall user"}
+            else:
+                flash("Dining ID or password not correct")
+                return {"message":"Dining ID or password not correct"}
+# Tests
+# register_institution("NYU")
+# register_dininghall("Jasper Kane", "1", "135")
+# login("1", "1a", "dining")
