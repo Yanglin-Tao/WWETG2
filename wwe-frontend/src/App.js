@@ -125,7 +125,9 @@ root.render(<App />);
 export default App;
 
 //pipenv shell
-//gearbox serve --reload --debug
 //netstat -ano | findstr "8080"
 //taskkill /PID 5172 /F
+//cd C:\Users\24560\Senior Design\WWETG2\wwetg2app
+//gearbox serve --reload --debug
+//cd C:\Users\24560\Senior Design\WWETG2\wwe-frontend
 //npm start

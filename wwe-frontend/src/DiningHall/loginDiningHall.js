@@ -1,6 +1,8 @@
 import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -30,17 +32,58 @@ function Copyright(props) {
   );
 }
 
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
 function LoginDiningHall() {
+  const [open, setOpen] = React.useState(false);
+  const [alertMessage, setAlertMessage] = React.useState('');
+  const [alertSeverity, setAlertSeverity] = React.useState('info');
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpen(false);
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+
+    const emailID = data.get('email');
+    const password = data.get('password');
+    const role = 'dining';
+    const apiUrl = `http://127.0.0.1:8080/login`;
+
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ emailID, password, role })
+    };
+
+    fetch(apiUrl, requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        const message = data.message;
+
+        if (message === "login success for a dining hall user") {
+          setAlertSeverity('success');
+          setAlertMessage(message);
+          setOpen(true);
+          window.open('/displayDiningHallDashboard', '_self');
+        } else {
+          setAlertSeverity('error');
+          setAlertMessage(message);
+          setOpen(true);
+        }
+      })
   };
 
   return (
@@ -110,6 +153,15 @@ function LoginDiningHall() {
               >
                 Sign In
               </Button>
+              <Snackbar
+                open={open}
+                autoHideDuration={6000}
+                onClose={handleClose}
+              >
+                <Alert onClose={handleClose} severity={alertSeverity} sx={{ width: '100%' }}>
+                  {alertMessage}
+                </Alert>
+              </Snackbar>
               <Grid container>
                 <Grid item xs>
                   <Link to="/forgetDiningHallPassword" variant="body2">

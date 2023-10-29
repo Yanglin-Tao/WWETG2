@@ -2,6 +2,8 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -31,37 +33,70 @@ function Copyright(props) {
   );
 }
 
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
+
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
 function RegisterCommonUser() {
+  const [open, setOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertSeverity, setAlertSeverity] = useState('info');
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpen(false);
+  };
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
-    console.log("Sending request with payload:", formData);
-    try {
-      const response = await axios.post('/register_user', {
-        email: formData.email,
-        password: formData.password,
-        // You might need to adjust the key names according to your backend API
-      });
-      const message = response.data.message;
-      console.log(response.data);
-      // You can add additional feedback to the user here
-      // For example, if registration is successful, you might redirect them to a login page or show a success message
-    } catch (error) {
-      console.error("Error creating user:", error.response ? error.response.data : error.message);
-      // Handle error and provide feedback to the user
-    }
+    const data = new FormData(event.currentTarget);
+
+    const email = data.get('email');
+    const password = data.get('password');
+    const apiUrl = `http://127.0.0.1:8080/register_common`;
+
+    // Constructing the request options for the POST request
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
+    };
+
+    fetch(apiUrl, requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        const message = data.message;
+
+        if (message === "Registration success") {
+          setAlertSeverity('success');
+          setAlertMessage(message);
+          setOpen(true);
+          window.open('/loginCommonUser', '_self');
+        } else {
+          setAlertSeverity('error');
+          setAlertMessage(message);
+          setOpen(true);
+        }
+
+      })
   };
 
   return (
@@ -109,22 +144,24 @@ function RegisterCommonUser() {
                   onChange={handleChange}
                 />
               </Grid>
-              <Grid item xs={12}>
-                <FormControlLabel
-                  control={<Checkbox value="allowExtraEmails" color="primary" />}
-                  label="I want to receive inspiration, marketing promotions and updates via email."
-                />
-              </Grid>
             </Grid>
             <Button
               type="submit"
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
-              
             >
               Sign Up
             </Button>
+            <Snackbar
+              open={open}
+              autoHideDuration={6000}
+              onClose={handleClose}
+            >
+              <Alert onClose={handleClose} severity={alertSeverity} sx={{ width: '100%' }}>
+                {alertMessage}
+              </Alert>
+            </Snackbar>
             <Grid container justifyContent="flex-end">
               <Grid item>
                 <Link to="/loginCommonUser" variant="body2">

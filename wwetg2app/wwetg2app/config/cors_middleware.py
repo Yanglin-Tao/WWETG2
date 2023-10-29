@@ -16,10 +16,10 @@ class CORSMiddleware:
         if environ.get('REQUEST_METHOD') == 'OPTIONS':
             # Pre-flight request. Reply successfully:
             response = Response()
-            response.headers.add('Access-Control-Allow-Origin', self.origins)
-            response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-            response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-            response.headers.add('Access-Control-Allow-Credentials', 'true')
+            # response.headers.add('Access-Control-Allow-Origin', self.origins)
+            # response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+            # response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+            # response.headers.add('Access-Control-Allow-Credentials', 'true')
             response.status_code = 200
             return response(environ, custom_start_response)
         

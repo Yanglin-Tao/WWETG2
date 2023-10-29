@@ -1,6 +1,8 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -30,17 +32,72 @@ function Copyright(props) {
   );
 }
 
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
 function RegisterDiningHall() {
+  const [open, setOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertSeverity, setAlertSeverity] = useState('info');
+
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    name: '',
+    institutionId: '',
+  });
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpen(false);
+  };
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+
+    const email = data.get('email');
+    const password = data.get('password');
+    const name = data.get('name');
+    const institutionId = data.get('institutionId');
+    const apiUrl = `http://127.0.0.1:8080/register_dininghall`;
+
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password, name, institutionId })
+    };
+
+    fetch(apiUrl, requestOptions)
+      .then(response => response.json())
+      .then(data => {
+        const message = data.message;
+
+        if (message === "Dining Hall register success") {
+          setAlertSeverity('success');
+          setAlertMessage(message);
+          setOpen(true);
+          window.open('/loginDiningHall', '_self');
+        } else {
+          setAlertSeverity('error');
+          setAlertMessage(message);
+          setOpen(true);
+        }
+
+      })
   };
 
   return (
@@ -63,25 +120,15 @@ function RegisterDiningHall() {
           </Typography>
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  autoComplete="given-name"
-                  name="firstName"
-                  required
-                  fullWidth
-                  id="firstName"
-                  label="First Name"
-                  autoFocus
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12}>
                 <TextField
                   required
                   fullWidth
-                  id="lastName"
-                  label="Last Name"
-                  name="lastName"
-                  autoComplete="family-name"
+                  id="name"
+                  label="Dining Hall Name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -92,6 +139,19 @@ function RegisterDiningHall() {
                   label="Email Address"
                   name="email"
                   autoComplete="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  id="institutionId"
+                  label="Institution ID"
+                  name="institutionId"
+                  value={formData.institutionId}
+                  onChange={handleChange}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -103,12 +163,8 @@ function RegisterDiningHall() {
                   type="password"
                   id="password"
                   autoComplete="new-password"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <FormControlLabel
-                  control={<Checkbox value="allowExtraEmails" color="primary" />}
-                  label="I want to receive inspiration, marketing promotions and updates via email."
+                  value={formData.password}
+                  onChange={handleChange}
                 />
               </Grid>
             </Grid>
@@ -120,6 +176,15 @@ function RegisterDiningHall() {
             >
               Sign Up
             </Button>
+            <Snackbar
+              open={open}
+              autoHideDuration={6000}
+              onClose={handleClose}
+            >
+              <Alert onClose={handleClose} severity={alertSeverity} sx={{ width: '100%' }}>
+                {alertMessage}
+              </Alert>
+            </Snackbar>
             <Grid container justifyContent="flex-end">
               <Grid item>
                 <Link to="/loginDiningHall" variant="body2">

@@ -2,8 +2,10 @@
 """Main Controller"""
 
 import hashlib
+import tg
+from webob.exc import WSGIHTTPException
 from tg import expose, flash, require, url, lurl
-from tg import request, redirect, tmpl_context
+from tg import request, redirect, tmpl_context, response
 from tg.i18n import ugettext as _, lazy_ugettext as l_
 from tg.exceptions import HTTPFound
 from tg import predicates
@@ -205,7 +207,6 @@ class RootController(BaseController):
 
     def _before(self, *args, **kw):
         tmpl_context.project_name = "wwetg2app"
-
    
     @expose('wwetg2app.templates.index')
     def index(self):
@@ -284,29 +285,131 @@ class RootController(BaseController):
         """
         flash(_('We hope to see you soon!'))
         return HTTPFound(location=came_from)
-        
     
-    @expose()
-    def register_common(self,email, userID, password):
+    @expose('json')
+    def register_dininghall(self):  
+        data = request.json_body
+        email = data.get('email')
+        name = data.get('name') 
+        institution_id = int(data.get('institutionId'))
+        password = data.get('password') 
+        dining_email = session.query(DiningHall).filter_by(email=email).first()
+        name_exist = session.query(DiningHall).filter_by(name=name).first()
+        institution_exist = session.query(Institution).filter_by(institutionID=institution_id).first()
+
+        if dining_email:
+            # flash("This email has already be used by a dining hall account")
+            return {"message": "This email has already be used by a dining hall account."}
+        
+        if name_exist:
+            # flash(_('The dining hall name already exists.'), 'error')
+            return {"message": "The dining hall name already exists."}
+
+        if not institution_exist:
+            # flash(_('The institution does not exist. '), 'error')
+            return {"message": "The institution doesn't exist. "}
+                
+        else:
+            # Generate unique dining hall ID:
+            diningHall_id = session.query(DiningHall).count() +1
+            # Hash password
+            hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
+            # Insert rows
+            new_hall = DiningHall(
+                email = email, 
+                diningHallID = diningHall_id,
+                institutionID = institution_id,
+                name = name,
+                password = hashed_password
+            )
+            session.add(new_hall)
+            session.commit()
+            flash(_('Dining Hall registration success '), 'warning')
+            return {"message": "Dining Hall register success"}
+
+    @expose('json')
+    def login(self):  
+        data = request.json_body
+        emailID = data.get('emailID')
+        pwd = data.get('password') 
+        role = data.get('role')
+        if role == "common":
+            user_email = session.query(UserProfile).filter_by(email=emailID).first()
+            if not user_email:
+                return {"message":"user email or password not correct"}
+            else:
+                password = session.query(UserProfile).filter_by(email=emailID).first().password
+                if hashlib.sha256(pwd.encode('utf-8')).hexdigest() == password:
+                    return {"message": "login success for a common user"}
+                else:
+                    return {"message":"user email or password not correct"}
+        if role == "dining":
+            dining_email = session.query(DiningHall).filter_by(email=emailID).first()
+            if not dining_email:
+                # flash("dining hall email or password not correct")
+                return {"message":"dining hall email or password not correct"}
+            else:
+                password = session.query(DiningHall).filter_by(email = emailID).first().password
+                if hashlib.sha256(pwd.encode('utf-8')).hexdigest() == password:
+                    # flash("login success for a dining hall user")
+                    return {"message": "login success for a dining hall user"}
+                else:
+                    # flash("Dining ID or password not correct")
+                    return {"message":"Dining ID or password not correct"}
+
+    @expose('json')
+    def register_common(self):
+
+        data = request.json_body
+        email = data.get('email')
+        password = data.get('password')
         user_email = session.query(UserProfile).filter_by(email=email).first()
 
         if user_email:
             flash(email)
             return {"message": "This email has already been registered"}
         else:
-            # Insert rows
-            user_num = session.query(UserProfile).count()
-            flash(user_num)
-            hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
-            new_common = UserProfile(
-                userID = user_num + 1,
-                email = email,
-                password = hashed_password
-            )
-            flash(userID, email, password)
-            session.add(new_common)
-            session.commit()
-            return {"message": "Registration success"}
+            try:    
+                # Insert rows
+                user_num = session.query(UserProfile).count()
+                flash(user_num)
+                hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
+                new_common = UserProfile(
+                    userID = user_num + 1,
+                    email = email,
+                    password = hashed_password
+                )
+                session.add(new_common)
+                session.commit()
+                return {"message": "Registration success"}
+            except Exception as e:
+                    session.rollback()
+                    return {"message": f"Error: {str(e)}"}
+        
+    @expose('json')
+    def register_institution(self):
+        data = request.json_body
+        name = data.get('name')
+        institution_exist = session.query(Institution).filter_by(name=name).first()
+        if institution_exist:
+            flash(_('The institution name already exists.'), 'error')
+            return {"message": "The institution name already exists."}
+        else:
+            try:
+                # Generate unique institution ID:
+                institution_id = session.query(Institution).count() +1
+                # Insert rows
+                new_insti = Institution(
+                    institutionID = institution_id,
+                    name = name,
+                )
+                session.add(new_insti)
+                session.commit()
+                flash(_('Registration sucess.'), 'warning')
+                return {"message": "Institution register success", "institutionID": institution_id}
+            except Exception as e:
+                session.rollback()
+                return {"message": f"Error: {str(e)}"}
         
 Session = sessionmaker(bind = engine)
 session = Session()
