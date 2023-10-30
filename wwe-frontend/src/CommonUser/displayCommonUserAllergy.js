@@ -1,29 +1,14 @@
 import * as React from 'react';
-import { useState } from 'react';
-import Avatar from '@mui/material/Avatar';
-import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
-import MuiDrawer from '@mui/material/Drawer';
-import MuiAppBar from '@mui/material/AppBar';
+import { useState, useEffect } from 'react';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import Badge from '@mui/material/Badge';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Link from '@mui/material/Link';
-import MenuIcon from '@mui/icons-material/Menu';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import AccountCircle from '@mui/icons-material/AccountCircle';
-import MenuItem from '@mui/material/MenuItem';
-import Menu from '@mui/material/Menu';
-import PersonIcon from '@mui/icons-material/Person';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import { mainListItems, secondaryListItems } from './navigateCommonUserDashboard';
 import Title from './Title';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
@@ -104,6 +89,52 @@ function DisplayCommonUserAllergy() {
 
   const toggleEdit = () => {
     setIsEditable(!isEditable);
+  };
+
+  const [userData, setUserData] = useState({userId: '', foodAllergies: ''});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+      const fetchUserData = async () => {
+          try {
+              const response = await fetch('http://localhost:8080/get_common_user_allergy');
+              if (!response.ok) {
+                  throw new Error('Network response was not ok');
+              }
+              const data = await response.json();
+              setUserData(data);
+          } catch (error) {
+              console.error('There was a problem with the fetch operation:', error.message);
+          } finally {
+              setLoading(false);
+          }
+      };
+      // fetchUserData();
+  }, []);
+
+  const updateCommonUserAllergy = async () => {
+      try {
+          const response = await fetch('http://localhost:8080/update_common_user_allergy', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                  userId: userData.userId, 
+                  newFoodAllergies: newAllergy,
+              }),
+          });
+
+          if (!response.ok) {
+              throw new Error('Network response was not ok');
+          }
+
+          const responseData = await response.json();
+          // handle the response data 
+
+      } catch (error) {
+          console.error('There was a problem updating common user allergy:', error.message);
+      }
   };
 
   return (
