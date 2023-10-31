@@ -96,6 +96,15 @@ class DailyMenu(Base):
     diningHallID = Column(Integer, ForeignKey('dining_halls.diningHallID'))
     dishesID = Column(Integer) # This might need a relationship if dishes are stored in another table
 
+class Allergy(Base):
+    __tablename__ = 'allergy'
+    allergyID = Column(Integer, primary_key=True)
+    name = Column(String)
+
+class FoodPreferences(Base):
+    __tablename__ = 'food_preference'
+    preferenceID = Column(Integer, primary_key=True)
+    name = Column(String)
 
 class UserProfile(Base):
     __tablename__ = 'user_profiles'
@@ -103,8 +112,8 @@ class UserProfile(Base):
     email = Column(String)
     password = Column(String)
     institutionID = Column(Integer, ForeignKey('institutions.institutionID'))
-    foodPreferences = Column(String)
-    foodAllergies = Column(String)
+    foodPreference = Column(Integer, ForeignKey('food_preference.preferenceID'))
+    foodAllergy = Column(Integer, ForeignKey('allergy.allergyID'))
     dietPlan = Column(String)
 
 class MonthlyReport(Base):
@@ -128,6 +137,16 @@ class MenuItem(Base):
 def init_db():
     Base.metadata.drop_all(engine)
     Base.metadata.create_all(bind=engine)
+    # Add food preferences
+    food_preferences = ['Halal', 'Vegetarian', 'Gluten Free', 'Balanced', 'Vegan', 'Pescatarian']
+    for i in range(len(food_preferences)):
+        new_preference = FoodPreferences(
+        preferenceID = i + 1, 
+        name = food_preferences[i]
+        )
+        session.add(new_preference)
+        session.commit()
+
 
 init_db()
 
@@ -410,7 +429,7 @@ class RootController(BaseController):
             except Exception as e:
                 session.rollback()
                 return {"message": f"Error: {str(e)}"}
-        
+            
 Session = sessionmaker(bind = engine)
 session = Session()
 
