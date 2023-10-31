@@ -51,18 +51,18 @@ import DisplayCommonUserAccount from "./CommonUser/displayCommonUserAccount";
 import DisplayCommonUserPrivacySettings from "./CommonUser/displayCommonUserPrivacySettings";
 
 function App() {
-    const [data, setData] = useState(null);
+    // const [data, setData] = useState(null);
 
-    useEffect(() => {
-        axios.get('http://localhost:8000/')
-            .then(response => {
-                setData(response.data);
-            })
-            .catch(error => {
-                console.error("Error fetching data: ", error);
-                setData(null);
-            });
-    }, []);
+    // useEffect(() => {
+    //     axios.get('http://localhost:8000/')
+    //         .then(response => {
+    //             setData(response.data);
+    //         })
+    //         .catch(error => {
+    //             console.error("Error fetching data: ", error);
+    //             setData(null);
+    //         });
+    // }, []);
 
 // THESE LINES ARE USED TO TEST THE DATABASE CONNECTION ONLY
 //   const [message, setMessage] = useState("");
