@@ -38,6 +38,7 @@ from sqlalchemy.orm import relationship, sessionmaker
 __all__ = ['RootController']
 
 SECRET_KEY = 'WhatWeEat'
+FOOD_PREF = ('Halal', 'Vegetarian', 'Gluten Free', 'Balanced', 'Vegan', 'Pescatarian')
 
 # For psycopg2
 # conn = psycopg2.connect(database="whatweeatapp",
@@ -384,6 +385,151 @@ class RootController(BaseController):
                     return {"message": "login success for a dining hall user", "token": token}
                 else:
                     return {"message":"Dining ID or password not correct"}
+    
+    @expose('json')
+    # dining hall adds a new item to an existing daily menu
+    def addMenuItem(self):
+        data = request.json_body
+        menuID = data.get("menuID")
+        name = data.get("name")
+        catogory = data.get("catagoty")
+        ingredients = data.get("ingredients")
+        allergens = data.get("allergens")
+        calories = data.get("calories")
+        dietaryTags = data.get("diataryTags")
+        # check if the menu exists
+        menuExit = session.query(DailyMenu).filter_by(menuID = menuID).first()
+        if not menuExit:
+            return {"message":"Menu doesn't exist."}
+        # the list of new MenuItem
+        item = MenuItem(
+            dishID = session.query(MenuItem).count() + 1,
+            name = name,
+            catogory = catogory,
+            ingredients = ingredients,
+            allergens = allergens,
+            dietaryTags = dietaryTags,
+            calories = calories,
+        )
+        # add new MenuItems to the existing DailyMenu
+        oldMenu = session.query(DailyMenu).filter_by(menuID = menuID).first()
+        oldMenu.dishesID.append(dishList) #### ??
+        return {"message":"finish uploading"}, dishList
+#---------PREFERENCE & ALLERGY--------------
+    # return a list of string of user's preference
+    def getUserPreference(self):
+        data = request.json_body
+        userID = data.get('userID')
+        if userID:
+            # userID
+            user = session.query(UserProfile).filter_by(userID = userID).first()
+            preferenceID = user.foodPreference.preferenceID
+            preferenceEntries = session.query(FoodPreferences).filter(FoodPreferences.preferenceID == preferenceID).all()
+            # Extracting the names
+            nameList = [str(p[0]) for p in preferenceEntries]
+            return nameList, {"message": "User preferences returned"}
+        else:
+            return {"message": "User doesn't exist"}
+
+    # upadate everything in the preference about that user
+    # Assume userPref has correct number of tags and all tags are in the FOOD_PREF
+    def updateUserPreference(self):
+        data = request.json_body
+        userID = data.get("userID")
+        userPref = data.get("userID") # a list of strings
+
+        if userID:
+            user = session.query(UserProfile).filter_by(userID = userID).first()
+            preferenceID = user.foodPreference.preferenceID
+            preferenceEntries = session.query(FoodPreferences).filter(FoodPreferences.preferenceID == preferenceID).all()
+            # delete the old entries
+            for preference in preferenceEntries:
+                session.delete(preference)
+            # add the new entries 
+            if len(userPref) > len(FOOD_PREF):
+                return {"message": "Too many tags"}
+            for p in range(len(userPref)):
+                newPref = FoodPreferences(
+                    name = userPref[p],
+                    preferenceID = preferenceID
+                )
+            session.commit()
+            return {"message":"Update sucessful"}
+        else:
+            return {"message":"User doesn't exist"}
+            
+                
+
+
+
+
+
+
+#---------UPLOAD MENU & MENUITEM------------
+    @expose('json')
+    # dining hall update an existing menu item on an existing menu
+    def updateMenuItem(self):
+        data = request.json_body
+        menuID = data.get("menuID")
+        dishID = data.get("dishID")
+        # check if the menu exists
+        menuExit = session.query(DailyMenu).filter_by(menuID = menuID).first()
+        if not menuExit:
+            return {"message":"Menu doesn't exist."}
+        # check if the menu item exists
+        itemExit = session.query(MenuItem).filter_by(dishID = dishID).first()
+        if not menuExit:
+            return {"message":"Menu doesn't exist."}
+    
+    # delete a menu item
+    @expose('json')
+    def deleteMenuItem(self, dishID):
+        # check existence
+        item = session.query(MenuItem).filter_by(dishID = dishID).first()
+        # delete item
+        if item:
+            session.delete(item)
+            session.commit()
+        else:
+            return {"message":"Item not found or already deleted"}
+    
+    # delete a menu, and its items
+    @expose('json')
+    def deleteMenu(self):
+        menuID = data.get("menuID")
+        menu = session.query(DailyMenu).filter_by(menuID = menuID).first()
+        if menu:
+            # delete all dish itmes having the same menuID
+            subquery = session.query(MenuItem.menuID).group_by(MenuItem.menuID).having(func.count(MenuItem.menuID) >= 1).subquery()
+            allItems = session.query(MenuItem.menuID).filter(MenuItem.menuID.in_(subquery))
+            allID = [id[0] for id in allItems]
+            for i in allID:
+                deleteMenuItem(i)
+            # delete the menu
+            session.delete(menu)
+            session.commit()
+            return {"message":"Menu deleted."}
+        else:
+            return {"message":"Menu doesn't exist."}
+        
+    # dining hall create a new daliy menu
+    def createDaliyMenu(self):
+        data = request.json_body
+        menuID = data.get("menuID")
+        date = data.get("date")
+        diningHallID = data.get("diningHallID")
+        # create a DaliyMenu object, and add the MenuItems to it
+        menu = DailyMenu(
+            menuID = menuID,
+            date = date,
+            diningHallID = diningHallID,
+            dishesID = None #??????
+        )
+         # create a list of MenuItems
+        dishList = self.uploadDiningHallMenu(menu.menuID)[1] #????
+        return {"message": "Menu created"}
+
+
 
     @expose('json')
     def register_common(self):
@@ -406,6 +552,7 @@ class RootController(BaseController):
                     userID = user_num + 1,
                     email = email,
                     password = hashed_password
+                    # add preference and allergy ID ???
                 )
                 session.add(new_common)
                 session.commit()
@@ -472,6 +619,8 @@ class RootController(BaseController):
             return {"status": "error", "message": "Token has expired."}
         except DecodeError:
             return {"status": "error", "message": "Token is invalid."}
+
+
 
 Session = sessionmaker(bind = engine)
 session = Session()
