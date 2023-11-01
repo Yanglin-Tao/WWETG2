@@ -592,7 +592,6 @@ class RootController(BaseController):
         token = request.headers.get('Authorization')
         if not token:
             return {"status": "error", "message": "Token is missing."}
-
         try:
             decoded_token = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
             
@@ -612,9 +611,9 @@ class RootController(BaseController):
 
             # Compare last_login with current time
             if datetime.now() > expiration:
-                return {"status": "error", "message": "Login expired."}
+                return {"status": "error", "message": "Login expired.", "role": role}
 
-            return {"status": "success", "message": "User is logged in."}
+            return {"status": "success", "message": "User is logged in.", "role": role}
 
         except ExpiredSignatureError:
             return {"status": "error", "message": "Token has expired."}

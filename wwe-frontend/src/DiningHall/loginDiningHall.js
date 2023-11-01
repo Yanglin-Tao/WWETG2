@@ -14,6 +14,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 /* TODO: This component should provide a form to allow dining hall administrator login with email address 
   and password.
@@ -72,7 +73,8 @@ function LoginDiningHall() {
       .then(response => response.json())
       .then(data => {
         const message = data.message;
-
+        Cookies.remove('token');
+        Cookies.set('token', data.token);
         if (message === "login success for a dining hall user") {
           setAlertSeverity('success');
           setAlertMessage(message);
@@ -118,7 +120,7 @@ function LoginDiningHall() {
               <LockOutlinedIcon />
             </Avatar>
             <Typography component="h1" variant="h5">
-              Sign in
+              Dining Hall Admin Sign in
             </Typography>
             <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
               <TextField
