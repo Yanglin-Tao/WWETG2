@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
@@ -14,6 +14,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 /* TODO: This component should provide a form to allow common user login with email address and password.
 */
@@ -65,14 +66,14 @@ function LoginCommonUser() {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ emailID, password, role})
+            body: JSON.stringify({ emailID, password, role })
         };
 
         fetch(apiUrl, requestOptions)
             .then(response => response.json())
             .then(data => {
                 const message = data.message;
-
+                Cookies.set('token', data.token);
                 if (message === "login success for a common user") {
                     setAlertSeverity('success');
                     setAlertMessage(message);
@@ -163,11 +164,6 @@ function LoginCommonUser() {
                                 </Alert>
                             </Snackbar>
                             <Grid container>
-                                <Grid item xs>
-                                    <Link to="/forgetCommonUserPassword" variant="body2">
-                                        Forgot password?
-                                    </Link>
-                                </Grid>
                                 <Grid item>
                                     <Link to="/registerCommonUser" variant="body2">
                                         {"Don't have an account? Sign Up"}

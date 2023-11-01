@@ -14,6 +14,10 @@ from wwetg2app.controllers.secure import SecureController
 from wwetg2app.model import DBSession
 from tgext.admin.tgadminconfig import BootstrapTGAdminConfig as TGAdminConfig
 from tgext.admin.controller import AdminController
+from datetime import datetime, timedelta
+from pytz import utc
+import jwt
+from jwt.exceptions import ExpiredSignatureError, DecodeError
 
 from wwetg2app.lib.base import BaseController
 from wwetg2app.controllers.error import ErrorController
@@ -23,7 +27,7 @@ import json
 
 from sqlalchemy import create_engine
 
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Date, Float
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Date, Float, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 
@@ -32,6 +36,8 @@ from sqlalchemy.orm import relationship, sessionmaker
 # from repoze.what.predicates import not_anonymous
 
 __all__ = ['RootController']
+
+SECRET_KEY = 'WhatWeEat'
 
 # For psycopg2
 # conn = psycopg2.connect(database="whatweeatapp",
@@ -352,28 +358,31 @@ class RootController(BaseController):
         emailID = data.get('emailID')
         pwd = data.get('password') 
         role = data.get('role')
+        
         if role == "common":
             user_email = session.query(UserProfile).filter_by(email=emailID).first()
             if not user_email:
                 return {"message":"user email or password not correct"}
             else:
-                password = session.query(UserProfile).filter_by(email=emailID).first().password
+                password = user_email.password
+                session.commit()
+                token = jwt.encode({'user_id': user_email.userID, 'role': role, 'exp': datetime.now(utc) + timedelta(minutes=1)}, SECRET_KEY, algorithm="HS256")
                 if hashlib.sha256(pwd.encode('utf-8')).hexdigest() == password:
-                    return {"message": "login success for a common user"}
+                    return {"message": "login success for a common user", "token": token}
                 else:
                     return {"message":"user email or password not correct"}
+                    
         if role == "dining":
             dining_email = session.query(DiningHall).filter_by(email=emailID).first()
             if not dining_email:
-                # flash("dining hall email or password not correct")
                 return {"message":"dining hall email or password not correct"}
             else:
-                password = session.query(DiningHall).filter_by(email = emailID).first().password
+                password = dining_email.password
+                session.commit()
+                token = jwt.encode({'user_id': dining_email.diningHallID, 'role': role, 'exp': datetime.now(utc) + timedelta(minutes=30)}, SECRET_KEY, algorithm="HS256")
                 if hashlib.sha256(pwd.encode('utf-8')).hexdigest() == password:
-                    # flash("login success for a dining hall user")
-                    return {"message": "login success for a dining hall user"}
+                    return {"message": "login success for a dining hall user", "token": token}
                 else:
-                    # flash("Dining ID or password not correct")
                     return {"message":"Dining ID or password not correct"}
 
     @expose('json')
@@ -430,6 +439,41 @@ class RootController(BaseController):
                 session.rollback()
                 return {"message": f"Error: {str(e)}"}
             
+
+    @expose('json')
+    def login_status(self):
+        token = request.headers.get('Authorization')
+        if not token:
+            return {"status": "error", "message": "Token is missing."}
+
+        try:
+            decoded_token = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+            
+            # Get the role and ID from the token
+            role = decoded_token['role']
+            user_id = decoded_token['user_id']
+            expiration = datetime.utcfromtimestamp(decoded_token['exp'])
+
+            # Get the last login time based on role and user_id
+            if role == "common":
+                user = session.query(UserProfile).filter_by(userID=user_id).first()
+            elif role == "dining":
+                user = session.query(DiningHall).filter_by(diningHallID=user_id).first()
+
+            if not user:
+                return {"status": "error", "message": "Invalid user."}
+
+            # Compare last_login with current time
+            if datetime.now() > expiration:
+                return {"status": "error", "message": "Login expired."}
+
+            return {"status": "success", "message": "User is logged in."}
+
+        except ExpiredSignatureError:
+            return {"status": "error", "message": "Token has expired."}
+        except DecodeError:
+            return {"status": "error", "message": "Token is invalid."}
+
 Session = sessionmaker(bind = engine)
 session = Session()
 
@@ -554,5 +598,11 @@ def login(emailID, pwd, role):
             else:
                 # flash("Dining ID or password not correct")
                 return {"message":"Dining ID or password not correct"}
+            
+# @expose('json')
+# def register_user(self, email, userID, password):
+#     response = register_common(email, userID, password)
+#     return response
+
 # Tests
 # login("123@nyu.edu", "123", "dining")

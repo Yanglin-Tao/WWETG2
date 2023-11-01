@@ -163,11 +163,6 @@ function LoginDiningHall() {
                 </Alert>
               </Snackbar>
               <Grid container>
-                <Grid item xs>
-                  <Link to="/forgetDiningHallPassword" variant="body2">
-                    Forgot password?
-                  </Link>
-                </Grid>
                 <Grid item>
                   <Link to="/registerDiningHall" variant="body2">
                     {"Don't have an account? Sign Up"}
