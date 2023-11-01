@@ -26,6 +26,7 @@ import Cookies from 'js-cookie';
 
 function App() {
     const [isAuth, setIsAuthenticated] = useState(false);
+    const [role, setRole] = useState('');
 
     useEffect(() => {
         const fetchLoginStatus = async () => {
@@ -45,8 +46,11 @@ function App() {
                 // Check the returned data to decide if authenticated or not.
                 // For example:
                 if (data.status === "success") {
+                    setRole(data.role);
                     setIsAuthenticated(true);
                 } else {
+                    Cookies.remove('token');
+                    console.log("role: ", role);
                     setIsAuthenticated(false);
                 }
             } catch (error) {
@@ -59,25 +63,34 @@ function App() {
     }, []);
 
     const renderPrivateRoute = (Component) => {
-        return isAuth ? <Component /> : <Navigate to="/" />;
+        if (role === "common") {
+            return isAuth ? <Component /> : <Navigate to="/loginCommonUser" />;
+        } else if (role === "dining") {
+            return isAuth ? <Component /> : <Navigate to="/loginDiningHall" />;
+        }
+        return <Navigate to="/" />
     };
 
-    const renderLoginPage = (Component) => {
-        return isAuth ? <Navigate to="/displayCommonUserDashboard" /> : <Component />;
+    const renderLoginPageoginPage = (Component) => {
+        if (role === "common") {
+            return isAuth ? <Navigate to="/displayCommonUserDashboard" /> : <Component />;
+        } else if (role === "dining") {
+            return isAuth ? <Navigate to="/displayDiningHallDashboard" /> : <Component />;
+        }
+        return <Component />
     };
-
 
     return (
         <>
             <BrowserRouter>
                 <Routes>
                     {/* Main route */}
-                    <Route path="/" element={renderLoginPage(LoginUser)} />
+                    <Route path="/" element={renderLoginPageoginPage(LoginUser)} />
                     {/* Institution route */}
                     <Route path="/registerInstitution" element={<RegisterInstitution />} />
                     {/* Common User route */}
-                    <Route path="/loginCommonUser" element={renderLoginPage(LoginCommonUser)} />
-                    <Route path="/registerCommonUser" element={renderLoginPage(RegisterCommonUser)} />
+                    <Route path="/loginCommonUser" element={renderLoginPageoginPage(LoginCommonUser)} />
+                    <Route path="/registerCommonUser" element={renderLoginPageoginPage(RegisterCommonUser)} />
                     <Route path="/displayCommonUserDashboard" element={renderPrivateRoute(DisplayCommonUserDashboard)} />
                     <Route path="/browseDailyMenu" element={renderPrivateRoute(BrowseDailyMenu)} />
                     <Route path="/displayCommonUserFoodPreference" element={renderPrivateRoute(DisplayCommonUserFoodPreference)} />
@@ -87,14 +100,14 @@ function App() {
                     <Route path="/displayCommonUserPrivacySettings" element={renderPrivateRoute(DisplayCommonUserPrivacySettings)} />
                     <Route path="/mealShoppingCart" element={renderPrivateRoute(MealShoppingCart)} />
                     {/* Dining Hall route */}
-                    <Route path="/loginDiningHall" element={<LoginDiningHall />} />
-                    <Route path="/registerDiningHall" element={<RegisterDiningHall />} />
-                    <Route path="/displayDiningHallDashboard" element={<DisplayDiningHallDashboard />} />
-                    <Route path="/displayDiningHallAccount" element={<DisplayDiningHallAccount />} />
+                    <Route path="/loginDiningHall" element={renderLoginPageoginPage(LoginDiningHall)} />
+                    <Route path="/registerDiningHall" element={renderLoginPageoginPage(RegisterDiningHall)} />
+                    <Route path="/displayDiningHallDashboard" element={renderPrivateRoute(DisplayDiningHallDashboard)} />
+                    <Route path="/displayDiningHallAccount" element={renderPrivateRoute(DisplayDiningHallAccount)} />
                     {/* Menu route */}
-                    <Route path="/displayDailyMenu" element={<DisplayDailyMenu />} />
-                    <Route path="/displayMenuItem" element={<DisplayMenuItem />} />
-                    <Route path="/createDailyMenu" element={<CreateDailyMenu />} />
+                    <Route path="/displayDailyMenu" element={renderPrivateRoute(DisplayDailyMenu)} />
+                    <Route path="/displayMenuItem" element={renderPrivateRoute(DisplayMenuItem)} />
+                    <Route path="/createDailyMenu" element={renderPrivateRoute(CreateDailyMenu)} />
                 </Routes>
             </BrowserRouter>
         </>

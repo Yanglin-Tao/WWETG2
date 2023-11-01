@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import Cookies from 'js-cookie';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import { styled } from '@mui/material/styles';
 import List from '@mui/material/List';
@@ -76,6 +76,11 @@ const DashboardLayout = ({title}) => {
     const handleClose = () => {
         setAnchorEl(null);
     };
+
+    const handleLogout = () => {
+        Cookies.remove('token');
+        window.open("/", "_self");
+    };
     return (
         <div style={{ display: 'flex' }}>
             <AppBar position="absolute" open={open}>
@@ -134,6 +139,7 @@ const DashboardLayout = ({title}) => {
                             >
                                 <MenuItem onClick={handleClose}>Profile</MenuItem>
                                 <MenuItem onClick={handleClose}>My account</MenuItem>
+                                <MenuItem onClick={handleLogout}>Log Out</MenuItem>
                             </Menu>
                         </div>
                     )}

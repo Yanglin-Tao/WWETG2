@@ -73,6 +73,7 @@ function LoginCommonUser() {
             .then(response => response.json())
             .then(data => {
                 const message = data.message;
+                Cookies.remove('token');
                 Cookies.set('token', data.token);
                 if (message === "login success for a common user") {
                     setAlertSeverity('success');
@@ -119,7 +120,7 @@ function LoginCommonUser() {
                             <LockOutlinedIcon />
                         </Avatar>
                         <Typography component="h1" variant="h5">
-                            Sign in
+                            Common User Sign in
                         </Typography>
                         <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
                             <TextField

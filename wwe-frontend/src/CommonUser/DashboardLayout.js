@@ -13,6 +13,7 @@ import Divider from '@mui/material/Divider';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import Cookies from 'js-cookie';
 import { mainListItems, secondaryListItems } from './navigateCommonUserDashboard'; // adjust the import path as needed
 
 const drawerWidth = 240;
@@ -79,6 +80,11 @@ const DashboardLayout = ({title}) => {
     const handleClose = () => {
         setAnchorEl(null);
     };
+
+    const handleLogout = () => {
+        Cookies.remove('token');
+        window.open("/", "_self");
+    };
     return (
         <div style={{ display: 'flex' }}>
             <AppBar position="absolute" open={open}>
@@ -143,6 +149,7 @@ const DashboardLayout = ({title}) => {
                             >
                                 <MenuItem onClick={handleClose}>Profile</MenuItem>
                                 <MenuItem onClick={handleClose}>My account</MenuItem>
+                                <MenuItem onClick={handleLogout}>Log Out</MenuItem>
                             </Menu>
                         </div>
                     )}
