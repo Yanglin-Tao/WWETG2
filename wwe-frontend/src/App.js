@@ -1,33 +1,6 @@
-// import logo from './logo.svg';
-// import './App.css';
-// import React, { useEffect, useState } from 'react';
-
-// function App() {
-//   const [message, setMessage] = useState("");
-
-//   useEffect(() => {
-//     // Fetch data from TG2 backend
-//     fetch("http://localhost:8080/helloworld")
-//       .then(response => response.json())
-//       .then(data => setMessage(data.message));
-//   }, []);
-
-//   return (
-//     <div className="App">
-//       <header className="App-header">
-//         {message}
-//       </header>
-//     </div>
-//   );
-// }
-
-// export default App;
-// import logo from './logo.svg';
-// import './App.css';
 import ReactDOM from "react-dom/client";
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginUser from "./Main/loginUser";
 import RegisterCommonUser from "./CommonUser/registerCommonUser";
 import LoginCommonUser from "./CommonUser/loginCommonUser";
@@ -49,38 +22,49 @@ import CreateDailyMenu from "./Menu/createDailyMenu";
 import DisplayDiningHallAccount from "./DiningHall/displayDininghallAccount";
 import DisplayCommonUserAccount from "./CommonUser/displayCommonUserAccount";
 import DisplayCommonUserPrivacySettings from "./CommonUser/displayCommonUserPrivacySettings";
+import Cookies from 'js-cookie';
 
 function App() {
-    // const [data, setData] = useState(null);
+    const [isAuth, setIsAuthenticated] = useState(false);
 
-    // useEffect(() => {
-    //     axios.get('http://localhost:8000/')
-    //         .then(response => {
-    //             setData(response.data);
-    //         })
-    //         .catch(error => {
-    //             console.error("Error fetching data: ", error);
-    //             setData(null);
-    //         });
-    // }, []);
+    useEffect(() => {
+        const fetchLoginStatus = async () => {
+            try {
+                const token = Cookies.get('token');
+                const apiUrl = `http://127.0.0.1:8080/login_status`;
+                const requestOptions = {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': token,
+                        'Content-Type': 'application/json'
+                    }
+                };
+                const response = await fetch(apiUrl, requestOptions);
+                const data = await response.json();
 
-// THESE LINES ARE USED TO TEST THE DATABASE CONNECTION ONLY
-//   const [message, setMessage] = useState("");
+                // Check the returned data to decide if authenticated or not.
+                // For example:
+                if (data.status === "success") {
+                    setIsAuthenticated(true);
+                } else {
+                    setIsAuthenticated(false);
+                }
+            } catch (error) {
+                console.error("Error fetching login status:", error);
+                setIsAuthenticated(false);
+            }
+        };
 
-//   useEffect(() => {
-//     // Fetch data from TG2 backend
-//     fetch("http://localhost:8080/helloworld")
-//       .then(response => response.json())
-//       .then(data => setMessage(data.message));
-//   }, []);
+        fetchLoginStatus();
+    }, []);
 
-//   return (
-//     <div className="App">
-//       <h1>
-//         {message}
-//       </h1>
-//     </div>
-//   );
+    const renderPrivateRoute = (Component) => {
+        return isAuth ? <Component /> : <Navigate to="/" />;
+    };
+
+    const renderLoginPage = (Component) => {
+        return isAuth ? <Navigate to="/displayCommonUserDashboard" /> : <Component />;
+    };
 
 
     return (
@@ -88,25 +72,23 @@ function App() {
             <BrowserRouter>
                 <Routes>
                     {/* Main route */}
-                    <Route path="/" element={<LoginUser />} />
+                    <Route path="/" element={renderLoginPage(LoginUser)} />
                     {/* Institution route */}
                     <Route path="/registerInstitution" element={<RegisterInstitution />} />
                     {/* Common User route */}
-                    <Route path="/loginCommonUser" element={<LoginCommonUser />} />
-                    <Route path="/registerCommonUser" element={<RegisterCommonUser />} />
-                    <Route path="/forgetCommonUserPassword" element={<ForgetCommonUserPassword />} />
-                    <Route path="/displayCommonUserDashboard" element={<DisplayCommonUserDashboard />} />
-                    <Route path="/browseDailyMenu" element={<BrowseDailyMenu />} />
-                    <Route path="/displayCommonUserFoodPreference" element={<DisplayCommonUserFoodPreference />} />
-                    <Route path="/displayCommonUserAllergy" element={<DisplayCommonUserAllergy />} />
-                    <Route path="/displayCommonUserGoals" element={<DisplayCommonUserGoals />} />
-                    <Route path="/displayCommonUserAccount" element={<DisplayCommonUserAccount />} />
-                    <Route path="/displayCommonUserPrivacySettings" element={<DisplayCommonUserPrivacySettings />} />
-                    <Route path="/mealShoppingCart" element={<MealShoppingCart />} />
+                    <Route path="/loginCommonUser" element={renderLoginPage(LoginCommonUser)} />
+                    <Route path="/registerCommonUser" element={renderLoginPage(RegisterCommonUser)} />
+                    <Route path="/displayCommonUserDashboard" element={renderPrivateRoute(DisplayCommonUserDashboard)} />
+                    <Route path="/browseDailyMenu" element={renderPrivateRoute(BrowseDailyMenu)} />
+                    <Route path="/displayCommonUserFoodPreference" element={renderPrivateRoute(DisplayCommonUserFoodPreference)} />
+                    <Route path="/displayCommonUserAllergy" element={renderPrivateRoute(DisplayCommonUserAllergy)} />
+                    <Route path="/displayCommonUserGoals" element={renderPrivateRoute(DisplayCommonUserGoals)} />
+                    <Route path="/displayCommonUserAccount" element={renderPrivateRoute(DisplayCommonUserAccount)} />
+                    <Route path="/displayCommonUserPrivacySettings" element={renderPrivateRoute(DisplayCommonUserPrivacySettings)} />
+                    <Route path="/mealShoppingCart" element={renderPrivateRoute(MealShoppingCart)} />
                     {/* Dining Hall route */}
                     <Route path="/loginDiningHall" element={<LoginDiningHall />} />
                     <Route path="/registerDiningHall" element={<RegisterDiningHall />} />
-                    <Route path="/forgetDiningHallPassword" element={<ForgetDiningHallPassword />} />
                     <Route path="/displayDiningHallDashboard" element={<DisplayDiningHallDashboard />} />
                     <Route path="/displayDiningHallAccount" element={<DisplayDiningHallAccount />} />
                     {/* Menu route */}
@@ -120,7 +102,7 @@ function App() {
 }
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<App />);
+
 
 export default App;
 
