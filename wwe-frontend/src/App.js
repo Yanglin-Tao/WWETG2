@@ -1,10 +1,11 @@
 import ReactDOM from "react-dom/client";
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 import LoginUser from "./Main/loginUser";
 import RegisterCommonUser from "./CommonUser/registerCommonUser";
 import LoginCommonUser from "./CommonUser/loginCommonUser";
-import ForgetCommonUserPassword from "./CommonUser/forgetCommonUserPassword";
 import DisplayCommonUserDashboard from "./CommonUser/displayCommonUserDashboard";
 import DisplayCommonUserFoodPreference from "./CommonUser/displayCommonUserFoodPreference";
 import DisplayCommonUserAllergy from "./CommonUser/displayCommonUserAllergy";
@@ -12,7 +13,6 @@ import DisplayCommonUserGoals from "./CommonUser/displayCommonUserGoals";
 import BrowseDailyMenu from "./CommonUser/browseDailyMenu";
 import LoginDiningHall from "./DiningHall/loginDiningHall"
 import RegisterDiningHall from "./DiningHall/registerDiningHall"
-import ForgetDiningHallPassword from "./DiningHall/forgetDiningHallPassword";
 import DisplayDiningHallDashboard from "./DiningHall/displayDiningHallDashboard";
 import DisplayMenuItem from "./Menu/displayMenuItem"
 import DisplayDailyMenu from "./Menu/displayDailyMenu";
@@ -27,6 +27,7 @@ import Cookies from 'js-cookie';
 function App() {
     const [isAuth, setIsAuthenticated] = useState(false);
     const [role, setRole] = useState('');
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchLoginStatus = async () => {
@@ -46,6 +47,7 @@ function App() {
                 // Check the returned data to decide if authenticated or not.
                 // For example:
                 if (data.status === "success") {
+                    console.log("role: ", data.role);
                     setRole(data.role);
                     setIsAuthenticated(true);
                 } else {
@@ -57,18 +59,14 @@ function App() {
                 console.error("Error fetching login status:", error);
                 setIsAuthenticated(false);
             }
+            setLoading(false);
         };
 
         fetchLoginStatus();
     }, []);
 
     const renderPrivateRoute = (Component) => {
-        if (role === "common") {
-            return isAuth ? <Component /> : <Navigate to="/loginCommonUser" />;
-        } else if (role === "dining") {
-            return isAuth ? <Component /> : <Navigate to="/loginDiningHall" />;
-        }
-        return <Navigate to="/" />
+        return isAuth ? <Component /> : <Navigate to="/" />
     };
 
     const renderLoginPageoginPage = (Component) => {
@@ -79,6 +77,12 @@ function App() {
         }
         return <Component />
     };
+
+    if (loading) {
+        return <Box sx={{ display: 'flex' }}>
+            <CircularProgress />
+        </Box>;
+    }
 
     return (
         <>
