@@ -1,30 +1,18 @@
 import * as React from 'react';
-import { useState } from 'react';
-import Avatar from '@mui/material/Avatar';
-import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
+import { useState, useEffect } from 'react';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import MuiDrawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
-import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
-import Badge from '@mui/material/Badge';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Link from '@mui/material/Link';
-import MenuIcon from '@mui/icons-material/Menu';
-import PersonIcon from '@mui/icons-material/Person';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import { mainListItems, secondaryListItems } from './navigateCommonUserDashboard';
 import Title from './Title';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
-import Stack from '@mui/material/Stack';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -67,6 +55,52 @@ function DisplayCommonUserGoals() {
 
   const toggleEdit = () => {
     setIsEditable(!isEditable);
+  };
+
+  const [userData, setUserData] = useState({user_goals: ''});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+      const fetchUserData = async () => {
+          try {
+              const response = await fetch('http://localhost:8080/get_common_user_goals');
+              if (!response.ok) {
+                  throw new Error('Network response was not ok');
+              }
+              const data = await response.json();
+              setUserData(data);
+          } catch (error) {
+              console.error('There was a problem with the fetch operation:', error.message);
+          } finally {
+              setLoading(false);
+          }
+      };
+      // fetchUserData();
+  }, []);
+
+  const updateCommonUserGoals = async () => {
+      try {
+          const response = await fetch('http://localhost:8080/update_common_user_goals', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                  userId: userData.userId, 
+                  newFoodPreference: userData.user_goals,
+              }),
+          });
+
+          if (!response.ok) {
+              throw new Error('Network response was not ok');
+          }
+
+          const responseData = await response.json();
+          // handle the response data 
+
+      } catch (error) {
+          console.error('There was a problem updating common user goals:', error.message);
+      }
   };
 
   return (

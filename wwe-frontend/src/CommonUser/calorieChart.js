@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useTheme } from '@mui/material/styles';
 import { LineChart, Line, XAxis, YAxis, Label, ResponsiveContainer } from 'recharts';
 import Title from './Title';
+import { useState, useEffect } from 'react';
 
 /* TODO: This component should show a line chart of common user's calories in take in the day. 
 This component is optional to have.  
@@ -26,6 +27,27 @@ const data = [
 
 export default function CalorieChart() {
   const theme = useTheme();
+
+  const [userData, setUserData] = useState({user_daily_calories_intake_by_time: ''});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+      const fetchUserData = async () => {
+          try {
+              const response = await fetch('http://localhost:8080/get_user_daily_calories_intake_by_time');
+              if (!response.ok) {
+                  throw new Error('Network response was not ok');
+              }
+              const data = await response.json();
+              setUserData(data);
+          } catch (error) {
+              console.error('There was a problem with the fetch operation:', error.message);
+          } finally {
+              setLoading(false);
+          }
+      };
+      // fetchUserData();
+  }, []);
 
   return (
     <React.Fragment>

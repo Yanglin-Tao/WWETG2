@@ -60,9 +60,9 @@ function DisplayCommonUserPrivacySettings() {
         // fetchUserData();
     }, []);
 
-    const updatePrivacySettings = async () => {
+    const updateCommonUserPrivacySettings = async () => {
         try {
-            const response = await fetch('http://localhost:8080/set_user_privacy_settings', {
+            const response = await fetch('http://localhost:8080/update_user_privacy_settings', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Toolbar from '@mui/material/Toolbar';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
@@ -46,6 +46,53 @@ function DisplayDiningHallAccount() {
     
     const handleAddressChange = (e) => {
         setAddress(e.target.value);
+    };
+
+    const [userData, setUserData] = useState({institution: '', dining_hall: '', contact_email: '', password: '', address: ''});
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const response = await fetch('http://localhost:8080/get_dining_hall_account');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                setUserData(data);
+            } catch (error) {
+                console.error('There was a problem with the fetch operation:', error.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+        // fetchUserData();
+    }, []);
+
+    const updateDiningHallAccount = async () => {
+        try {
+            const response = await fetch('http://localhost:8080/update_dining_hall_account', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: userData.email, 
+                    newPassword: userData.password,
+                    newAddress: userData.address,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+
+            const responseData = await response.json();
+            // handle the response data 
+
+        } catch (error) {
+            console.error('There was a problem updating the dining hall password:', error.message);
+        }
     };
     
     return (

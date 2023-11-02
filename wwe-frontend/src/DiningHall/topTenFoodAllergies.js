@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 import Link from '@mui/material/Link';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -51,6 +52,27 @@ function preventDefault(event) {
 }
 
 export default function TopTenFoodAllergies() {
+  const [userData, setUserData] = useState({top_ten_food_allergies: ''});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+      const fetchUserData = async () => {
+          try {
+              const response = await fetch('http://localhost:8080/get_top_ten_food_allergies');
+              if (!response.ok) {
+                  throw new Error('Network response was not ok');
+              }
+              const data = await response.json();
+              setUserData(data);
+          } catch (error) {
+              console.error('There was a problem with the fetch operation:', error.message);
+          } finally {
+              setLoading(false);
+          }
+      };
+      // fetchUserData();
+  }, []);
+
   return (
     <React.Fragment>
       <Title>Top Ten Food Allergies</Title>

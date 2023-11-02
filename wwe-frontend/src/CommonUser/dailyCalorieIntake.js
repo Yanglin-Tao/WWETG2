@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import Title from './Title';
@@ -11,6 +12,27 @@ function preventDefault(event) {
 }
 
 export default function DailyCalorieIntake() {
+  const [userData, setUserData] = useState({daily_total_calories_intake: ''});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+      const fetchUserData = async () => {
+          try {
+              const response = await fetch('http://localhost:8080/get_user_daily_total_calories_intake');
+              if (!response.ok) {
+                  throw new Error('Network response was not ok');
+              }
+              const data = await response.json();
+              setUserData(data);
+          } catch (error) {
+              console.error('There was a problem with the fetch operation:', error.message);
+          } finally {
+              setLoading(false);
+          }
+      };
+      // fetchUserData();
+  }, []);
+
   return (
     <React.Fragment>
       <Title>Total Calories Intake</Title>

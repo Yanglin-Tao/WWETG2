@@ -56,7 +56,7 @@ function DisplayCommonUserAccount() {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await fetch('http://localhost:8080/get_user_account');
+                const response = await fetch('http://localhost:8080/get_common_user_account');
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
@@ -71,9 +71,9 @@ function DisplayCommonUserAccount() {
         // fetchUserData();
     }, []);
 
-    const updatePassword = async () => {
+    const updateCommonUserPassword = async () => {
         try {
-            const response = await fetch('http://localhost:8080/set_user_password', {
+            const response = await fetch('http://localhost:8080/update_common_user_password', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -92,7 +92,7 @@ function DisplayCommonUserAccount() {
             // handle the response data 
 
         } catch (error) {
-            console.error('There was a problem updating the password:', error.message);
+            console.error('There was a problem updating the common user password:', error.message);
         }
     };
     
