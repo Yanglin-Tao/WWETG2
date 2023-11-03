@@ -564,6 +564,7 @@ class RootController(BaseController):
 
                 # Add user's allergies to the userAllergy table
                 for allergy in allergyList:
+                    allergy = allergy.lower()
                     # Check if the user allergies are in the database
                     # If not, add the allergy to the allergy table first
                     if allergy not in allergyDBDict:
