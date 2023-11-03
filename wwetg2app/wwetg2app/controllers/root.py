@@ -108,8 +108,12 @@ class UserProfile(Base):
     password = Column(String)
     institutionID = Column(Integer, ForeignKey('institutions.institutionID'))
     foodPreference = Column(Integer, ForeignKey('food_preference.preferenceID'))
-    foodAllergy = Column(Integer, ForeignKey('allergy.allergyID'))
     dietPlan = Column(String)
+
+class UserAllergy(Base):
+    __tablename__ = 'user_allergy'
+    userID = Column(Integer, ForeignKey('user_profiles.userID'), primary_key=True)
+    allergyID = Column(Integer, ForeignKey('allergy.allergyID'), primary_key=True)
 
 class MonthlyReport(Base):
     __tablename__ = 'monthly_reports'
@@ -538,6 +542,49 @@ class RootController(BaseController):
         else:
             return {"message":"User doesn't exist"}
         
+    @expose('json')
+    def updateAllergy(self):
+        data = request.json_body
+        allergyList = data.get('allergies')
+        userID = data.get("userID")
+        if userID:
+            # Drop all the rows related to that user
+            toDrop = session.query(UserAllergy).filter_by(userID = userID).all()
+            for drop in toDrop:
+                session.delete(drop)
+            session.commit()
+
+            # If there are user allergies
+            if len(allergyList) != 0:
+                # Get all the current allergies in the database
+                allergyDB = session.query(Allergy)
+                allergyDBDict = {}
+                for allergy in allergyDB:
+                    allergyDBDict[allergy.name] = allergy.allergyID
+
+                # Add user's allergies to the userAllergy table
+                for allergy in allergyList:
+                    # Check if the user allergies are in the database
+                    # If not, add the allergy to the allergy table first
+                    if allergy not in allergyDBDict:
+                        new_allergy = Allergy(
+                            name = allergy,
+                            allergyID = len(allergyDBDict) + 1
+                        )
+                        session.add(new_allergy)
+                        session.commit()
+                        allergyDBDict[allergy] = len(allergyDBDict) + 1
+                    new_userallergy = UserAllergy(
+                    userID = userID,
+                    allergyID = allergyDBDict[allergy]
+                    )
+                    session.add(new_userallergy)
+                    session.commit()
+            return {"Message": "Successfully updated the allergy info in your profile."}
+        else:
+            return {"message": "You have to login first."}
+        
+      
 #---------UPLOAD MENU & MENUITEM------------
     @expose('json')
     # dining hall update an existing menu item on an existing menu
