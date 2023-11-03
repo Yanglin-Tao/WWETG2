@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -15,6 +15,9 @@ import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
 import { Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import DashboardLayout from './DashboardLayout';
+import Cookies from 'js-cookie';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 /* TODO: This component should display common user's food preference
 */
 // TODO remove, this demo shouldn't need to reset the theme.
@@ -33,24 +36,29 @@ function Copyright(props) {
   );
 }
 
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
 function DisplayCommonUserFoodPreference() {
-    const [open, setOpen] = React.useState(true);
-    const toggleDrawer = () => {
-      setOpen(!open);
-    };
-    const login = () => {
-      window.open("/login", "_self");
-    };
 
     const [isEditable, setIsEditable] = useState(false);
-    const [preferences, setPreferences] = useState([
-      'Halal',
-      'Vegetarian',
-      'Gluten Free',
-      'Balanced'
-    ]);
+    const [preferences, setPreferences] = useState([]);
     const [selectedPreference, setSelectedPreference] = useState('');
     const possiblePreferences = ['Halal', 'Vegetarian', 'Gluten Free', 'Balanced', 'Vegan', 'Pescatarian']; 
+    const [userId, setUserId] = useState('');
+    const [isAuth, setIsAuthenticated] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [open, setOpen] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('info');
+
+    const handleClose = (event, reason) => {
+      if (reason === 'clickaway') {
+        return;
+      }
+      setOpen(false);
+    };
 
     const handleDelete = (preferenceToRemove) => () => {
       setPreferences(preferences.filter(preference => preference !== preferenceToRemove));
@@ -65,49 +73,105 @@ function DisplayCommonUserFoodPreference() {
   
     const toggleEdit = () => {
       setIsEditable(!isEditable);
+      if (isEditable) {
+        updateCommonUserFoodPreference();
+      }
     };
 
-    const [userData, setUserData] = useState({userId: '', foodPreferences: ''});
-    const [loading, setLoading] = useState(true);
-
     useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const response = await fetch('http://localhost:8080/get_common_user_food_preferences');
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                setUserData(data);
-            } catch (error) {
-                console.error('There was a problem with the fetch operation:', error.message);
-            } finally {
-                setLoading(false);
+      const fetchLoginStatus = async () => {
+        try {
+          const token = Cookies.get('token');
+          const apiUrl = `http://127.0.0.1:8080/login_status`;
+          const requestOptions = {
+            method: 'GET',
+            headers: {
+              'Authorization': token,
+              'Content-Type': 'application/json'
             }
-        };
-        // fetchUserData();
+          };
+          const response = await fetch(apiUrl, requestOptions);
+          const data = await response.json();
+          console.log(data);
+          if (data.status === "success") {
+            setUserId(data.user_id);
+            setIsAuthenticated(true);
+          } 
+
+        } catch (error) {
+          console.error("Error fetching login status:", error);
+        }
+        setLoading(false);
+      };
+  
+      fetchLoginStatus();
     }, []);
 
-    const updateCommonUserAllergyFoodPreference = async () => {
+    useEffect(() => {
+      const fetchCommonUserFoodPreferences = async () => {
+          if (!isAuth) { 
+            return;
+          }
+          const token = Cookies.get('token'); 
+          const apiUrl = `http://localhost:8080/getUserPreference`; 
+          const requestOptions = {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': token,
+              },
+              body: JSON.stringify({ 
+                userID: userId
+              })
+          };
+
+          try {
+              const response = await fetch(apiUrl, requestOptions);
+              if (!response.ok) {
+                  throw new Error('Network response was not ok');
+              }
+              const data = await response.json();
+              console.log(data);
+              setPreferences(data.Preferences);
+          } catch (error) {
+              console.error('There was a problem fetching the user preferences:', error);
+          }
+      };
+
+      fetchCommonUserFoodPreferences();
+  }, [userId]); 
+
+    const updateCommonUserFoodPreference = async () => {
         try {
-            const response = await fetch('http://localhost:8080/update_common_user_food_preference', {
+            const token = Cookies.get('token'); 
+            console.log(preferences);
+            const response = await fetch('http://localhost:8080/updateUserPreference', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': token,
                 },
                 body: JSON.stringify({
-                    userId: userData.userId, 
-                    newFoodPreference: selectedPreference,
+                  userID: userId,
+                  userPref: preferences
                 }),
             });
 
             if (!response.ok) {
                 throw new Error('Network response was not ok');
-            }
+            } 
 
             const responseData = await response.json();
-            // handle the response data 
-
+            console.log('Update successful', responseData);
+            if (responseData.Message === "Successfully updated the food preference info into your profile.") {
+              setAlertSeverity('success');
+              setAlertMessage(responseData.Message);
+              setOpen(true);
+            } else {
+              setAlertSeverity('error');
+              setAlertMessage(responseData.Message);
+              setOpen(true);
+            }
         } catch (error) {
             console.error('There was a problem updating common user food preference:', error.message);
         }
@@ -131,13 +195,22 @@ function DisplayCommonUserFoodPreference() {
             }}
           >
             <Toolbar />
+            <Snackbar
+              open={open}
+              autoHideDuration={6000}
+              onClose={handleClose}
+            >
+              <Alert onClose={handleClose} severity={alertSeverity} sx={{ width: '100%' }}>
+                {alertMessage}
+              </Alert>
+            </Snackbar>
             <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
               <Grid container spacing={3}>
                 <Grid item xs={12}>
                   <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
                   <Title>My Food Preferences</Title>
                   <Stack direction="row" spacing={1}>
-                  {preferences.map(preference => (
+                  {Array.isArray(preferences) && preferences.map(preference => (
                     <Chip 
                       key={preference}
                       label={preference}
@@ -155,7 +228,7 @@ function DisplayCommonUserFoodPreference() {
                           onChange={(e) => setSelectedPreference(e.target.value)}
                           label="Select Preference"
                         >
-                          {possiblePreferences.filter(p => !preferences.includes(p)).map(preference => (
+                          {possiblePreferences.filter(p => Array.isArray(preferences) && !preferences.includes(p)).map(preference => (
                             <MenuItem key={preference} value={preference}>
                               {preference}
                             </MenuItem>

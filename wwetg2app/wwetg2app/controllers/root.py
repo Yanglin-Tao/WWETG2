@@ -432,7 +432,7 @@ class RootController(BaseController):
             if datetime.now() > expiration:
                 return {"status": "error", "message": "Login expired.", "role": role}
 
-            return {"status": "success", "message": "User is logged in.", "role": role}
+            return {"status": "success", "message": "User is logged in.", "role": role, "user_id": user_id}
 
         except ExpiredSignatureError:
             return {"status": "error", "message": "Token has expired."}
