@@ -75,6 +75,7 @@ class DiningHall(Base):
     institutionID = Column(Integer, ForeignKey('institutions.institutionID'))
     name = Column(String)
     password = Column(String)
+    address = Column(String)
 
 class DiningHallReport(Base):
     __tablename__ = 'dining_hall_reports'
@@ -613,6 +614,34 @@ class RootController(BaseController):
         else:
             return {"message": "You have to login first."}
         
+#--------------GET ACCOUNTS-----------------
+    @expose('json')
+    def get_common_user_account(self):
+        data = request.json_body
+        userID = data.get("userID")
+        if userID:
+            userInfo = session.query(UserProfile).filter_by(userID = userID).first()
+            email = userInfo.email
+            insID = userInfo.institutionID
+            insName = session.query(Institution).filter_by(institutionID = insID).first().name
+            return {"institutionName": insName, "institutionID": insID, "email": email}
+        else:
+            return {"message": "You have to login first."}
+        
+    @expose('json')
+    def get_dining_hall_account(self):
+        data = request.json_body
+        diningHallID = data.get("diningHallID")
+        if diningHallID:
+            diningHallInfo = session.query(DiningHall).filter_by(diningHallID = diningHallID).first()
+            institutionID = diningHallInfo.institutionID
+            institutionName = session.query(Institution).filter_by(institutionID = institutionID).first().name
+            diningHallName = diningHallInfo.name
+            email = diningHallInfo.email
+            address = diningHallInfo.address
+            return {"institutionID": institutionID, "institutionName": institutionName, "diningHallName":diningHallName, "email": email, "address": address}
+        else:
+            return {"message": "You have to login first."}
       
 #---------UPLOAD MENU & MENUITEM------------
     @expose('json')
@@ -677,3 +706,4 @@ class RootController(BaseController):
          # create a list of MenuItems
         dishList = self.uploadDiningHallMenu(menu.menuID)[1] #????
         return {"message": "Menu created"}
+
