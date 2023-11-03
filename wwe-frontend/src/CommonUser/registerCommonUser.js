@@ -1,4 +1,3 @@
-import axios from 'axios';
 import React, { useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -6,8 +5,6 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
@@ -17,7 +14,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
 
 /* TODO: This component should provide a form to allow common user register with email address, 
-  password, and institutionId.
+  password, and institutionID.
 */
 
 function Copyright(props) {
@@ -49,6 +46,7 @@ function RegisterCommonUser() {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
+    institutionID: ''
   });
 
   const handleClose = (event, reason) => {
@@ -69,6 +67,7 @@ function RegisterCommonUser() {
 
     const email = data.get('email');
     const password = data.get('password');
+    const institutionID = data.get('institutionID');
     const apiUrl = `http://127.0.0.1:8080/register_common`;
 
     // Constructing the request options for the POST request
@@ -77,7 +76,7 @@ function RegisterCommonUser() {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email, password, institutionID })
     };
 
     fetch(apiUrl, requestOptions)
@@ -143,6 +142,18 @@ function RegisterCommonUser() {
                   value={formData.password}
                   onChange={handleChange}
                 />
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                    required
+                    fullWidth
+                    id="institutionID"
+                    label="Institution ID"
+                    name="institutionID"
+                    autoComplete="institutionID"
+                    value={formData.institutionID}
+                    onChange={handleChange}
+                  />
               </Grid>
             </Grid>
             <Button
