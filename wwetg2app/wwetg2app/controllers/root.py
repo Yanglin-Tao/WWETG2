@@ -584,6 +584,21 @@ class RootController(BaseController):
             return {"Message": "Successfully updated the allergy info in your profile."}
         else:
             return {"message": "You have to login first."}
+
+    @expose('json') 
+    def getAllergy(self):
+        data = request.json_body
+        userID = data.get("userID")
+        if userID:
+            allergyList = []
+            userAllergies = session.query(UserAllergy).filter_by(userID = userID).all()
+            for userAllergy in userAllergies:
+                allergyID = userAllergy.allergyID
+                allergyName = session.query(Allergy).filter_by(allergyID = allergyID).first().name
+                allergyList.append(allergyName)
+            return {"Allergies": allergyList}
+        else:
+            return {"message": "You have to login first."}
         
       
 #---------UPLOAD MENU & MENUITEM------------
