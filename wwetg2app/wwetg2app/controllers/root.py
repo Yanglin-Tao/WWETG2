@@ -107,13 +107,17 @@ class UserProfile(Base):
     email = Column(String)
     password = Column(String)
     institutionID = Column(Integer, ForeignKey('institutions.institutionID'))
-    foodPreference = Column(Integer, ForeignKey('food_preference.preferenceID'))
     dietPlan = Column(String)
 
 class UserAllergy(Base):
     __tablename__ = 'user_allergy'
     userID = Column(Integer, ForeignKey('user_profiles.userID'), primary_key=True)
     allergyID = Column(Integer, ForeignKey('allergy.allergyID'), primary_key=True)
+
+class UserPreference(Base):
+    __tablename__ = 'user_preference'
+    userID = Column(Integer, ForeignKey('user_profiles.userID'), primary_key=True)
+    preferenceID = Column(Integer, ForeignKey('food_preference.preferenceID'), primary_key=True)
 
 class MonthlyReport(Base):
     __tablename__ = 'monthly_reports'
@@ -500,47 +504,56 @@ class RootController(BaseController):
         return {"message":"finish uploading"}, dishList
     
 #---------PREFERENCE & ALLERGY--------------
-    # return a list of string of user's preference
-    def getUserPreference(self):
-        data = request.json_body
-        userID = data.get('userID')
-        if userID:
-            # userID
-            user = session.query(UserProfile).filter_by(userID = userID).first()
-            preferenceID = user.foodPreference.preferenceID
-            preferenceEntries = session.query(FoodPreferences).filter(FoodPreferences.preferenceID == preferenceID).all()
-            # Extracting the names
-            nameList = [str(p[0]) for p in preferenceEntries]
-            return nameList, {"message": "User preferences returned"}
-        else:
-            return {"message": "User doesn't exist"}
-
+    @expose('json')
     # upadate everything in the preference about that user
     # Assume userPref has correct number of tags and all tags are in the FOOD_PREF
     def updateUserPreference(self):
         data = request.json_body
         userID = data.get("userID")
-        userPref = data.get("userID") # a list of strings
+        userPref = data.get("userPref") # a list of strings
 
         if userID:
-            user = session.query(UserProfile).filter_by(userID = userID).first()
-            preferenceID = user.foodPreference.preferenceID
-            preferenceEntries = session.query(FoodPreferences).filter(FoodPreferences.preferenceID == preferenceID).all()
-            # delete the old entries
-            for preference in preferenceEntries:
-                session.delete(preference)
-            # add the new entries 
-            if len(userPref) > len(FOOD_PREF):
-                return {"message": "Too many tags"}
-            for p in range(len(userPref)):
-                newPref = FoodPreferences(
-                    name = userPref[p],
-                    preferenceID = preferenceID
-                )
+            # Drop all the rows related to that user
+            toDrop = session.query(UserPreference).filter_by(userID = userID).all()
+            for drop in toDrop:
+                session.delete(drop)
             session.commit()
-            return {"message":"Update sucessful"}
+
+            # If there are user preferences
+            if len(userPref) != 0:
+                # Get all the preferences in the database
+                preferenceDB = session.query(FoodPreferences)
+                preferenceDBDict = {}
+                for preference in preferenceDB:
+                    preferenceDBDict[preference.name] = preference.preferenceID
+
+                # Add user's preferences to the userPreference table
+                for preference in userPref:
+                    new_userPref = UserPreference(
+                    userID = userID,
+                    preferenceID = preferenceDBDict[preference]
+                    )
+                    session.add(new_userPref)
+                    session.commit()
+            return {"Message": "Successfully updated the food preference info into your profile."}
         else:
-            return {"message":"User doesn't exist"}
+            return {"message": "You have to login first."}
+        
+    @expose('json')
+    # return a list of string of user's preference
+    def getUserPreference(self):
+        data = request.json_body
+        userID = data.get('userID')
+        if userID:
+            preferenceList = []
+            userPreferences = session.query(UserPreference).filter_by(userID = userID).all()
+            for userPreference in userPreferences:
+                preferenceID = userPreference.preferenceID
+                preferenceName = session.query(FoodPreferences).filter_by(preferenceID = preferenceID).first().name
+                preferenceList.append(preferenceName)
+            return {"Preferences": preferenceList}
+        else:
+            return {"message": "You have to login first."}
         
     @expose('json')
     def updateAllergy(self):
@@ -581,7 +594,7 @@ class RootController(BaseController):
                     )
                     session.add(new_userallergy)
                     session.commit()
-            return {"Message": "Successfully updated the allergy info in your profile."}
+            return {"Message": "Successfully updated the allergy info into your profile."}
         else:
             return {"message": "You have to login first."}
 
