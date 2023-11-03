@@ -367,7 +367,7 @@ class RootController(BaseController):
             else:
                 password = user_email.password
                 session.commit()
-                token = jwt.encode({'user_id': user_email.userID, 'role': role, 'exp': datetime.now(utc) + timedelta(minutes=1)}, SECRET_KEY, algorithm="HS256")
+                token = jwt.encode({'user_id': user_email.userID, 'role': role, 'exp': datetime.now(utc) + timedelta(minutes=30)}, SECRET_KEY, algorithm="HS256")
                 if hashlib.sha256(pwd.encode('utf-8')).hexdigest() == password:
                     return {"message": "login success for a common user", "token": token}
                 else:

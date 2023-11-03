@@ -77,12 +77,23 @@ const DashboardLayout = ({title}) => {
         setAnchorEl(event.currentTarget);
     };
 
+    const handleAccount = () => {
+        setAnchorEl(null);
+        window.open("/displayCommonUserAccount", "_self");
+    };
+
+    const handlePrivacy = () => {
+        setAnchorEl(null);
+        window.open("/displayCommonUserPrivacySettings", "_self");
+    };
+
     const handleClose = () => {
         setAnchorEl(null);
     };
 
     const handleLogout = () => {
         Cookies.remove('token');
+        setAnchorEl(null);
         window.open("/", "_self");
     };
     return (
@@ -147,8 +158,8 @@ const DashboardLayout = ({title}) => {
                                 open={Boolean(anchorEl)}
                                 onClose={handleClose}
                             >
-                                <MenuItem onClick={handleClose}>Profile</MenuItem>
-                                <MenuItem onClick={handleClose}>My account</MenuItem>
+                                <MenuItem onClick={handleAccount}>My account</MenuItem>
+                                <MenuItem onClick={handlePrivacy}>Privacy Settings</MenuItem>
                                 <MenuItem onClick={handleLogout}>Log Out</MenuItem>
                             </Menu>
                         </div>

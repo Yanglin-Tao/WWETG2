@@ -1,8 +1,7 @@
 import ReactDOM from "react-dom/client";
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import CircularProgress from '@mui/material/CircularProgress';
-import Box from '@mui/material/Box';
+import LoadingIndicator from "./Loading";
 import LoginUser from "./Main/loginUser";
 import RegisterCommonUser from "./CommonUser/registerCommonUser";
 import LoginCommonUser from "./CommonUser/loginCommonUser";
@@ -79,10 +78,8 @@ function App() {
     };
 
     if (loading) {
-        return <Box sx={{ display: 'flex' }}>
-            <CircularProgress />
-        </Box>;
-    }
+        return <LoadingIndicator />
+    };
 
     return (
         <>

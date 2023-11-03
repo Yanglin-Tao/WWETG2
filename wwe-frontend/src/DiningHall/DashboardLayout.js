@@ -61,7 +61,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
     }),
 );
 
-const DashboardLayout = ({title}) => {
+const DashboardLayout = ({ title }) => {
     const [open, setOpen] = React.useState(true);
     const [auth, setAuth] = React.useState(true);
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -75,6 +75,11 @@ const DashboardLayout = ({title}) => {
 
     const handleClose = () => {
         setAnchorEl(null);
+    };
+
+    const handleAccount = () => {
+        setAnchorEl(null);
+        window.open("/displayDiningHallAccount", "_self");
     };
 
     const handleLogout = () => {
@@ -137,8 +142,7 @@ const DashboardLayout = ({title}) => {
                                 open={Boolean(anchorEl)}
                                 onClose={handleClose}
                             >
-                                <MenuItem onClick={handleClose}>Profile</MenuItem>
-                                <MenuItem onClick={handleClose}>My account</MenuItem>
+                                <MenuItem onClick={handleAccount}>My account</MenuItem>
                                 <MenuItem onClick={handleLogout}>Log Out</MenuItem>
                             </Menu>
                         </div>

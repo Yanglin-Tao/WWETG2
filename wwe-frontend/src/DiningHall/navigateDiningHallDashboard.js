@@ -21,6 +21,10 @@ const menu = () => {
   window.open("/displayDailyMenu", "_self");
 };
 
+const account = () => {
+  window.open("/displayDiningHallAccount", "_self");
+};
+
 export const mainListItems = (
   <React.Fragment>
     <ListItemButton onClick={dashboard}>
@@ -55,7 +59,7 @@ export const secondaryListItems = (
     <ListSubheader component="div" inset>
       Settings
     </ListSubheader>
-    <ListItemButton onClick={dashboard}>
+    <ListItemButton onClick={account}>
       <ListItemIcon>
         <AssignmentIcon />
       </ListItemIcon>

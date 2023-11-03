@@ -4,7 +4,6 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListSubheader from '@mui/material/ListSubheader';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import PeopleIcon from '@mui/icons-material/People';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import LayersIcon from '@mui/icons-material/Layers';
@@ -27,6 +26,12 @@ const preference = () => {
 };
 const goal = () => {
   window.open("/displayCommonUserGoals", "_self");
+};
+const account = () => {
+  window.open("/displayCommonUserAccount", "_self");
+};
+const privacy = () => {
+  window.open("/displayCommonUserPrivacySettings", "_self");
 };
 export const mainListItems = (
   <React.Fragment>
@@ -74,13 +79,13 @@ export const secondaryListItems = (
     <ListSubheader component="div" inset>
       Settings
     </ListSubheader>
-    <ListItemButton onClick={dashboard}>
+    <ListItemButton onClick={account}>
       <ListItemIcon>
         <AssignmentIcon />
       </ListItemIcon>
       <ListItemText primary="My Account" />
     </ListItemButton>
-    <ListItemButton onClick={dashboard}>
+    <ListItemButton onClick={privacy}>
       <ListItemIcon>
         <AssignmentIcon />
       </ListItemIcon>
