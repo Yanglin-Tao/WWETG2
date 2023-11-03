@@ -40,12 +40,6 @@ __all__ = ['RootController']
 SECRET_KEY = 'WhatWeEat'
 FOOD_PREF = ('Halal', 'Vegetarian', 'Gluten Free', 'Balanced', 'Vegan', 'Pescatarian')
 
-# For psycopg2
-# conn = psycopg2.connect(database="whatweeatapp",
-#                         host="localhost",
-#                         user="yanglintao",
-#                         password="admin",
-#                         port="5432")
 
 # connect to database
 DATABASE_URL = "postgresql://yanglintao:admin@localhost:5432/whatweeatapp"
@@ -58,12 +52,6 @@ session = Session()
 Base = declarative_base()
 Session = sessionmaker(bind=engine)
 session = Session()
-
-# For checking only
-# class CheckConnection(Base):
-#     __tablename__ = 'check_connection'
-#     check1 = Column(Integer, primary_key=True)
-
 
 class MealTracking(Base):
     __tablename__ = 'meal_trackings'
@@ -313,6 +301,31 @@ class RootController(BaseController):
         return HTTPFound(location=came_from)
     
     @expose('json')
+    def register_institution(self):
+        data = request.json_body
+        name = data.get('name')
+        institution_exist = session.query(Institution).filter_by(name=name).first()
+        if institution_exist:
+            flash(_('The institution name already exists.'), 'error')
+            return {"message": "The institution name already exists."}
+        else:
+            try:
+                # Generate unique institution ID:
+                institution_id = session.query(Institution).count() +1
+                # Insert rows
+                new_insti = Institution(
+                    institutionID = institution_id,
+                    name = name,
+                )
+                session.add(new_insti)
+                session.commit()
+                flash(_('Registration sucess.'), 'warning')
+                return {"message": "Institution register success", "institutionID": institution_id}
+            except Exception as e:
+                session.rollback()
+                return {"message": f"Error: {str(e)}"}
+            
+    @expose('json')
     def register_dininghall(self):  
         data = request.json_body
         email = data.get('email')
@@ -352,6 +365,72 @@ class RootController(BaseController):
             session.commit()
             flash(_('Dining Hall registration success '), 'warning')
             return {"message": "Dining Hall register success"}
+        
+    @expose('json')
+    def register_common(self):
+        data = request.json_body
+        email = data.get('email')
+        password = data.get('password')
+        institutionID = data.get('institutionID')
+        user_email = session.query(UserProfile).filter_by(email=email).first()
+        institution_ID = session.query(Institution).filter_by(institutionID = institutionID).first()
+
+        if user_email:
+            return {"message": "This email has already been registered"}
+        elif not institution_ID:
+            return {"message": "This institution ID does not exist."}
+        else:
+            try:    
+                # Insert rows
+                user_num = session.query(UserProfile).count()
+                flash(user_num)
+                hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
+                new_common = UserProfile(
+                    userID = user_num + 1,
+                    email = email,
+                    password = hashed_password,
+                    institutionID = institutionID
+                )
+                session.add(new_common)
+                session.commit()
+                return {"message": "Registration success"}
+            except Exception as e:
+                    session.rollback()
+                    return {"message": f"Error: {str(e)}"}  
+
+    @expose('json')
+    def login_status(self):
+        token = request.headers.get('Authorization')
+        if not token:
+            return {"status": "error", "message": "Token is missing."}
+        try:
+            decoded_token = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+            
+            # Get the role and ID from the token
+            role = decoded_token['role']
+            user_id = decoded_token['user_id']
+            expiration = datetime.utcfromtimestamp(decoded_token['exp'])
+
+            # Get the last login time based on role and user_id
+            if role == "common":
+                user = session.query(UserProfile).filter_by(userID=user_id).first()
+            elif role == "dining":
+                user = session.query(DiningHall).filter_by(diningHallID=user_id).first()
+
+            if not user:
+                return {"status": "error", "message": "Invalid user."}
+
+            # Compare last_login with current time
+            if datetime.now() > expiration:
+                return {"status": "error", "message": "Login expired.", "role": role}
+
+            return {"status": "success", "message": "User is logged in.", "role": role}
+
+        except ExpiredSignatureError:
+            return {"status": "error", "message": "Token has expired."}
+        except DecodeError:
+            return {"status": "error", "message": "Token is invalid."}
+
 
     @expose('json')
     def login(self):  
@@ -415,6 +494,7 @@ class RootController(BaseController):
         oldMenu = session.query(DailyMenu).filter_by(menuID = menuID).first()
         oldMenu.dishesID.append(dishList) #### ??
         return {"message":"finish uploading"}, dishList
+    
 #---------PREFERENCE & ALLERGY--------------
     # return a list of string of user's preference
     def getUserPreference(self):
@@ -457,14 +537,7 @@ class RootController(BaseController):
             return {"message":"Update sucessful"}
         else:
             return {"message":"User doesn't exist"}
-            
-                
-
-
-
-
-
-
+        
 #---------UPLOAD MENU & MENUITEM------------
     @expose('json')
     # dining hall update an existing menu item on an existing menu
@@ -528,96 +601,3 @@ class RootController(BaseController):
          # create a list of MenuItems
         dishList = self.uploadDiningHallMenu(menu.menuID)[1] #????
         return {"message": "Menu created"}
-
-
-
-    @expose('json')
-    def register_common(self):
-
-        data = request.json_body
-        email = data.get('email')
-        password = data.get('password')
-        user_email = session.query(UserProfile).filter_by(email=email).first()
-
-        if user_email:
-            flash(email)
-            return {"message": "This email has already been registered"}
-        else:
-            try:    
-                # Insert rows
-                user_num = session.query(UserProfile).count()
-                flash(user_num)
-                hashed_password = hashlib.sha256(password.encode('utf-8')).hexdigest()
-                new_common = UserProfile(
-                    userID = user_num + 1,
-                    email = email,
-                    password = hashed_password
-                    # add preference and allergy ID ???
-                )
-                session.add(new_common)
-                session.commit()
-                return {"message": "Registration success"}
-            except Exception as e:
-                    session.rollback()
-                    return {"message": f"Error: {str(e)}"}
-        
-    @expose('json')
-    def register_institution(self):
-        data = request.json_body
-        name = data.get('name')
-        institution_exist = session.query(Institution).filter_by(name=name).first()
-        if institution_exist:
-            flash(_('The institution name already exists.'), 'error')
-            return {"message": "The institution name already exists."}
-        else:
-            try:
-                # Generate unique institution ID:
-                institution_id = session.query(Institution).count() +1
-                # Insert rows
-                new_insti = Institution(
-                    institutionID = institution_id,
-                    name = name,
-                )
-                session.add(new_insti)
-                session.commit()
-                flash(_('Registration sucess.'), 'warning')
-                return {"message": "Institution register success", "institutionID": institution_id}
-            except Exception as e:
-                session.rollback()
-                return {"message": f"Error: {str(e)}"}
-            
-
-    @expose('json')
-    def login_status(self):
-        token = request.headers.get('Authorization')
-        if not token:
-            return {"status": "error", "message": "Token is missing."}
-        try:
-            decoded_token = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
-            
-            # Get the role and ID from the token
-            role = decoded_token['role']
-            user_id = decoded_token['user_id']
-            expiration = datetime.utcfromtimestamp(decoded_token['exp'])
-
-            # Get the last login time based on role and user_id
-            if role == "common":
-                user = session.query(UserProfile).filter_by(userID=user_id).first()
-            elif role == "dining":
-                user = session.query(DiningHall).filter_by(diningHallID=user_id).first()
-
-            if not user:
-                return {"status": "error", "message": "Invalid user."}
-
-            # Compare last_login with current time
-            if datetime.now() > expiration:
-                return {"status": "error", "message": "Login expired.", "role": role}
-
-            return {"status": "success", "message": "User is logged in.", "role": role}
-
-        except ExpiredSignatureError:
-            return {"status": "error", "message": "Token has expired."}
-        except DecodeError:
-            return {"status": "error", "message": "Token is invalid."}
-
-
