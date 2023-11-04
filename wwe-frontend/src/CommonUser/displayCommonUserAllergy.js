@@ -14,9 +14,10 @@ import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert'; 
 import DashboardLayout from './DashboardLayout';
+import Cookies from 'js-cookie';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 
 /* TODO: This component should display common user's allergy. */
 
@@ -36,51 +37,37 @@ function Copyright(props) {
   );
 }
 
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
 function DisplayCommonUserAllergy() {
-  const [open, setOpen] = React.useState(true);
-  const [auth, setAuth] = React.useState(true);
-  const [anchorEl, setAnchorEl] = React.useState(null);
-
-  const handleChange = (event) => {
-    setAuth(event.target.checked);
-  };
-
-  const handleMenu = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-  const toggleDrawer = () => {
-    setOpen(!open);
-  };
-  const login = () => {
-    window.open("/login", "_self");
-  };
-
   const [isEditable, setIsEditable] = useState(false);
-  const [allergies, setAllergies] = useState([
-    'Milk',
-    'Eggs',
-    'Fish',
-    'Crustacean shellfish',
-    'Peanuts'
-  ]);
+  const [allergies, setAllergies] = useState([]);
   const [newAllergy, setNewAllergy] = useState('');
-  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState('');
+  const [isAuth, setIsAuthenticated] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertSeverity, setAlertSeverity] = useState('info');
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpen(false);
+  };
 
   const handleAddAllergy = () => {
     if (newAllergy && !allergies.includes(newAllergy)) {
         setAllergies(prevAllergies => [...prevAllergies, newAllergy]);
         setNewAllergy(''); 
     } else {
-        setOpenSnackbar(true);  
+      setAlertSeverity('error');
+      setAlertMessage('This allergy already exists!');
+      setOpen(true); 
     }
-  };
-
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false);
   };
 
   const handleDelete = (allergyToRemove) => () => {
@@ -89,39 +76,87 @@ function DisplayCommonUserAllergy() {
 
   const toggleEdit = () => {
     setIsEditable(!isEditable);
+    if (isEditable) {
+      updateCommonUserAllergy();
+    }
   };
 
-  const [userData, setUserData] = useState({userId: '', foodAllergies: ''});
-  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const fetchLoginStatus = async () => {
+      try {
+        const token = Cookies.get('token');
+        const apiUrl = `http://127.0.0.1:8080/login_status`;
+        const requestOptions = {
+          method: 'GET',
+          headers: {
+            'Authorization': token,
+            'Content-Type': 'application/json'
+          }
+        };
+        const response = await fetch(apiUrl, requestOptions);
+        const data = await response.json();
+        console.log(data);
+        if (data.status === "success") {
+          setUserId(data.user_id);
+          setIsAuthenticated(true);
+        } 
+
+      } catch (error) {
+        console.error("Error fetching login status:", error);
+      }
+      setLoading(false);
+    };
+
+    fetchLoginStatus();
+  }, []);
 
   useEffect(() => {
-      const fetchUserData = async () => {
-          try {
-              const response = await fetch('http://localhost:8080/get_common_user_allergy');
-              if (!response.ok) {
-                  throw new Error('Network response was not ok');
-              }
-              const data = await response.json();
-              setUserData(data);
-          } catch (error) {
-              console.error('There was a problem with the fetch operation:', error.message);
-          } finally {
-              setLoading(false);
-          }
-      };
-      // fetchUserData();
-  }, []);
+    const fetchCommonUserAllergy = async () => {
+        if (!isAuth) { 
+          return;
+        }
+        const token = Cookies.get('token'); 
+        const apiUrl = `http://localhost:8080/getAllergy`; 
+        const requestOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token,
+            },
+            body: JSON.stringify({ 
+              userID: userId
+            })
+        };
+
+        try {
+            const response = await fetch(apiUrl, requestOptions);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            console.log(data);
+            setAllergies(data.Allergies);
+        } catch (error) {
+            console.error('There was a problem fetching the user allergies:', error);
+        }
+    };
+
+    fetchCommonUserAllergy();
+  }, [userId]); 
 
   const updateCommonUserAllergy = async () => {
       try {
-          const response = await fetch('http://localhost:8080/update_common_user_allergy', {
+          const token = Cookies.get('token'); 
+          console.log(allergies);
+          const response = await fetch('http://localhost:8080/updateAllergy', {
               method: 'POST',
               headers: {
                   'Content-Type': 'application/json',
+                  'Authorization': token,
               },
               body: JSON.stringify({
-                  userId: userData.userId, 
-                  newFoodAllergies: newAllergy,
+                  userID: userId, 
+                  allergies: allergies,
               }),
           });
 
@@ -130,7 +165,16 @@ function DisplayCommonUserAllergy() {
           }
 
           const responseData = await response.json();
-          // handle the response data 
+          console.log('Update successful', responseData);
+            if (responseData.Message === "Successfully updated the allergy info into your profile.") {
+              setAlertSeverity('success');
+              setAlertMessage(responseData.Message);
+              setOpen(true);
+            } else {
+              setAlertSeverity('error');
+              setAlertMessage(responseData.Message);
+              setOpen(true);
+            }
 
       } catch (error) {
           console.error('There was a problem updating common user allergy:', error.message);
@@ -155,13 +199,22 @@ function DisplayCommonUserAllergy() {
           }}
         >
           <Toolbar />
+          <Snackbar
+              open={open}
+              autoHideDuration={6000}
+              onClose={handleClose}
+            >
+              <Alert onClose={handleClose} severity={alertSeverity} sx={{ width: '100%' }}>
+                {alertMessage}
+              </Alert>
+          </Snackbar>
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
                   <Title>My Food Allergies</Title>
                   <Stack direction="row" spacing={1}>
-                  {allergies.map(allergy => (
+                  {Array.isArray(allergies) && allergies.map(allergy => (
                     <Chip 
                       key={allergy}
                       label={allergy}
@@ -170,16 +223,6 @@ function DisplayCommonUserAllergy() {
                     />
                   ))}
                   </Stack>
-                  <Snackbar 
-                      open={openSnackbar} 
-                      autoHideDuration={6000} 
-                      onClose={handleCloseSnackbar}
-                      anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                  >
-                      <Alert onClose={handleCloseSnackbar} severity="warning" variant="filled">
-                          This allergy already exists!
-                      </Alert>
-                  </Snackbar>
                   {isEditable && (
                     <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
                       <TextField
