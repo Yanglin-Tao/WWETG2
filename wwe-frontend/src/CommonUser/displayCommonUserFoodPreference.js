@@ -40,15 +40,14 @@ const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-function DisplayCommonUserFoodPreference() {
+function DisplayCommonUserFoodPreference({ userId }) {
 
     const [isEditable, setIsEditable] = useState(false);
     const [preferences, setPreferences] = useState([]);
     const [selectedPreference, setSelectedPreference] = useState('');
     const possiblePreferences = ['Halal', 'Vegetarian', 'Gluten Free', 'Balanced', 'Vegan', 'Pescatarian']; 
-    const [userId, setUserId] = useState('');
     const [isAuth, setIsAuthenticated] = useState(false);
-    const [loading, setLoading] = useState(true);
+
     const [open, setOpen] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [alertSeverity, setAlertSeverity] = useState('info');
@@ -77,35 +76,6 @@ function DisplayCommonUserFoodPreference() {
         updateCommonUserFoodPreference();
       }
     };
-
-    useEffect(() => {
-      const fetchLoginStatus = async () => {
-        try {
-          const token = Cookies.get('token');
-          const apiUrl = `http://127.0.0.1:8080/login_status`;
-          const requestOptions = {
-            method: 'GET',
-            headers: {
-              'Authorization': token,
-              'Content-Type': 'application/json'
-            }
-          };
-          const response = await fetch(apiUrl, requestOptions);
-          const data = await response.json();
-          console.log(data);
-          if (data.status === "success") {
-            setUserId(data.user_id);
-            setIsAuthenticated(true);
-          } 
-
-        } catch (error) {
-          console.error("Error fetching login status:", error);
-        }
-        setLoading(false);
-      };
-  
-      fetchLoginStatus();
-    }, []);
 
     useEffect(() => {
       const fetchCommonUserFoodPreferences = async () => {
@@ -181,7 +151,7 @@ function DisplayCommonUserFoodPreference() {
       <ThemeProvider theme={defaultTheme}>
         <Box sx={{ display: 'flex' }}>
           <CssBaseline />
-          <DashboardLayout title = 'Preferences'/>
+          <DashboardLayout title = 'Preferences' userId={userId}/>
           <Box
             component="main"
             sx={{

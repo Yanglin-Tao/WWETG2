@@ -61,7 +61,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
     }),
 );
 
-const DashboardLayout = ({ title }) => {
+const DashboardLayout = ({ title, userId }) => {
     const [open, setOpen] = React.useState(true);
     const [auth, setAuth] = React.useState(true);
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -83,7 +83,9 @@ const DashboardLayout = ({ title }) => {
     };
 
     const handleLogout = () => {
+        setAnchorEl(null);
         Cookies.remove('token');
+        Cookies.remove(`cart_${userId}`);
         window.open("/", "_self");
     };
     return (

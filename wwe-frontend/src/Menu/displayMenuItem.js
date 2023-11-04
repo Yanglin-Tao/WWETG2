@@ -37,7 +37,7 @@ function Copyright() {
     );
 }
 
-function DisplayMenuItem() {
+function DisplayMenuItem({userId}) {
     const menu = () => {
         window.open("/displayDailyMenu", "_self");
     };
@@ -53,7 +53,7 @@ function DisplayMenuItem() {
         <ThemeProvider theme={createTheme()}>
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
-                <DashboardLayout title="Menu" />
+                <DashboardLayout title="Menu" userId={userId}/>
                 <Box
                     component="main"
                     sx={{

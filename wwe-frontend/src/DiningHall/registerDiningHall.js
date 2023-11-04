@@ -44,6 +44,13 @@ function RegisterDiningHall() {
   const [alertMessage, setAlertMessage] = useState('');
   const [alertSeverity, setAlertSeverity] = useState('info');
 
+  const [emailError, setEmailError] = React.useState('');
+  const [passwordError, setPasswordError] = React.useState('');
+  // Regular expression for email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // Regular expression for password validation (at least one uppercase letter)
+  const passwordRegex = /^(?=.*[A-Z]).{8,}$/;
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -73,6 +80,19 @@ function RegisterDiningHall() {
     const institutionId = data.get('institutionId');
     const apiUrl = `http://127.0.0.1:8080/register_dininghall`;
 
+    if (!emailRegex.test(email)) {
+      setEmailError('Please enter a valid email address.');
+      return;
+    } else {
+      setEmailError('');
+    }
+    if (!passwordRegex.test(password)) {
+      setPasswordError('Password must contain at least one uppercase letter and be at least 8 characters long.');
+      return;
+    } else {
+      setPasswordError('');
+    }
+
     const requestOptions = {
       method: 'POST',
       headers: {
@@ -90,7 +110,9 @@ function RegisterDiningHall() {
           setAlertSeverity('success');
           setAlertMessage(message);
           setOpen(true);
-          window.open('/loginDiningHall', '_self');
+          setTimeout(() => {
+            window.open('/loginDiningHall', '_self');
+          }, 800);
         } else {
           setAlertSeverity('error');
           setAlertMessage(message);
@@ -141,6 +163,8 @@ function RegisterDiningHall() {
                   autoComplete="email"
                   value={formData.email}
                   onChange={handleChange}
+                  error={!!emailError}
+                  helperText={emailError}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -165,6 +189,8 @@ function RegisterDiningHall() {
                   autoComplete="new-password"
                   value={formData.password}
                   onChange={handleChange}
+                  error={!!passwordError}
+                  helperText={passwordError}
                 />
               </Grid>
             </Grid>

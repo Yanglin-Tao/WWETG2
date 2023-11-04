@@ -23,6 +23,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import DashboardLayout from './DashboardLayout';
 import Rating from './rating';
+import Cookies from 'js-cookie';
 
 /* TODO: This component should display a shopping cart interface to users. 
     The component should display a list of foot item names and quantities. 
@@ -47,25 +48,12 @@ const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const cards = [
-    {
-        id: 1,
-        name: 'Food Item 1',
-        calories: 300,
-        imageUrl: 'https://source.unsplash.com/random?food&1',
 
-    },
-    {
-        id: 2,
-        name: 'Food Item 2',
-        calories: 450,
-        imageUrl: 'https://source.unsplash.com/random?food&2',
-    },
-];
-
-function BrowseDailyMenu() {
-    const [cartItems, setCartItems] = React.useState([]);
-    const [totalCalories, setTotalCalories] = React.useState(0);
+function MealShoppingCart({ userId }) {
+    const userCartCookieKey = `cart_${userId}`;
+    const cartItemsFromCookie = JSON.parse(Cookies.get(userCartCookieKey) || '[]');
+    const [cartItems, setCartItems] = React.useState(cartItemsFromCookie);
+    const [totalCalories, setTotalCalories] = React.useState(cartItemsFromCookie.reduce((acc, curr) => acc + (curr.calories * curr.count), 0));
     const [modalOpen, setModalOpen] = React.useState(false);
     const [open, setOpen] = React.useState(false);
     const [ratingMessage, setRatingMessage] = React.useState(false);
@@ -88,85 +76,51 @@ function BrowseDailyMenu() {
 
     const handleCheckout = () => {
         setOpen(true);
-        setModalOpen(true); // Open the modal when the checkout button is clicked
+        setModalOpen(true); 
     }
 
     const handleCloseModal = () => {
-        setModalOpen(false); // Close the modal
+        setModalOpen(false);    
         setRatingMessage(true);
     }
 
     const handleRatingComplete = () => {
-        setCartItems([]); // Clears the cart
-        setTotalCalories(0); // Clears the calories
-        handleCloseModal(); // Close the rating modal
+        setCartItems([]); 
+        setTotalCalories(0); 
+        handleCloseModal(); 
+
+        Cookies.set(userCartCookieKey, JSON.stringify([]), { expires: 1 });
+        window.dispatchEvent(new CustomEvent('cart-updated', { detail: [] }));
     }
-
-    // const submitRatings = () => {
-    //     // TODO: Submit the ratings and complete the checkout process
-    //     console.log('Ratings submitted:', cartItems);
-    //     setModalOpen(false);
-    // }
-
-    const handleAddToCart = (foodItem) => {
-        setCartItems((prevCartItems) => {
-            const itemIndex = prevCartItems.findIndex(item => item.id === foodItem.id);
-            let newCartItems;
-            if (itemIndex > -1) {
-                // If the item is already in the cart, increment the count
-                newCartItems = [...prevCartItems];
-                newCartItems[itemIndex].count += 1;
-            } else {
-                // If the item is not in the cart, add it with a count of 1
-                // Include the imageUrl in the food item data
-                newCartItems = [...prevCartItems, { ...foodItem, count: 1, imageUrl: `https://source.unsplash.com/random?food&${foodItem.id}` }];
-            }
-            // Update the total calories
-            const newTotalCalories = newCartItems.reduce((acc, curr) => acc + (curr.calories * curr.count), 0);
-            setTotalCalories(newTotalCalories);
-
-            return newCartItems;
-        });
-    };
-
 
     const handleRemoveFromCart = (foodId) => {
         setCartItems((prevCartItems) => {
             const itemIndex = prevCartItems.findIndex(item => item.id === foodId);
-
-            // If the item is not found, do nothing
             if (itemIndex === -1) return prevCartItems;
+
             const newCartItems = [...prevCartItems];
             const item = newCartItems[itemIndex];
-            // If the count is greater than 1, decrement the count
             if (item.count > 1) {
                 newCartItems[itemIndex].count -= 1;
             } else {
-                // If the count is 1, remove the item from the cart
                 newCartItems.splice(itemIndex, 1);
             }
-            // Update the total calories
             const newTotalCalories = newCartItems.reduce((acc, curr) => acc + (curr.calories * curr.count), 0);
             setTotalCalories(newTotalCalories);
 
+            Cookies.set(userCartCookieKey, JSON.stringify(newCartItems), { expires: 1 }); // Expires in 1 day
+
+            window.dispatchEvent(new CustomEvent('cart-updated', { detail: newCartItems }));
+
             return newCartItems;
         });
-    };
-
-
-    const dashboard = () => {
-        window.open("/displayCommonUserDashboard", "_self");
-    };
-
-    const shop = () => {
-        window.open("/mealShoppingCart", "_self");
     };
 
     return (
         <ThemeProvider theme={createTheme()}>
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
-                <DashboardLayout title='Shopping Cart' />
+                <DashboardLayout title='Shopping Cart' userId={userId}/>
                 <Box
                     component="main"
                     sx={{
@@ -199,7 +153,7 @@ function BrowseDailyMenu() {
                                                         {cartItems.map((item) => (
                                                             <Grid item key={item.id} xs={12} sm={6} md={4}>
                                                                 <Badge badgeContent={item.count} color="primary" anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
-                                                                    <Card sx={{ width: { xs: '100%', sm: '335px' }, height: '100%', display: 'flex', flexDirection: 'column' }}>
+                                                                    <Card sx={{ width: { xs: '100%', sm: '300px' }, height: '100%', display: 'flex', flexDirection: 'column' }}>
                                                                         <CardMedia
                                                                             component="div"
                                                                             sx={{
@@ -232,38 +186,6 @@ function BrowseDailyMenu() {
                                                 <p>Total Calories: {totalCalories}</p>
                                             </Box>
                                         </Box>
-                                        {/* Display available Food Items */}
-                                        <Grid container spacing={4}>
-                                            {cards.map((card) => (
-                                                <Grid item key={card.id} xs={12} sm={6} md={4}>
-                                                    <Card
-                                                        sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-                                                    >
-                                                        <CardMedia
-                                                            component="div"
-                                                            sx={{
-                                                                // 16:9
-                                                                pt: '56.25%',
-                                                            }}
-                                                            image={card.imageUrl}
-                                                        />
-                                                        <CardContent sx={{ flexGrow: 1 }}>
-                                                            <Typography variant="h5" component="div">
-                                                                {card.name}
-                                                            </Typography>
-                                                            <Typography variant="body2" color="text.secondary">
-                                                                {card.calories} calories
-                                                            </Typography>
-                                                        </CardContent>
-                                                        <CardActions>
-                                                            <Button size="small" color="primary" onClick={() => handleAddToCart(card)}>
-                                                                Add to Cart
-                                                            </Button>
-                                                        </CardActions>
-                                                    </Card>
-                                                </Grid>
-                                            ))}
-                                        </Grid>
                                         <Button
                                             type="submit"
                                             fullWidth
@@ -310,4 +232,4 @@ function BrowseDailyMenu() {
     );
 }
 
-export default BrowseDailyMenu;
+export default MealShoppingCart;

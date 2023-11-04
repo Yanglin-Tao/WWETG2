@@ -39,7 +39,7 @@ function Copyright(props) {
   );
 }
 
-function DisplayCommonUserGoals() {
+function DisplayCommonUserGoals({userId}) {
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
@@ -107,7 +107,7 @@ function DisplayCommonUserGoals() {
     <ThemeProvider theme={defaultTheme}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
-        <DashboardLayout title = 'My Goals'/>
+        <DashboardLayout title = 'My Goals' userId={userId}/>
         <Box
           component="main"
           sx={{

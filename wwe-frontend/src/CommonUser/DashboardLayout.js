@@ -1,4 +1,5 @@
 import React from 'react';
+import Badge from '@mui/material/Badge';
 import MuiDrawer from '@mui/material/Drawer';
 import MuiAppBar from '@mui/material/AppBar';
 import Typography from '@mui/material/Typography';
@@ -62,10 +63,37 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
     }),
 );
 
-const DashboardLayout = ({title}) => {
+const DashboardLayout = ({ title, userId }) => {
+    const userCartCookieKey = `cart_${userId}`;
     const [open, setOpen] = React.useState(true);
     const [auth, setAuth] = React.useState(true);
     const [anchorEl, setAnchorEl] = React.useState(null);
+    const [cartUpdateKey, setCartUpdateKey] = React.useState(Date.now());
+
+    // This function just calculates the cart item count
+    const getCartItemCount = () => {
+        const cart = Cookies.get(userCartCookieKey);
+        const cartItems = cart ? JSON.parse(cart) : [];
+        return cartItems.reduce((total, item) => total + item.count, 0);
+    };
+
+    const [cartItemCount, setCartItemCount] = React.useState(getCartItemCount());
+
+    React.useEffect(() => {
+        const handleCartUpdated = (event) => {
+          if (event && event.detail) {
+            setCartItemCount(event.detail.reduce((total, item) => total + item.count, 0));
+          } else {
+            setCartItemCount(getCartItemCount());
+          }
+        };
+        window.addEventListener('cart-updated', handleCartUpdated);
+        handleCartUpdated();
+        return () => {
+          window.removeEventListener('cart-updated', handleCartUpdated);
+        };
+      }, [userId]);
+
 
     const toggleDrawer = () => {
         setOpen(!open);
@@ -97,7 +125,7 @@ const DashboardLayout = ({title}) => {
         window.open("/", "_self");
     };
     return (
-        <div style={{ display: 'flex' }}>
+        <div style={{ display: 'flex' }} key={cartUpdateKey}>
             <AppBar position="absolute" open={open}>
                 <Toolbar
                     sx={{
@@ -126,10 +154,9 @@ const DashboardLayout = ({title}) => {
                         {title}
                     </Typography>
                     <IconButton size="large" color="inherit" onClick={shop}>
-                        {/* <Badge badgeContent={4} color="secondary">
-                <NotificationsIcon />
-              </Badge> */}
-                        <ShoppingCartIcon />
+                        <Badge badgeContent={cartItemCount} color="error">
+                            <ShoppingCartIcon />
+                        </Badge>
                     </IconButton>
                     {auth && (
                         <div>

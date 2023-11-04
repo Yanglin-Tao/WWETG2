@@ -1,5 +1,4 @@
 import * as React from 'react';
-import AppBar from '@mui/material/AppBar';
 import Button from '@mui/material/Button';
 import Title from './Title';
 import Paper from '@mui/material/Paper';
@@ -12,7 +11,6 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import CssBaseline from '@mui/material/CssBaseline';
 import Grid from '@mui/material/Grid';
-import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
@@ -20,6 +18,7 @@ import Container from '@mui/material/Container';
 import Link from '@mui/material/Link';
 import DashboardLayout from './DashboardLayout';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Cookies from 'js-cookie';
 
 /* TODO: This component should let common user browse a list of menuItems in dailyMenu. 
     Each item displays a name, customer rating, food warning/recommendation and a button to add 
@@ -45,40 +44,50 @@ const cards = [
     id: 1,
     name: 'Food Item 1',
     calories: 300,
-    imageUrl: 'https://source.unsplash.com/random?food1',
+    imageUrl: 'https://source.unsplash.com/random?food&1',
   },
   {
     id: 2,
     name: 'Food Item 2',
     calories: 450,
-    imageUrl: 'https://source.unsplash.com/random?food2',
+    imageUrl: 'https://source.unsplash.com/random?food&2',
   },
 ];
 
-function BrowseDailyMenu() {
-  const [cartItems, setCartItems] = React.useState([]);
-  const [totalCalories, setTotalCalories] = React.useState(0);
+function BrowseDailyMenu({ userId }) {
+  const [cartItems, setCartItems] = React.useState(() => {
+    const userCartCookieName = `cart_${userId}`;
+    const itemsFromCookies = Cookies.get(userCartCookieName);
+    return itemsFromCookies ? JSON.parse(itemsFromCookies) : [];
+  });
 
   const handleAddToCart = (foodItem) => {
-    // Add the selected food item to the cart
-    setCartItems([...cartItems, foodItem]);
-    // Update the total calories
-    setTotalCalories(totalCalories + foodItem.calories);
-  };
+    setCartItems((prevCartItems) => {
+      const itemIndex = prevCartItems.findIndex(item => item.id === foodItem.id);
+      let newCartItems;
+      if (itemIndex > -1) {
+        newCartItems = [...prevCartItems];
+        newCartItems[itemIndex].count += 1;
+      } else {
+        newCartItems = [...prevCartItems, { ...foodItem, count: 1 }];
+      }
 
-  const dashboard = () => {
-    window.open("/displayCommonUserDashboard", "_self");
-  };
+      console.log('New Cart Items:', newCartItems);
 
-  const shop = () => {
-    window.open("/mealShoppingCart", "_self");
+      const userCartCookieName = `cart_${userId}`;
+      Cookies.set(userCartCookieName, JSON.stringify(newCartItems), { expires: 1 }); // Expires in 1 day
+
+      window.dispatchEvent(new CustomEvent('cart-updated', { detail: newCartItems }));
+
+      return newCartItems;
+    });
   };
 
   return (
     <ThemeProvider theme={createTheme()}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
-        <DashboardLayout title="Menu" />
+        <DashboardLayout title="Menu" userId={userId}/>
         <Box
           component="main"
           sx={{
@@ -109,7 +118,7 @@ function BrowseDailyMenu() {
                           {/* Display the Shopping Cart using Cards */}
                           <Grid container spacing={4}>
                             {cards.map((card) => (
-                              <Grid item key={card} xs={12} sm={6} md={4}>
+                              <Grid item key={card.id} xs={12} sm={6} md={4}>
                                 <Card
                                   sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
                                 >
@@ -118,21 +127,21 @@ function BrowseDailyMenu() {
                                     sx={{
                                       pt: '56.25%',
                                     }}
-                                    image="https://source.unsplash.com/random?food"
+                                    image={card.imageUrl}
                                   />
                                   <CardContent sx={{ flexGrow: 1 }}>
                                     <Typography gutterBottom variant="h5" component="h2">
-                                      Food Item Name
+                                      {card.name}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                      {card.calories} calories
                                     </Typography>
                                     <Typography>
                                       Rating: 5 stars
                                     </Typography>
                                   </CardContent>
                                   <CardActions>
-                                    <Button
-                                      size="small"
-                                      onClick={() => handleAddToCart({ name: 'Food Item Name', calories: 300 })}
-                                    >
+                                    <Button size="small" color="primary" onClick={() => handleAddToCart(card)}>
                                       Add to Cart
                                     </Button>
                                     <Button size="small">View Details</Button>

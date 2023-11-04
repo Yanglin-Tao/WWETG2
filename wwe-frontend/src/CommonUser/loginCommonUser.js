@@ -45,6 +45,11 @@ function LoginCommonUser() {
     const [alertMessage, setAlertMessage] = React.useState('');
     const [alertSeverity, setAlertSeverity] = React.useState('info');
 
+    const [emailError, setEmailError] = React.useState('');
+    // Regular expression for email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
             return;
@@ -55,11 +60,17 @@ function LoginCommonUser() {
     const handleSubmit = (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-
         const emailID = data.get('email');
         const password = data.get('password');
         const role = 'common';
         const apiUrl = `http://127.0.0.1:8080/login`;
+
+        if (!emailRegex.test(emailID)) {
+            setEmailError('Please enter a valid email address.');
+            return;
+        } else {
+            setEmailError('');
+        }
 
         const requestOptions = {
             method: 'POST',
@@ -79,7 +90,9 @@ function LoginCommonUser() {
                     setAlertSeverity('success');
                     setAlertMessage(message);
                     setOpen(true);
-                    window.open('/displayCommonUserDashboard', '_self');
+                    setTimeout(() => {
+                        window.open('/displayCommonUserDashboard', '_self');
+                    }, 800);
                 } else {
                     setAlertSeverity('error');
                     setAlertMessage(message);
@@ -132,6 +145,8 @@ function LoginCommonUser() {
                                 name="email"
                                 autoComplete="email"
                                 autoFocus
+                                error={!!emailError}
+                                helperText={emailError}
                             />
                             <TextField
                                 margin="normal"

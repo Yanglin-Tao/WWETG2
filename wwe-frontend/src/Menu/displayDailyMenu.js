@@ -43,7 +43,7 @@ const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
-function DisplayDailyMenu() {
+function DisplayDailyMenu({userId}) {
     const item = () => {
         window.open("/displayMenuItem", "_self");
     };
@@ -51,7 +51,7 @@ function DisplayDailyMenu() {
         <ThemeProvider theme={createTheme()}>
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
-                <DashboardLayout title="Menu" />
+                <DashboardLayout title="Menu" userId={userId}/>
                 <Box
                     component="main"
                     sx={{

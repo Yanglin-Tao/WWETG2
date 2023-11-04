@@ -26,7 +26,8 @@ import Cookies from 'js-cookie';
 function App() {
     const [isAuth, setIsAuthenticated] = useState(false);
     const [role, setRole] = useState('');
-    const [loading, setLoading] = useState(true);
+    const [pageLoading, setPageLoading] = useState(true);
+    const [userId, setUserId] = useState(null);
 
     useEffect(() => {
         const fetchLoginStatus = async () => {
@@ -49,6 +50,7 @@ function App() {
                     console.log("role: ", data.role);
                     setRole(data.role);
                     setIsAuthenticated(true);
+                    setUserId(data.user_id);
                 } else {
                     Cookies.remove('token');
                     console.log("role: ", role);
@@ -58,14 +60,14 @@ function App() {
                 console.error("Error fetching login status:", error);
                 setIsAuthenticated(false);
             }
-            setLoading(false);
+            setPageLoading(false);
         };
 
         fetchLoginStatus();
     }, []);
 
     const renderPrivateRoute = (Component) => {
-        return isAuth ? <Component /> : <Navigate to="/" />
+        return isAuth ? <Component userId={userId} /> : <Navigate to="/" />
     };
 
     const renderLoginPageoginPage = (Component) => {
@@ -77,7 +79,7 @@ function App() {
         return <Component />
     };
 
-    if (loading) {
+    if (pageLoading) {
         return <LoadingIndicator />
     };
 

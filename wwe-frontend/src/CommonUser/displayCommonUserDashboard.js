@@ -49,7 +49,7 @@ function Copyright(props) {
   );
 }
 
-function DisplayCommonUserDashboard() {
+function DisplayCommonUserDashboard({ userId }) {
   const [open, setOpen] = React.useState(true);
   const [auth, setAuth] = React.useState(true);
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -78,7 +78,7 @@ function DisplayCommonUserDashboard() {
     <ThemeProvider theme={defaultTheme}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
-        <DashboardLayout title = 'What We Eat Dashboard'/>
+        <DashboardLayout title = 'What We Eat Dashboard' userId={userId}/>
         <Box
           component="main"
           sx={{

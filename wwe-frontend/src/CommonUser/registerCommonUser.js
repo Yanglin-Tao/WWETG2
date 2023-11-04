@@ -43,6 +43,13 @@ function RegisterCommonUser() {
   const [alertMessage, setAlertMessage] = useState('');
   const [alertSeverity, setAlertSeverity] = useState('info');
 
+  const [emailError, setEmailError] = React.useState('');
+  const [passwordError, setPasswordError] = React.useState('');
+  // Regular expression for email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // Regular expression for password validation (at least one uppercase letter)
+  const passwordRegex = /^(?=.*[A-Z]).{8,}$/;
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -70,6 +77,19 @@ function RegisterCommonUser() {
     const institutionID = data.get('institutionID');
     const apiUrl = `http://127.0.0.1:8080/register_common`;
 
+    if (!emailRegex.test(email)) {
+      setEmailError('Please enter a valid email address.');
+      return;
+    } else {
+      setEmailError('');
+    }
+    if (!passwordRegex.test(password)) {
+      setPasswordError('Password must contain at least one uppercase letter and be at least 8 characters long.');
+      return;
+    } else {
+      setPasswordError('');
+    }
+
     // Constructing the request options for the POST request
     const requestOptions = {
       method: 'POST',
@@ -88,7 +108,9 @@ function RegisterCommonUser() {
           setAlertSeverity('success');
           setAlertMessage(message);
           setOpen(true);
-          window.open('/loginCommonUser', '_self');
+          setTimeout(() => {
+            window.open('/loginCommonUser', '_self');
+          }, 800);
         } else {
           setAlertSeverity('error');
           setAlertMessage(message);
@@ -128,6 +150,8 @@ function RegisterCommonUser() {
                   autoComplete="email"
                   value={formData.email}
                   onChange={handleChange}
+                  error={!!emailError}
+                  helperText={emailError}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -141,19 +165,21 @@ function RegisterCommonUser() {
                   autoComplete="new-password"
                   value={formData.password}
                   onChange={handleChange}
+                  error={!!passwordError}
+                  helperText={passwordError}
                 />
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                    required
-                    fullWidth
-                    id="institutionID"
-                    label="Institution ID"
-                    name="institutionID"
-                    autoComplete="institutionID"
-                    value={formData.institutionID}
-                    onChange={handleChange}
-                  />
+                  required
+                  fullWidth
+                  id="institutionID"
+                  label="Institution ID"
+                  name="institutionID"
+                  autoComplete="institutionID"
+                  value={formData.institutionID}
+                  onChange={handleChange}
+                />
               </Grid>
             </Grid>
             <Button

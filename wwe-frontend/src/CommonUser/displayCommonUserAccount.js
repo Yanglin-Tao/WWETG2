@@ -28,7 +28,7 @@ return (
 );
 }
 
-function DisplayCommonUserAccount() {
+function DisplayCommonUserAccount({userId}) {
     const [open, setOpen] = React.useState(true);
     const toggleDrawer = () => {
         setOpen(!open);
@@ -100,7 +100,7 @@ function DisplayCommonUserAccount() {
         <ThemeProvider theme={createTheme()}>
         <Box sx={{ display: 'flex' }}>
             <CssBaseline />
-            <DashboardLayout title ="What We Eat Dashboard" />
+            <DashboardLayout title ="What We Eat Dashboard" userId={userId}/>
             <Box
             component="main"
             sx={{
