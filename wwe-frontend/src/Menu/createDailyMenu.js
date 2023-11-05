@@ -1,31 +1,23 @@
 import * as React from 'react';
-import { useState } from 'react';
-import Avatar from '@mui/material/Avatar';
+import { useState, useEffect } from 'react';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import MuiDrawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
-import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import Badge from '@mui/material/Badge';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Link from '@mui/material/Link';
-import MenuIcon from '@mui/icons-material/Menu';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import PersonIcon from '@mui/icons-material/Person';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import DashboardLayout from '../DiningHall/DashboardLayout';
 import Title from './Title';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 import Button from '@mui/material/Button';
 import { DataGrid } from '@mui/x-data-grid';
 import TextField from '@mui/material/TextField';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers';
 
 /* TODO: This component should allow dining hall administrator create a new dailyMenu. 
     The component should have a button to display createMenuItem component and allow dining hall 
@@ -46,14 +38,10 @@ function Copyright(props) {
 }
 
 function CreateDailyMenu() {
-    const [open, setOpen] = React.useState(true);
-    const toggleDrawer = () => {
-      setOpen(!open);
-    };
-    const login = () => {
-      window.open("/login", "_self");
-    };
     const [isEditable, setIsEditable] = useState(false);
+    const [menuDate, setMenuDate] = useState("")
+    const [foodItems, setFoodItems] = useState([{ name: '', ingredients: '', type: '' }]);
+
     const toggleEdit = () => {
         setIsEditable(!isEditable);
     };
@@ -77,10 +65,13 @@ function CreateDailyMenu() {
         menu: `2023-10-${String(i+1).padStart(2, '0')} Daily Menu`
     }));
 
-    const [foodItems, setFoodItems] = React.useState([{ name: '', ingredients: '', type: '' }]);
-
     const handleAddFoodItem = () => {
         setFoodItems([...foodItems, { name: '', ingredients: '', type: '' }]);
+    };
+
+    const handleDeleteFoodItem = (index) => {
+        const filteredItems = foodItems.filter((item, i) => i !== index);
+        setFoodItems(filteredItems);
     };
 
     const handleInputChange = (index, field, value) => {
@@ -121,9 +112,16 @@ function CreateDailyMenu() {
                             checkboxSelection={false}
                         />
                     </div>
-                    <Title>Create Daily Menu for 10-23-2023 </Title>
+                    <Title>Create Daily Menu </Title>
                     {isEditable && (
                         <div>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DatePicker
+                                    label="Menu Date"
+                                    value={menuDate}
+                                    onChange={(newMenuDate) => setMenuDate(newMenuDate)}
+                                />
+                            </LocalizationProvider>
                             {foodItems.map((item, index) => (
                                 <div key={index}>
                                     <TextField
@@ -172,7 +170,7 @@ function CreateDailyMenu() {
                                             onChange={e => handleInputChange(index, 'ingredients', e.target.value)}
                                         />
                                     </Box>
-                                    <Button>Delete</Button>
+                                    <Button onClick={() => handleDeleteFoodItem(index)}>Delete</Button>
                                 </div>
                             ))}
                             <Button onClick={handleAddFoodItem}>Add</Button>
