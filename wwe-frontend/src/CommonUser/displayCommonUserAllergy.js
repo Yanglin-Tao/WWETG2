@@ -45,7 +45,6 @@ function DisplayCommonUserAllergy({ userId }) {
   const [isEditable, setIsEditable] = useState(false);
   const [allergies, setAllergies] = useState([]);
   const [newAllergy, setNewAllergy] = useState('');
-  const [isAuth, setIsAuthenticated] = useState(false);
   const [open, setOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertSeverity, setAlertSeverity] = useState('info');
@@ -81,9 +80,6 @@ function DisplayCommonUserAllergy({ userId }) {
 
   useEffect(() => {
     const fetchCommonUserAllergy = async () => {
-        if (!isAuth) { 
-          return;
-        }
         const token = Cookies.get('token'); 
         const apiUrl = `http://localhost:8080/getAllergy`; 
         const requestOptions = {

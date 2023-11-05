@@ -46,8 +46,6 @@ function DisplayCommonUserFoodPreference({ userId }) {
     const [preferences, setPreferences] = useState([]);
     const [selectedPreference, setSelectedPreference] = useState('');
     const possiblePreferences = ['Halal', 'Vegetarian', 'Gluten Free', 'Balanced', 'Vegan', 'Pescatarian']; 
-    const [isAuth, setIsAuthenticated] = useState(false);
-
     const [open, setOpen] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [alertSeverity, setAlertSeverity] = useState('info');
@@ -79,9 +77,6 @@ function DisplayCommonUserFoodPreference({ userId }) {
 
     useEffect(() => {
       const fetchCommonUserFoodPreferences = async () => {
-          if (!isAuth) { 
-            return;
-          }
           const token = Cookies.get('token'); 
           const apiUrl = `http://localhost:8080/getUserPreference`; 
           const requestOptions = {

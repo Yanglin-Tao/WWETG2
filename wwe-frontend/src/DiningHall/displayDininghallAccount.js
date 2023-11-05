@@ -12,6 +12,10 @@ import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
 import Title from './Title';
 import Button from '@mui/material/Button';
+import Cookies from 'js-cookie';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+
 /* TODO: This component should display a dining hall's email and institution
 */
 function Copyright(props) {
@@ -26,80 +30,114 @@ function Copyright(props) {
         </Typography>
     );
 }
-function DisplayDiningHallAccount() {
-    const [open, setOpen] = React.useState(true);
-    const toggleDrawer = () => {
-      setOpen(!open);
-    };
-    const login = () => {
-      window.open("/login", "_self");
-    };
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
+function DisplayDiningHallAccount({ userId }) {
     const [isEditable, setIsEditable] = useState(false);
+    const [userData, setUserData] = useState({institutionName: '', diningHallName: '', email: '', address: ''});
+    const [loading, setLoading] = useState(true);
+    const [open, setOpen] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertSeverity, setAlertSeverity] = useState('info');
+
+    const handleClose = (event, reason) => {
+      if (reason === 'clickaway') {
+        return;
+      }
+      setOpen(false);
+    };
+
     const toggleEdit = () => {
         setIsEditable(!isEditable);
+        // if (isEditable) {
+        //   updateDiningHallAccount();
+        // }
     };
-
-    const current_institution = "New York University";
-    const current_dining_hall = "NYU Jasper Kane Dining Hall";
-    const contact_email = "askcampusservices@nyu.edu";
-    const [address, setAddress] = useState("6 MetroTech Center, Brooklyn, NY 11201");
     
-    const handleAddressChange = (e) => {
-        setAddress(e.target.value);
+    const handleUserDataChange = (e) => {
+        setUserData(e.target.value);
     };
-
-    const [userData, setUserData] = useState({institution: '', dining_hall: '', contact_email: '', password: '', address: ''});
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchUserData = async () => {
-            try {
-                const response = await fetch('http://localhost:8080/get_dining_hall_account');
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                setUserData(data);
-            } catch (error) {
-                console.error('There was a problem with the fetch operation:', error.message);
-            } finally {
-                setLoading(false);
-            }
+          const token = Cookies.get('token'); 
+          const apiUrl = `http://localhost:8080/get_dining_hall_account`; 
+          console.log(userId);
+          const requestOptions = {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': token,
+              },
+              body: JSON.stringify({ 
+                diningHallID: userId
+              })
+          };
+  
+          try {
+              const response = await fetch(apiUrl, requestOptions);
+              if (!response.ok) {
+                  throw new Error('Network response was not ok');
+              }
+              const data = await response.json();
+              console.log(data);
+              setUserData({
+                institutionName: data.institutionName,
+                diningHallName: data.diningHallName,
+                email: data.email,
+                address: data.address
+              })
+          } catch (error) {
+              console.error('There was a problem fetching dining hall account data:', error);
+          }
         };
-        // fetchUserData();
-    }, []);
+        fetchUserData();
+    }, [userId]);
 
     const updateDiningHallAccount = async () => {
-        try {
-            const response = await fetch('http://localhost:8080/update_dining_hall_account', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    email: userData.email, 
-                    newPassword: userData.password,
-                    newAddress: userData.address,
-                }),
-            });
+      try {
+          const token = Cookies.get('token'); 
+          const response = await fetch('http://localhost:8080/update_dining_hall_account', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': token,
+              },
+              body: JSON.stringify({
+                  userID: userId, 
+                  userData: userData
+              }),
+          });
 
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
+          if (!response.ok) {
+              throw new Error('Network response was not ok');
+          }
+
+          const responseData = await response.json();
+          console.log('Update successful', responseData);
+            if (responseData.Message === "Successfully updated dining hall account info into your profile.") {
+              setAlertSeverity('success');
+              setAlertMessage(responseData.Message);
+              setOpen(true);
+            } else {
+              setAlertSeverity('error');
+              setAlertMessage(responseData.Message);
+              setOpen(true);
             }
 
-            const responseData = await response.json();
-            // handle the response data 
-
-        } catch (error) {
-            console.error('There was a problem updating the dining hall password:', error.message);
-        }
+      } catch (error) {
+          console.error('There was a problem updating dining hall user account:', error.message);
+      }
     };
     
     return (
       <ThemeProvider theme={createTheme()}>
         <Box sx={{ display: 'flex' }}>
           <CssBaseline />
-          <DashboardLayout title ="What We Eat Dashboard" />
+          <DashboardLayout title ="What We Eat Dashboard" userId={userId}/>
           <Box
             component="main"
             sx={{
@@ -113,25 +151,34 @@ function DisplayDiningHallAccount() {
             }}
           >
             <Toolbar />
+            <Snackbar
+              open={open}
+              autoHideDuration={6000}
+              onClose={handleClose}
+            >
+              <Alert onClose={handleClose} severity={alertSeverity} sx={{ width: '100%' }}>
+                {alertMessage}
+              </Alert>
+            </Snackbar>
             <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
               <Grid container spacing={3}>
                 <Grid item xs={12}>
                   <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  <Title>Current Institution</Title>
-                  {current_institution}
-                  <Title>Current Dining Hall</Title>
-                  {current_dining_hall}
+                  <Title>Institution</Title>
+                  {userData.institutionName}
+                  <Title>Dining Hall</Title>
+                  {userData.diningHallName}
                   <Title>Contact Email</Title>
-                  {contact_email}
+                  {userData.email}
                   <Title>Address</Title>
                   { isEditable ? (
                       <input 
                           type="text"
-                          value={address}
-                          onChange={handleAddressChange}
+                          value={userData}
+                          onChange={handleUserDataChange}
                       />
                   ) : (
-                      address
+                      userData.address
                   )}
                   <Button
                     type="submit"
