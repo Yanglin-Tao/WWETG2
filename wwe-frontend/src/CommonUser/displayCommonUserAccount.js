@@ -12,6 +12,9 @@ import Link from '@mui/material/Link';
 import Title from './Title';
 import Button from '@mui/material/Button';
 import DashboardLayout from './DashboardLayout';
+import Cookies from 'js-cookie';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 /* TODO: This component should display common user's email and institution.
 */
 
@@ -29,72 +32,43 @@ return (
 }
 
 function DisplayCommonUserAccount({userId}) {
-    const [open, setOpen] = React.useState(true);
-    const toggleDrawer = () => {
-        setOpen(!open);
-    };
-    const login = () => {
-        window.open("/login", "_self");
-    };
-    const [isEditable, setIsEditable] = useState(false);
-    const toggleEdit = () => {
-        setIsEditable(!isEditable);
-    };
 
-    const current_institution = "New York University";
-    const user_email = "janedoe@nyu.edu";
-    const [password, setPassword] = useState("1234567890letMeIn");
-    
-    const handlePasswordChange = (e) => {
-        setPassword(e.target.value);
-        // update password
-    };
-
-    const [userData, setUserData] = useState({email: '', institution: ''});
+    const [userData, setUserData] = useState({email: '', institutionName: ''});
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchUserData = async () => {
-            try {
-                const response = await fetch('http://localhost:8080/get_common_user_account');
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                setUserData(data);
-            } catch (error) {
-                console.error('There was a problem with the fetch operation:', error.message);
-            } finally {
-                setLoading(false);
-            }
+          const token = Cookies.get('token'); 
+          const apiUrl = `http://localhost:8080/get_common_user_account`; 
+          console.log(userId);
+          const requestOptions = {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': token,
+              },
+              body: JSON.stringify({ 
+                userID: userId
+              })
+          };
+  
+          try {
+              const response = await fetch(apiUrl, requestOptions);
+              if (!response.ok) {
+                  throw new Error('Network response was not ok');
+              }
+              const data = await response.json();
+              console.log(data);
+              setUserData({
+                institutionName: data.institutionName,
+                email: data.email,
+              })
+          } catch (error) {
+              console.error('There was a problem fetching common user account data:', error);
+          }
         };
-        // fetchUserData();
-    }, []);
-
-    const updateCommonUserPassword = async () => {
-        try {
-            const response = await fetch('http://localhost:8080/update_common_user_password', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    email: userData.email, 
-                    newPassword: password,
-                }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-
-            const responseData = await response.json();
-            // handle the response data 
-
-        } catch (error) {
-            console.error('There was a problem updating the common user password:', error.message);
-        }
-    };
+        fetchUserData();
+    }, [userId]);
     
     return (
         <ThemeProvider theme={createTheme()}>
@@ -118,29 +92,10 @@ function DisplayCommonUserAccount({userId}) {
                 <Grid container spacing={3}>
                 <Grid item xs={12}>
                     <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                    <Title>Current Institution</Title>
-                    {current_institution}
-                    <Title>User Email</Title>
-                    {user_email}
-                    <Title>Password</Title>
-                    { isEditable ? (
-                      <input 
-                            type="text"
-                            value={password}
-                            onChange={handlePasswordChange}
-                        />
-                    ) : (
-                        '*********'
-                    )}
-                    <Button
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        sx={{ mt: 3, mb: 2 }}
-                        onClick={toggleEdit}
-                    >
-                        {isEditable ? 'Save Changes' : 'Edit Common User Profile'}
-                    </Button>
+                    <Title>Institution</Title>
+                    {userData.institutionName}
+                    <Title>Email</Title>
+                    {userData.email}
                     </Paper>
                 </Grid>
                 </Grid>
