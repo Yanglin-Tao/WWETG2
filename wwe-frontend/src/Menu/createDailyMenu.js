@@ -37,7 +37,7 @@ function Copyright(props) {
     );
 }
 
-function CreateDailyMenu() {
+function CreateDailyMenu({userId}) {
     const [isEditable, setIsEditable] = useState(false);
     const [menuDate, setMenuDate] = useState("")
     const [foodItems, setFoodItems] = useState([{ name: '', ingredients: '', type: '' }]);
@@ -84,7 +84,7 @@ function CreateDailyMenu() {
       <ThemeProvider theme={createTheme()}>
         <Box sx={{ display: 'flex' }}>
           <CssBaseline />
-          <DashboardLayout title ="What We Eat Dashboard" />
+          <DashboardLayout title ="What We Eat Dashboard" userId={userId}/>
           <Box
             component="main"
             sx={{

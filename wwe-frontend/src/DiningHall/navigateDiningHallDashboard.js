@@ -7,7 +7,6 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import PeopleIcon from '@mui/icons-material/People';
 import BarChartIcon from '@mui/icons-material/BarChart';
-import LayersIcon from '@mui/icons-material/Layers';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 
 /* TODO: This component is a list of items for dining hall users to navigate their dashboards.
@@ -18,6 +17,14 @@ const dashboard = () => {
 };
 
 const menu = () => {
+  window.open("/displayDailyMenu", "_self");
+};
+
+const create = () => {
+  window.open("/createDailyMenu", "_self");
+};
+
+const reports = () => {
   window.open("/displayDailyMenu", "_self");
 };
 
@@ -39,11 +46,11 @@ export const mainListItems = (
       </ListItemIcon>
       <ListItemText primary="Today's Menu" />
     </ListItemButton>
-    <ListItemButton onClick={dashboard}>
+    <ListItemButton onClick={create}>
       <ListItemIcon>
         <PeopleIcon />
       </ListItemIcon>
-      <ListItemText primary="Upload Menu" />
+      <ListItemText primary="Create Menu" />
     </ListItemButton>
     <ListItemButton onClick={dashboard}>
       <ListItemIcon>

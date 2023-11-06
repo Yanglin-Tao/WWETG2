@@ -67,10 +67,12 @@ function App() {
     }, []);
 
     const renderPrivateRoute = (Component) => {
+        //console.log("Private: ", Component)
         return isAuth ? <Component userId={userId} /> : <Navigate to="/" />
     };
 
     const renderLoginPageoginPage = (Component) => {
+        //console.log("Login: ", Component)
         if (role === "common") {
             return isAuth ? <Navigate to="/displayCommonUserDashboard" /> : <Component />;
         } else if (role === "dining") {

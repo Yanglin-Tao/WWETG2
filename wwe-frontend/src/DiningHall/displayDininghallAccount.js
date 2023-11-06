@@ -38,7 +38,6 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 function DisplayDiningHallAccount({ userId }) {
     const [isEditable, setIsEditable] = useState(false);
     const [userData, setUserData] = useState({institutionName: '', diningHallName: '', email: '', address: ''});
-    const [loading, setLoading] = useState(true);
     const [open, setOpen] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [alertSeverity, setAlertSeverity] = useState('info');
