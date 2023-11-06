@@ -39,7 +39,9 @@ const defaultTheme = createTheme();
 function RegisterInstitution() {
   const [open, setOpen] = React.useState(false);
   const [alertMessage, setAlertMessage] = React.useState('');
-  const [alertSeverity, setAlertSeverity] = React.useState('info')
+  const [alertSeverity, setAlertSeverity] = React.useState('info');
+  const [isRegisterSuccess, setIsRegisterSuccess] = React.useState(false);
+  const [institutionId, setInstitutionId] = React.useState('');
 
   const [formData, setFormData] = useState({
     name: ''
@@ -82,6 +84,8 @@ function RegisterInstitution() {
         } else {
           setAlertMessage('Successful registration!');
           setAlertSeverity('success');  // Green alert for success
+          setIsRegisterSuccess(true);
+          setInstitutionId(data.institutionID);
         }
         setOpen(true);
       })
@@ -134,6 +138,11 @@ function RegisterInstitution() {
             >
               Sign Up
             </Button>
+            {isRegisterSuccess && (
+              <Typography variant="subtitle1" align="center" color="primary" sx={{ mt: 2 }}>
+                Your Institution ID is: {institutionId}. Copy & share.
+              </Typography>
+            )}
             <Snackbar
               open={open}
               autoHideDuration={6000}
