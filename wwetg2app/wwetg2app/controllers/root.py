@@ -27,7 +27,7 @@ import json
 
 from sqlalchemy import create_engine
 
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Date, Float, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Date, Float, DateTime, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 
@@ -149,7 +149,7 @@ class MenuItem(Base):
     calories = Column(Float)
 
 def init_db():
-    # Base.metadata.drop_all(engine)
+    Base.metadata.drop_all(engine)
     Base.metadata.create_all(bind=engine)
     # Add food preferences
     food_preferences = ['Halal', 'Vegetarian', 'Gluten Free', 'Balanced', 'Vegan', 'Pescatarian']
@@ -743,12 +743,29 @@ class RootController(BaseController):
             return {"message": "Successfully updated your rating"}
         else:
             return {"message": "You have to login first."}
+        
+    @expose('json')
+    def get_food_rating(self):
+        data = request.json_body
+        userID = data.get("userID")
+        diningHallID = data.get("diningHallID")
+        dishName = data.get("dishName")
+        if userID:
+            dishID = session.query(Dish).filter_by(diningHallID = diningHallID).filter_by(dishName = dishName).first().dishID
+            rating = session.query(UserRating).filter_by(userID = userID).filter_by(dishID = dishID).first().rating
+            return {"rating": rating}
+        else:
+            return {"message": "You have to login first."}
+        
+    @expose('json')
+    def get_average_food_rating(self):
+        data = request.json_body
+        diningHallID = data.get("diningHallID")
+        dishName = data.get("dishName")
+        dishID = session.query(Dish).filter_by(diningHallID = diningHallID).filter_by(dishName = dishName).first().dishID
+        ratings = session.query(UserRating).filter_by(dishID = dishID).all()
+        rating_list = []
+        for rating in ratings:
+            rating_list.append(rating.rating)
+        return {"rating": round(sum(rating_list) / len(rating_list),1)}
     
-# todo:
-# get_food_item_rating 
-# {
-#  food_item_rating: ‘’ }
-# get_food_item_average_rating
-# {
-#  food_item_average_rating: ‘’
-# }
