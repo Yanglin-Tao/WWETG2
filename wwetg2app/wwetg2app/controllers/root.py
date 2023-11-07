@@ -53,15 +53,6 @@ Base = declarative_base()
 Session = sessionmaker(bind=engine)
 session = Session()
 
-class MealTracking(Base):
-    __tablename__ = 'meal_trackings'
-    userID = Column(Integer, primary_key=True)
-    shoppingCart = Column(String)
-    intakeRecords = Column(String)
-    dishRatings = Column(Float)
-    calorieIntake = Column(Float)
-    fatIntake = Column(Float)
-    nutrientIntake = Column(Float)
 
 class Institution(Base):
     __tablename__ = 'institutions'
@@ -85,12 +76,31 @@ class DiningHallReport(Base):
     top10PriorityFoodAllergies = Column(String)
     top10HighestRatedDishes = Column(String)
 
+class Dish(Base):
+    __tablename__ = 'dish'
+    dishID = Column(Integer, primary_key=True)
+    diningHallID = Column(Integer, ForeignKey('dining_halls.diningHallID'))
+    dishName = Column(String)
+    calorie = Column(Integer)
+
 class DailyMenu(Base):
     __tablename__ = 'daily_menus'
     menuID = Column(Integer, primary_key=True)
     date = Column(Date)
     diningHallID = Column(Integer, ForeignKey('dining_halls.diningHallID'))
-    dishesID = Column(Integer) # This might need a relationship if dishes are stored in another table
+    dishID = Column(Integer,ForeignKey('dish.dishID'))
+
+class MealTracking(Base):
+    __tablename__ = 'meal_trackings'
+    userID = Column(Integer, ForeignKey('user_profiles.userID'), primary_key=True)
+    date = Column(Date)
+    dishID = Column(Integer,ForeignKey('dish.dishID'))
+
+class UserRating(Base):
+    __tablename__ = 'user_rating'
+    userID = Column(Integer, ForeignKey('user_profiles.userID'), primary_key=True)
+    dishID = Column(Integer,ForeignKey('dish.dishID'), primary_key=True)
+    rating = Column(Integer)
 
 class Allergy(Base):
     __tablename__ = 'allergy'
@@ -139,7 +149,7 @@ class MenuItem(Base):
     calories = Column(Float)
 
 def init_db():
-    Base.metadata.drop_all(engine)
+    # Base.metadata.drop_all(engine)
     Base.metadata.create_all(bind=engine)
     # Add food preferences
     food_preferences = ['Halal', 'Vegetarian', 'Gluten Free', 'Balanced', 'Vegan', 'Pescatarian']
@@ -707,3 +717,38 @@ class RootController(BaseController):
         dishList = self.uploadDiningHallMenu(menu.menuID)[1] #????
         return {"message": "Menu created"}
 
+#-----------------Ratings-------------------
+    @expose('json')
+    def update_food_item_rating(self):
+        data = request.json_body
+        userID = data.get("userID")
+        rating = data.get("rating")
+        diningHallID = data.get("diningHallID")
+        dishName = data.get("dishName")
+        if userID:
+            # Delete previous rating if has
+            dishID = session.query(Dish).filter_by(diningHallID = diningHallID).filter_by(dishName = dishName).first().dishID
+            toDrop = session.query(UserRating).filter_by(userID = userID).filter_by(dishID = dishID).first()
+            if toDrop:
+                session.delete(toDrop)
+                session.commit()
+            # Add new rating
+            new_rating = UserRating(
+                userID = userID,
+                dishID = dishID,
+                rating = rating
+            )
+            session.add(new_rating)
+            session.commit()
+            return {"message": "Successfully updated your rating"}
+        else:
+            return {"message": "You have to login first."}
+    
+# todo:
+# get_food_item_rating 
+# {
+#  food_item_rating: ‘’ }
+# get_food_item_average_rating
+# {
+#  food_item_average_rating: ‘’
+# }
