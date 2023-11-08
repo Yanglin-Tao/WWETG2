@@ -58,12 +58,12 @@ function DisplayCommonUserAllergy({ userId }) {
 
   const handleAddAllergy = () => {
     if (newAllergy && !allergies.includes(newAllergy)) {
-        setAllergies(prevAllergies => [...prevAllergies, newAllergy]);
-        setNewAllergy(''); 
+      setAllergies(prevAllergies => [...prevAllergies, newAllergy]);
+      setNewAllergy('');
     } else {
       setAlertSeverity('error');
       setAlertMessage('This allergy already exists!');
-      setOpen(true); 
+      setOpen(true);
     }
   };
 
@@ -79,78 +79,87 @@ function DisplayCommonUserAllergy({ userId }) {
   };
 
   useEffect(() => {
-    const fetchCommonUserAllergy = async () => {
-        const token = Cookies.get('token'); 
-        const apiUrl = `http://localhost:8080/getAllergy`; 
+    let isMounted = true;
+    if (!userId) {
+      console.log("UserID is not set.");
+      return;
+    }
+
+    if (userId) {
+      const fetchCommonUserAllergy = async () => {
+        const token = Cookies.get('token');
+        const apiUrl = `http://localhost:8080/getAllergy`;
         const requestOptions = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': token,
-            },
-            body: JSON.stringify({ 
-              userID: userId
-            })
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token,
+          },
+          body: JSON.stringify({
+            userID: userId
+          })
         };
-
         try {
-            const response = await fetch(apiUrl, requestOptions);
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            const data = await response.json();
-            console.log(data);
+          const response = await fetch(apiUrl, requestOptions);
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          const data = await response.json();
+          console.log(data);
+          if (isMounted) {
             setAllergies(data.Allergies);
+          }
         } catch (error) {
-            console.error('There was a problem fetching the user allergies:', error);
+          console.error('There was a problem fetching the user allergies:', error);
         }
-    };
+      };
 
-    fetchCommonUserAllergy();
-  }, [userId]); 
+      fetchCommonUserAllergy();
+    }
+  }, [userId]);
 
   const updateCommonUserAllergy = async () => {
-      try {
-          const token = Cookies.get('token'); 
-          console.log(allergies);
-          const response = await fetch('http://localhost:8080/updateAllergy', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': token,
-              },
-              body: JSON.stringify({
-                  userID: userId, 
-                  allergies: allergies,
-              }),
-          });
+    try {
+      const token = Cookies.get('token');
+      console.log(allergies);
+      const response = await fetch('http://localhost:8080/updateAllergy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token,
+        },
+        body: JSON.stringify({
+          userID: userId,
+          allergies: allergies,
+        }),
+      });
 
-          if (!response.ok) {
-              throw new Error('Network response was not ok');
-          }
-
-          const responseData = await response.json();
-          console.log('Update successful', responseData);
-            if (responseData.Message === "Successfully updated the allergy info into your profile.") {
-              setAlertSeverity('success');
-              setAlertMessage(responseData.Message);
-              setOpen(true);
-            } else {
-              setAlertSeverity('error');
-              setAlertMessage(responseData.Message);
-              setOpen(true);
-            }
-
-      } catch (error) {
-          console.error('There was a problem updating common user allergy:', error.message);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
+
+      const responseData = await response.json();
+      console.log('Update successful', responseData);
+      if (responseData.Message === "Successfully updated the allergy info into your profile.") {
+        setAlertSeverity('success');
+        setAlertMessage(responseData.Message);
+        setOpen(true);
+      } else {
+        setAlertSeverity('error');
+        setAlertMessage(responseData.Message);
+        setOpen(true);
+      }
+
+    } catch (error) {
+      console.error('There was a problem updating common user allergy:', error.message);
+    }
   };
 
   return (
     <ThemeProvider theme={defaultTheme}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
-        <DashboardLayout title = 'Allergies' userId={userId}/>
+        <DashboardLayout title='Allergies' userId={userId} />
         <Box
           component="main"
           sx={{
@@ -165,13 +174,13 @@ function DisplayCommonUserAllergy({ userId }) {
         >
           <Toolbar />
           <Snackbar
-              open={open}
-              autoHideDuration={6000}
-              onClose={handleClose}
-            >
-              <Alert onClose={handleClose} severity={alertSeverity} sx={{ width: '100%' }}>
-                {alertMessage}
-              </Alert>
+            open={open}
+            autoHideDuration={6000}
+            onClose={handleClose}
+          >
+            <Alert onClose={handleClose} severity={alertSeverity} sx={{ width: '100%' }}>
+              {alertMessage}
+            </Alert>
           </Snackbar>
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
             <Grid container spacing={3}>
@@ -179,14 +188,14 @@ function DisplayCommonUserAllergy({ userId }) {
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
                   <Title>My Food Allergies</Title>
                   <Stack direction="row" spacing={1}>
-                  {Array.isArray(allergies) && allergies.map(allergy => (
-                    <Chip 
-                      key={allergy}
-                      label={allergy}
-                      variant="outlined"
-                      onDelete={isEditable ? handleDelete(allergy) : undefined}
-                    />
-                  ))}
+                    {Array.isArray(allergies) && allergies.map(allergy => (
+                      <Chip
+                        key={allergy}
+                        label={allergy}
+                        variant="outlined"
+                        onDelete={isEditable ? handleDelete(allergy) : undefined}
+                      />
+                    ))}
                   </Stack>
                   {isEditable && (
                     <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
