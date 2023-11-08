@@ -10,11 +10,8 @@ import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Link from '@mui/material/Link';
 import Title from './Title';
-import Button from '@mui/material/Button';
 import DashboardLayout from './DashboardLayout';
 import Cookies from 'js-cookie';
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
 /* TODO: This component should display common user's email and institution.
 */
 
