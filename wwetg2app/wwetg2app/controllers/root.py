@@ -82,13 +82,19 @@ class Dish(Base):
     diningHallID = Column(Integer, ForeignKey('dining_halls.diningHallID'))
     dishName = Column(String)
     calorie = Column(Integer)
+    ingredients = Column(String)
+    categories = Column(String)
 
 class DailyMenu(Base):
     __tablename__ = 'daily_menus'
     menuID = Column(Integer, primary_key=True)
     date = Column(Date)
     diningHallID = Column(Integer, ForeignKey('dining_halls.diningHallID'))
-    dishID = Column(Integer,ForeignKey('dish.dishID'))
+
+class MenuDish(Base):
+    __tablename__ = 'menu_dish'
+    dishID = Column(Integer,ForeignKey('dish.dishID'), primary_key=True)
+    menuID = Column(Integer,ForeignKey('daily_menu.dail'), primary_key=True)
 
 class MealTracking(Base):
     __tablename__ = 'meal_trackings'
