@@ -745,7 +745,7 @@ class RootController(BaseController):
     
     # Display all the menus under that dining hall
     @expose('json')
-    def displayHistoricalMenu(self):
+    def getHistoricalMenu(self):
         data = request.json_body
         diningHallID = data.get("diningHallID")
         # get all the menu ID and created date
