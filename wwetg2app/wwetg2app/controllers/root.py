@@ -86,7 +86,7 @@ class Dish(Base):
     categories = Column(String)
 
 class DailyMenu(Base):
-    __tablename__ = 'daily_menus'
+    __tablename__ = 'daily_menu'
     menuID = Column(Integer, primary_key=True)
     date = Column(Date)
     diningHallID = Column(Integer, ForeignKey('dining_halls.diningHallID'))
@@ -94,13 +94,13 @@ class DailyMenu(Base):
 class MenuDish(Base):
     __tablename__ = 'menu_dish'
     dishID = Column(Integer,ForeignKey('dish.dishID'), primary_key=True)
-    menuID = Column(Integer,ForeignKey('daily_menu.dail'), primary_key=True)
+    menuID = Column(Integer,ForeignKey('daily_menu.menuID'), primary_key=True)
 
 class MealTracking(Base):
     __tablename__ = 'meal_trackings'
     userID = Column(Integer, ForeignKey('user_profiles.userID'), primary_key=True)
-    date = Column(Date)
-    dishID = Column(Integer,ForeignKey('dish.dishID'))
+    date = Column(Date, primary_key=True)
+    dishID = Column(Integer,ForeignKey('dish.dishID'), primary_key=True)
 
 class UserRating(Base):
     __tablename__ = 'user_rating'
@@ -813,3 +813,24 @@ class RootController(BaseController):
             rating_list.append(rating.rating)
         return {"rating": round(sum(rating_list) / len(rating_list),1)}
     
+#--------------Meal Tracking----------------
+    @expose('json')
+    def track_meal(self):
+        data = request.json_body
+        diningHallID = data.get("diningHallID")
+        dishNameList = data.get("dishList")
+        userID = data.get("userID")
+        if userID:
+            for dish in dishNameList:
+                dishID = session.query(Dish).filter_by(diningHallID = diningHallID).filter_by(dishName = dish).first().dishID
+                new_track_dish = MealTracking(
+                    userID = userID,
+                    dishID = dishID,
+                    date = datetime.today()
+                )
+                session.add(new_track_dish)
+                session.commit()
+            return {"message": "Successfully updated your meal tracking"}
+        else:
+            return {"message": "You have to login first."}
+        
