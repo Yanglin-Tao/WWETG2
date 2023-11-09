@@ -63,7 +63,7 @@ function DisplayCommonUserGoals({userId}) {
   useEffect(() => {
       const fetchUserData = async () => {
           try {
-              const response = await fetch('http://localhost:8080/get_common_user_goals');
+              const response = await fetch('http://127.0.0.1:8080/get_common_user_goals');
               if (!response.ok) {
                   throw new Error('Network response was not ok');
               }
@@ -80,7 +80,7 @@ function DisplayCommonUserGoals({userId}) {
 
   const updateCommonUserGoals = async () => {
       try {
-          const response = await fetch('http://localhost:8080/update_common_user_goals', {
+          const response = await fetch('http://127.0.0.1:8080/update_common_user_goals', {
               method: 'POST',
               headers: {
                   'Content-Type': 'application/json',

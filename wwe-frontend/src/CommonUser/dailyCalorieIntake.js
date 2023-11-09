@@ -18,7 +18,7 @@ export default function DailyCalorieIntake() {
   useEffect(() => {
       const fetchUserData = async () => {
           try {
-              const response = await fetch('http://localhost:8080/get_user_daily_total_calories_intake');
+              const response = await fetch('http://127.0.0.1:8080/get_user_daily_total_calories_intake');
               if (!response.ok) {
                   throw new Error('Network response was not ok');
               }

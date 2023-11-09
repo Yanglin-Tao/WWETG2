@@ -88,7 +88,7 @@ function DisplayCommonUserAllergy({ userId }) {
     if (userId) {
       const fetchCommonUserAllergy = async () => {
         const token = Cookies.get('token');
-        const apiUrl = `http://localhost:8080/getAllergy`;
+        const apiUrl = `http://127.0.0.1:8080/getAllergy`;
         const requestOptions = {
           method: 'POST',
           headers: {
@@ -122,7 +122,7 @@ function DisplayCommonUserAllergy({ userId }) {
     try {
       const token = Cookies.get('token');
       console.log(allergies);
-      const response = await fetch('http://localhost:8080/updateAllergy', {
+      const response = await fetch('http://127.0.0.1:8080/updateAllergy', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

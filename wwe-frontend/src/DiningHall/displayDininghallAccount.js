@@ -63,7 +63,7 @@ function DisplayDiningHallAccount({ userId }) {
     useEffect(() => {
         const fetchUserData = async () => {
           const token = Cookies.get('token'); 
-          const apiUrl = `http://localhost:8080/get_dining_hall_account`; 
+          const apiUrl = `http://127.0.0.1:8080/get_dining_hall_account`; 
           console.log(userId);
           const requestOptions = {
               method: 'POST',
@@ -99,7 +99,7 @@ function DisplayDiningHallAccount({ userId }) {
     const updateDiningHallAccount = async () => {
       try {
           const token = Cookies.get('token'); 
-          const response = await fetch('http://localhost:8080/update_dining_hall_account', {
+          const response = await fetch('http://127.0.0.1:8080/update_dining_hall_account', {
               method: 'POST',
               headers: {
                   'Content-Type': 'application/json',

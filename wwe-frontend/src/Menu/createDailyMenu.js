@@ -79,7 +79,7 @@ function CreateDailyMenu({userId}) {
     useEffect(() => {
         const fetchHistoricalMenus = async () => {
           const token = Cookies.get('token'); 
-          const apiUrl = `http://localhost:8080/getHistoricalMenus`; 
+          const apiUrl = `http://127.0.0.1:8080/getHistoricalMenus`; 
           console.log(userId);
           const requestOptions = {
               method: 'POST',
@@ -110,7 +110,7 @@ function CreateDailyMenu({userId}) {
     const createDailyMenu = async () => {
         try {
             const token = Cookies.get('token'); 
-            const response = await fetch('http://localhost:8080/createDailyMenu', {
+            const response = await fetch('http://127.0.0.1:8080/createDailyMenu', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

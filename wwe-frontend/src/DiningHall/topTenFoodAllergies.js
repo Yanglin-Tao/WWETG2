@@ -58,7 +58,7 @@ export default function TopTenFoodAllergies() {
   useEffect(() => {
       const fetchUserData = async () => {
           try {
-              const response = await fetch('http://localhost:8080/get_top_ten_food_allergies');
+              const response = await fetch('http://127.0.0.1:8080/get_top_ten_food_allergies');
               if (!response.ok) {
                   throw new Error('Network response was not ok');
               }

@@ -34,7 +34,7 @@ export default function CalorieChart() {
   useEffect(() => {
       const fetchUserData = async () => {
           try {
-              const response = await fetch('http://localhost:8080/get_user_daily_calories_intake_by_time');
+              const response = await fetch('http://127.0.0.1:8080/get_user_daily_calories_intake_by_time');
               if (!response.ok) {
                   throw new Error('Network response was not ok');
               }

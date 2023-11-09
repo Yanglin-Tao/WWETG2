@@ -78,7 +78,7 @@ function DisplayCommonUserFoodPreference({ userId }) {
     useEffect(() => {
       const fetchCommonUserFoodPreferences = async () => {
           const token = Cookies.get('token'); 
-          const apiUrl = `http://localhost:8080/getUserPreference`; 
+          const apiUrl = `http://127.0.0.1:8080/getUserPreference`; 
           const requestOptions = {
               method: 'POST',
               headers: {
@@ -110,7 +110,7 @@ function DisplayCommonUserFoodPreference({ userId }) {
         try {
             const token = Cookies.get('token'); 
             console.log(preferences);
-            const response = await fetch('http://localhost:8080/updateUserPreference', {
+            const response = await fetch('http://127.0.0.1:8080/updateUserPreference', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
