@@ -45,7 +45,7 @@ function DisplayCommonUserPrivacySettings({userId}) {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await fetch('http://localhost:8080/get_user_privacy_settings');
+                const response = await fetch('http://127.0.0.1:8080/get_user_privacy_settings');
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
@@ -62,7 +62,7 @@ function DisplayCommonUserPrivacySettings({userId}) {
 
     const updateCommonUserPrivacySettings = async () => {
         try {
-            const response = await fetch('http://localhost:8080/update_user_privacy_settings', {
+            const response = await fetch('http://127.0.0.1:8080/update_user_privacy_settings', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

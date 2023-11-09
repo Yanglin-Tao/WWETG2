@@ -36,7 +36,7 @@ function DisplayCommonUserAccount({userId}) {
     useEffect(() => {
         const fetchUserData = async () => {
           const token = Cookies.get('token'); 
-          const apiUrl = `http://localhost:8080/get_common_user_account`; 
+          const apiUrl = `http://127.0.0.1:8080/get_common_user_account`; 
           console.log(userId);
           const requestOptions = {
               method: 'POST',
