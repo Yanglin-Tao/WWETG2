@@ -84,6 +84,7 @@ class Dish(Base):
     calorie = Column(Integer)
     ingredients = Column(String)
     categories = Column(String)
+    servingSize = Column(String)
 
 class DailyMenu(Base):
     __tablename__ = 'daily_menu'
@@ -632,88 +633,98 @@ class RootController(BaseController):
       
 #---------UPLOAD MENU & MENUITEM------------
     @expose('json')
-    # dining hall adds a new item to an existing daily menu
-    def addMenuItem(self):
+    # dining hall adds a new dish to an existing  menu
+    def addDish(self):
         data = request.json_body
         menuID = data.get("menuID")
         name = data.get("name")
         diningHallID = data.get("diningHallID")
-        catogory = data.get("catagoty")
+
         ingredients = data.get("ingredients")
-        allergens = data.get("allergens")
         calorie = data.get("calories")
-        dietaryTags = data.get("diataryTags")
+        categories = data.get("categories")
+        servingSize = data.get("servingSize")
         # check if the menu exists
         menuExit = session.query(DailyMenu).filter_by(menuID = menuID).first()
         if not menuExit:
             return {"message":"Menu doesn't exist."}
-        # the list of new MenuItem
-        dishID = session.query(MenuItem).count() + 1
-        item = Dish(
+        # check if the dish has been created before
+        dishID = session.query(Dish).filter_by(diningHallID = diningHallID).filter_by(dishName = name).first().dishID
+        if not dishID:
+            # create the new dish
+            dishID = session.query(Dish).count() + 1
+            newDish = Dish(
+                dishID = dishID,
+                diningHallID = diningHallID,
+                dishName = name,
+                calorie = calorie,
+                ingredients = ingredients,
+                categories = categories,
+                servingSize = servingSize
+            )
+            session.add(newDish)
+            session.commit()
+        # add new dish to menuDish and Dish table.
+        newMenuDish = MenuDish(
             dishID = dishID,
-            diningHallID = diningHallID,
-            dishName = name,
-            catogory = catogory,
-            ingredients = ingredients,
-            allergens = allergens,
-            dietaryTags = dietaryTags,
-            calorie = calorie,
+            menuID = menuID
         )
-        # add new MenuItems to the existing DailyMenu
-        oldMenu = session.query(DailyMenu).filter_by(menuID = menuID).first()
-        oldMenu.dishesID.append(dishID) #### ??
-        session.add(item)
+        session.add(newMenuDish)
         session.commit()
         return {"message":"finish uploading"}
     
-    # @expose('json')
-    # # dining hall update an existing menu item on an existing menu
-    # def updateMenuItem(self):
-    #     data = request.json_body
-    #     menuID = data.get("menuID")
-    #     dishID = data.get("dishID")
-    #     # check if the menu exists
-    #     menuExit = session.query(DailyMenu).filter_by(menuID = menuID).first()
-    #     if not menuExit:
-    #         return {"message":"Menu doesn't exist."}
-    #     # check if the menu item exists
-    #     itemExit = session.query(MenuItem).filter_by(dishID = dishID).first()
-    #     if not menuExit:
-    #         return {"message":"Menu doesn't exist."}
-    
-    # delete a menu item
     @expose('json')
-    def deleteMenuItem(self, dishID):
+    # update information of an existing dish, changing the information in Dish table
+    def updateDish(self):
         data = request.json_body
+        name = data.get("name")
+        diningHallID = data.get("diningHallID")
+        ingredients = data.get("ingredients")
+        calorie = data.get("calories")
+        categories = data.get("categories")
+        servingSize = data.get("servingSize") 
+        # check if the dish has been created before
+        dish = session.query(Dish).filter_by(diningHallID = diningHallID).filter_by(dishName = name).first()
+        if dish:
+            dish.calorie = calorie
+            dish.ingredients = ingredients
+            dish.categories = categories
+            dish.servingSize = servingSize
+
+            session.commit()
+
+        else: 
+            return {"message":"Dish doesn't exist."}
+
+
+    # delete a dish from a menu in MenuDish table
+    @expose('json')
+    def deleteDishFromMenu(self):
+        data = request.json_body
+        menuID = data.get("menuID")
         dishID = data.get("dishID")
         # check existence
-        item = session.query(MenuItem).filter_by(dishID = dishID).first()
+        dish = session.query(MenuDish).filter_by(dishID=dishID).filter_by(menuID=menuID).first()
         # delete item
-        if item:
-            session.delete(item)
+        if dish:
+            session.delete(dish)
             session.commit()
         else:
             return {"message":"Item not found or already deleted"}
     
-    # delete a menu, and its items
+    
     @expose('json')
+    # delete a menu, and its items from DailyMenu and MenuDish tables.
     def deleteMenu(self):
         data = request.json_body
         menuID = data.get("menuID")
         menu = session.query(DailyMenu).filter_by(menuID = menuID).first()
         if menu:
             # delete all dish itmes having the same menuID
-            subquery = session.query(MenuItem.menuID).group_by(MenuItem.menuID).having(func.count(MenuItem.menuID) >= 1).subquery()
-            allItems = session.query(MenuItem.menuID).filter(MenuItem.menuID.in_(subquery))
-            allID = [id[0] for id in allItems]
-            for id in allID:
-                item = session.query(MenuItem).filter_by(dishID = id).first()
-                # delete item
-                if item:
-                    session.delete(item)
-                    session.commit()
-                else:
-                    return {"message":"Item not found or already deleted"}
+            menuDishes = session.query(MenuDish).filter_by(menuID = menuID).all()
+            for dish in menuDishes:
+                session.delete(dish)
+                session.commit()
             # delete the menu
             session.delete(menu)
             session.commit()
@@ -721,6 +732,7 @@ class RootController(BaseController):
         else:
             return {"message":"Menu doesn't exist."}
         
+    @expose('json')  
     # dining hall create a new daliy menu
     def createDaliyMenu(self):
         data = request.json_body
@@ -728,25 +740,37 @@ class RootController(BaseController):
         date = data.get("menuDate")
         diningHallID = data.get("diningHallID")
         # create a DaliyMenu object, and add the MenuItems to it
+        menuID = session.query(DailyMenu).count() +1
         menu = DailyMenu(
-                menuID = session.query(DailyMenu).count() +1,
+                menuID = menuID,
                 date = date,
                 diningHallID = diningHallID,
-                dishesID = None)
+                )
         session.add(menu)
+        session.commit()
         for idx in range(len(dishList)):
             dish = dishList[idx]
-            newDish = Dish(
-                dishID = session.query(Dish).count() +1+idx,
-                diningHallID = diningHallID,
-                dishName = dish["dishName"],
-                calorie = dish["calories"],
-                ingradients = dish["ingradients"].split(','),
-                type = dish["type"],
-                serving_size = dish["serving_size"]
+            dishID = session.query(Dish).filter_by(diningHallID = diningHallID).filter_by(dishName = dish["dishName"]).first().dishID
+            if not dishID:
+                # that dish DNE before
+                dishID = session.query(Dish).count() +1+idx
+                newDish = Dish(
+                    dishID = dishID,
+                    diningHallID = diningHallID,
+                    dishName = dish["dishName"],
+                    calorie = dish["calories"],
+                    ingradients = dish["ingradients"],
+                    categories = dish["categories"],
+                    servingSize = dish["serving_size"]
+                )
+                session.add(newDish)
+                session.commit()
+            newMenuDish = MenuDish(
+                dishID = dishID,
+                menuID = menuID
             )
-            session.add(newDish)
-            menu.dishID.append(newDish.dishID) #????
+            session.add(newMenuDish)
+            session.commit()
         return {"message": "Menu created"}
     
     # Display all the menus under that dining hall
@@ -755,12 +779,12 @@ class RootController(BaseController):
         data = request.json_body
         diningHallID = data.get("diningHallID")
         # get all the menu ID and created date
-        menuIDList = session.query(DailyMenu).filter_by(diningHallID = diningHallID).menuID
+        menus = session.query(DailyMenu).filter_by(diningHallID = diningHallID).all()
         menuList = {}
-        for id in menuIDList:
-            menuList[id] =  session.query(DailyMenu).filter_by(menuID = id).first().date
+        for menu in menus:
+            menuList[menu.menuID] =  session.query(DailyMenu).filter_by(menuID = menu.menuID).first().date
         return menuList  
-        
+    
 #-----------------Ratings-------------------
     @expose('json')
     def update_food_item_rating(self):
