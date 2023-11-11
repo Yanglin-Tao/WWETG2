@@ -85,6 +85,7 @@ class Dish(Base):
     ingredients = Column(String)
     categories = Column(String)
     servingSize = Column(String)
+    type = Column(String)
 
 class DailyMenu(Base):
     __tablename__ = 'daily_menu'
@@ -643,15 +644,16 @@ class RootController(BaseController):
         ingredients = data.get("ingredients")
         calorie = data.get("calories")
         categories = data.get("categories")
-        servingSize = data.get("servingSize")
+        servingSize = data.get("serving_size")
+        type = data.get("type")
         # check if the menu exists
         menuExit = session.query(DailyMenu).filter_by(menuID = menuID).first()
         if not menuExit:
             return {"message":"Menu doesn't exist."}
         # check if the dish has been created before
-        dishID = session.query(Dish).filter_by(diningHallID = diningHallID).filter_by(dishName = name).first().dishID
-        if not dishID:
-            # create the new dish
+        dishExist = session.query(Dish).filter_by(diningHallID = diningHallID).filter_by(dishName = name).first()
+        if not dishExist:
+            # create the new dish, add to Dish table
             dishID = session.query(Dish).count() + 1
             newDish = Dish(
                 dishID = dishID,
@@ -660,11 +662,14 @@ class RootController(BaseController):
                 calorie = calorie,
                 ingredients = ingredients,
                 categories = categories,
-                servingSize = servingSize
+                servingSize = servingSize,
+                type = type
             )
             session.add(newDish)
             session.commit()
-        # add new dish to menuDish and Dish table.
+        else:
+            dishID = dishExist.dishID
+        # add new dish to menuDish table.
         newMenuDish = MenuDish(
             dishID = dishID,
             menuID = menuID
@@ -683,6 +688,8 @@ class RootController(BaseController):
         calorie = data.get("calories")
         categories = data.get("categories")
         servingSize = data.get("servingSize") 
+        type = data.get("type")
+
         # check if the dish has been created before
         dish = session.query(Dish).filter_by(diningHallID = diningHallID).filter_by(dishName = name).first()
         if dish:
@@ -690,8 +697,9 @@ class RootController(BaseController):
             dish.ingredients = ingredients
             dish.categories = categories
             dish.servingSize = servingSize
-
+            dish.type= type
             session.commit()
+            return {"message":"Dish Information Updated."}
 
         else: 
             return {"message":"Dish doesn't exist."}
@@ -738,7 +746,11 @@ class RootController(BaseController):
         data = request.json_body
         dishList = data.get("dishes")
         date = data.get("menuDate")
+        date = datetime.strptime(date, "%Y-%m-%d").date() # DELETE LATTER !!! OLNY FOR TESTING
         diningHallID = data.get("diningHallID")
+        diningHall = session.query(DiningHall).filter_by(diningHallID = diningHallID).first()
+        if not diningHall:
+            return {"message": "Dining Hall DNE."}
         # create a DaliyMenu object, and add the MenuItems to it
         menuID = session.query(DailyMenu).count() +1
         menu = DailyMenu(
@@ -750,21 +762,24 @@ class RootController(BaseController):
         session.commit()
         for idx in range(len(dishList)):
             dish = dishList[idx]
-            dishID = session.query(Dish).filter_by(diningHallID = diningHallID).filter_by(dishName = dish["dishName"]).first().dishID
-            if not dishID:
+            dishExist = session.query(Dish).filter_by(diningHallID = diningHallID).filter_by(dishName = dish["dishName"]).first()
+            if not dishExist:
                 # that dish DNE before
-                dishID = session.query(Dish).count() +1+idx
+                dishID = session.query(Dish).count() +1
                 newDish = Dish(
                     dishID = dishID,
                     diningHallID = diningHallID,
                     dishName = dish["dishName"],
                     calorie = dish["calories"],
-                    ingradients = dish["ingradients"],
+                    ingredients = dish["ingredients"],
                     categories = dish["categories"],
-                    servingSize = dish["serving_size"]
+                    servingSize = dish["serving_size"],
+                    type = dish["type"]
                 )
                 session.add(newDish)
                 session.commit()
+            else:
+                dishID = dishExist.dishID
             newMenuDish = MenuDish(
                 dishID = dishID,
                 menuID = menuID
