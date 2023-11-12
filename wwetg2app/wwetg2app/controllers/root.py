@@ -492,7 +492,24 @@ class RootController(BaseController):
                 else:
                     return {"message":"Dining ID or password not correct"}
     
-    
+    @expose('json')
+    # return all the dining hall names under an institution
+    def getAllDiningHalls(self):
+        data = request.json_body
+        institutionID = data.get("institutionID")
+        institution = session.query(Institution).filter_by(institutionID = institutionID).first()
+        if institution:
+            nameList = []
+            diningHalls = session.query(DiningHall).filter_by(institutionID = institutionID).all()
+            for d in diningHalls:
+                nameList.append(d.name)
+            return nameList
+        else:
+            return {"message":"Institution doesn't exist"}
+
+        
+
+
 #---------PREFERENCE & ALLERGY--------------
     @expose('json')
     # upadate everything in the preference about that user
