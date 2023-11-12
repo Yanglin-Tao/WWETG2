@@ -53,9 +53,9 @@ function CreateDailyMenu({userId}) {
     const possibleCategories = ['Halal', 'Vegetarian', 'Gluten Free', 'Balanced', 'Vegan', 'Pescatarian'];
     const possibleFoodTypes = ['Salad', 'Side', 'Main', 'Drink'];
     const [historicalMenus, setHistoricalMenus] = useState([]);
-    const [menuDate, setMenuDate] = useState("")
-    const [foodItems, setFoodItems] = useState([{ name: '', ingredients: '', type: '', calories: '', serving_size: '', category: [] }]);
-    const [displayCategories, setDisplayCategories] = useState([]);
+    const [menuDate, setMenuDate] = useState("");
+    const [foodItems, setFoodItems] = useState([{ dishName: '', ingredients: '', type: '', calories: '', serving_size: '', categories: [] }]);
+    const [rowSelectionModel, setRowSelectionModel] = useState([]);
     const [open, setOpen] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [alertSeverity, setAlertSeverity] = useState('info');
@@ -67,47 +67,65 @@ function CreateDailyMenu({userId}) {
         setOpen(false);
     };
 
-    const handleDisplayCategoriesChange = (event) => {
-        const {
-            target: { value },
-        } = event;
-        setDisplayCategories(
-            typeof value === 'string' ? value.split(',') : value,
-        );
+    const setCreateDailyMenuDefaultState = () => {
+        setMenuDate(""); 
+        setFoodItems([{ dishName: '', ingredients: '', type: '', calories: '', serving_size: '', categories: [] }]);
+    }
+
+    const handleCategoriesChange = (event, index) => {
+        const newSelection = event.target.value;
+        setFoodItems((currentFoodItems) => {
+            return currentFoodItems.map((item, i) => {
+                if (i === index) {
+                    return {
+                        ...item,
+                        categories: typeof newSelection === 'string' ? newSelection.split(',') : newSelection,
+                    };
+                }
+                return item; 
+            });
+        });
     };
 
     useEffect(() => {
-        const fetchHistoricalMenus = async () => {
-          const token = Cookies.get('token'); 
-          const apiUrl = `http://127.0.0.1:8080/getHistoricalMenus`; 
-          console.log(userId);
-          const requestOptions = {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': token,
-              },
-              body: JSON.stringify({ 
-                userID: userId
-              })
-          };
-  
-          try {
-              const response = await fetch(apiUrl, requestOptions);
-              if (!response.ok) {
-                  throw new Error('Network response was not ok');
-              }
-              const data = await response.json();
-              console.log(data);
-              setHistoricalMenus(data)
-          } catch (error) {
-              console.error('There was a problem fetching historical menu data:', error);
-          }
-        };
         fetchHistoricalMenus();
     }, [userId]);
 
+    const fetchHistoricalMenus = async () => {
+        const token = Cookies.get('token'); 
+        const apiUrl = `http://127.0.0.1:8080/getHistoricalMenu`; 
+        const requestOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token,
+            },
+            body: JSON.stringify({ 
+              diningHallID: userId
+            })
+        };
+      
+        try {
+            const response = await fetch(apiUrl, requestOptions);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            const menusArray = Object.keys(data).map(key => ({
+              id: key,
+              menu: `${data[key]} Daily Menu`
+            }));
+            setHistoricalMenus(menusArray);
+        } catch (error) {
+            console.error('There was a problem fetching historical menu data:', error);
+        }
+      };
+
     const createDailyMenu = async () => {
+        if (!validateMenu()) {
+            setIsEditable(true);
+            return;
+        }
         try {
             const token = Cookies.get('token'); 
             const response = await fetch('http://127.0.0.1:8080/createDailyMenu', {
@@ -117,8 +135,9 @@ function CreateDailyMenu({userId}) {
                     'Authorization': token,
                 },
                 body: JSON.stringify({
+                  diningHallID: userId,
                   menuDate: menuDate,
-                  menuItems: foodItems
+                  dishes: foodItems
                 }),
             });
 
@@ -127,14 +146,16 @@ function CreateDailyMenu({userId}) {
             } 
 
             const responseData = await response.json();
-            console.log('Menu creation successful', responseData);
-            if (responseData.Message === "Successfully created a new menu.") {
+            console.log(responseData);
+            if (responseData.message === "Menu created") {
               setAlertSeverity('success');
-              setAlertMessage(responseData.Message);
+              setAlertMessage(responseData.message);
               setOpen(true);
+              setCreateDailyMenuDefaultState();
+              await fetchHistoricalMenus();
             } else {
               setAlertSeverity('error');
-              setAlertMessage(responseData.Message);
+              setAlertMessage(responseData.message);
               setOpen(true);
             }
         } catch (error) {
@@ -142,8 +163,51 @@ function CreateDailyMenu({userId}) {
         }
     };
 
+    const deleteDailyMenu = async () => {
+        for (const menuId of rowSelectionModel) {
+            try {
+                const token = Cookies.get('token'); 
+                const response = await fetch('http://127.0.0.1:8080/deleteMenu', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': token,
+                    },
+                    body: JSON.stringify({
+                    diningHallID: userId,
+                    menuID: menuId,
+                    }),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                } 
+
+                const responseData = await response.json();
+                console.log(responseData);
+                if (responseData.message === "Menu deleted.") {
+                    setAlertSeverity('success');
+                    setAlertMessage(responseData.message);
+                    setOpen(true);
+                    setRowSelectionModel([]);
+                    setCreateDailyMenuDefaultState();
+                } else {
+                    setAlertSeverity('error');
+                    setAlertMessage(responseData.message);
+                    setOpen(true);
+                }
+            } catch (error) {
+                console.error('There was a problem deleting a menu:', error.message);
+            }
+        }
+    };
+
     const toggleEdit = () => {
         setIsEditable(!isEditable);
+        if (isEditable) {
+            console.log(foodItems)
+            createDailyMenu();
+        }
     };
     const columns = [
         { field: 'id', headerName: 'ID', width: 90 },
@@ -160,13 +224,8 @@ function CreateDailyMenu({userId}) {
         }
     ];
 
-    const menus = Array.from({ length: 10 }, (_, i) => ({
-        id: i + 1,
-        menu: `2023-10-${String(i+1).padStart(2, '0')} Daily Menu`
-    }));
-
     const handleAddFoodItem = () => {
-        setFoodItems([...foodItems, { name: '', ingredients: '', type: '' }]);
+        setFoodItems([...foodItems, { dishName: '', ingredients: '', type: '', calories: '', serving_size: '', categories: [] }]);
     };
 
     const handleDeleteFoodItem = (index) => {
@@ -179,6 +238,32 @@ function CreateDailyMenu({userId}) {
         newFoodItems[index][field] = value;
         setFoodItems(newFoodItems);
     };
+
+    const validateMenu = () => {
+        if (!menuDate) {
+          setAlertMessage('Menu date is required.');
+          setAlertSeverity('error');
+          setOpen(true);
+          return false;
+        }
+      
+        if (foodItems.length === 0) {
+          setAlertMessage('At least one food item is required.');
+          setAlertSeverity('error');
+          setOpen(true);
+          return false;
+        }
+      
+        for (const item of foodItems) {
+          if (!item.dishName || !item.calories || !item.serving_size || !item.ingredients || item.categories.length === 0 || !item.type) {
+            setAlertMessage('All fields are required for each food item.');
+            setAlertSeverity('error');
+            setOpen(true);
+            return false;
+          }
+        }
+        return true;
+      };
 
     return (
       <ThemeProvider theme={createTheme()}>
@@ -214,13 +299,26 @@ function CreateDailyMenu({userId}) {
                     <Title>Historical Menus</Title>
                     <div style={{ height: 400, width: '100%', marginTop: '10px', marginBottom: '10px' }}>
                         <DataGrid 
-                            rows={menus} 
+                            rows={historicalMenus} 
                             columns={columns} 
                             pageSize={5} 
                             rowsPerPageOptions={[5]}
-                            checkboxSelection={false}
+                            checkboxSelection={true}
+                            onRowSelectionModelChange={(newRowSelectionModel) => {
+                                setRowSelectionModel(newRowSelectionModel);
+                            }}
+                            rowSelectionModel={rowSelectionModel}
                         />
                     </div>
+                    <Button
+                        variant="contained"
+                        color="error"
+                        onClick={deleteDailyMenu}
+                        disabled={rowSelectionModel.length === 0}
+                        sx={{ mb: 2 }}
+                    >
+                        Delete Selected Menu
+                    </Button>
                     <Title>Create Daily Menu </Title>
                     {isEditable && (
                         <div>
@@ -229,6 +327,7 @@ function CreateDailyMenu({userId}) {
                                     label="Menu Date"
                                     value={menuDate}
                                     onChange={(newMenuDate) => setMenuDate(newMenuDate)}
+                                    required
                                 />
                             </LocalizationProvider>
                             {foodItems.map((item, index) => (
@@ -238,8 +337,9 @@ function CreateDailyMenu({userId}) {
                                         variant="outlined"
                                         margin="normal"
                                         sx={{ width: '300px', marginRight: '10px' }}
-                                        value={item.name}
-                                        onChange={e => handleInputChange(index, 'name', e.target.value)}
+                                        value={item.dishName}
+                                        onChange={e => handleInputChange(index, 'dishName', e.target.value)}
+                                        required
                                     />
                                     <TextField
                                         label="Calories per serving"
@@ -249,6 +349,7 @@ function CreateDailyMenu({userId}) {
                                         value={item.calories}
                                         sx={{ width: '300px', marginRight: '10px' }}
                                         onChange={e => handleInputChange(index, 'calories', e.target.value)}
+                                        required
                                     />
                                     <TextField
                                         label="Serving size"
@@ -258,14 +359,16 @@ function CreateDailyMenu({userId}) {
                                         value={item.serving_size}
                                         sx={{ width: '300px', marginRight: '10px' }}
                                         onChange={e => handleInputChange(index, 'serving_size', e.target.value)}
+                                        required
                                     />
                                     <FormControl variant="outlined" sx={{ width: 400, marginRight: '10px', marginBottom: '10px' }} >
-                                        <InputLabel>Category</InputLabel>
+                                        <InputLabel>Categories</InputLabel>
                                         <Select
                                         multiple
-                                        value={displayCategories}
-                                        label="Category"
-                                        onChange={handleDisplayCategoriesChange}
+                                        value={item.categories}
+                                        label="Categories"
+                                        onChange={(event) => handleCategoriesChange(event, index)}
+                                        required
                                         >
                                         {possibleCategories.map(category => (
                                             <MenuItem key={category} value={category}>
@@ -280,6 +383,7 @@ function CreateDailyMenu({userId}) {
                                             value={item.type}
                                             label="Food Type"
                                             onChange={e => handleInputChange(index, 'type', e.target.value)}
+                                            required
                                         >
                                         {possibleFoodTypes.map(type => (
                                             <MenuItem key={type} value={type}>
@@ -297,6 +401,7 @@ function CreateDailyMenu({userId}) {
                                             rows={4} 
                                             value={item.ingredients}
                                             onChange={e => handleInputChange(index, 'ingredients', e.target.value)}
+                                            required
                                         />
                                     </Box>
                                     <Button onClick={() => handleDeleteFoodItem(index)}>Delete</Button>

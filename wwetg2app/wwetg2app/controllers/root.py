@@ -742,7 +742,7 @@ class RootController(BaseController):
         
     @expose('json')  
     # dining hall create a new daliy menu
-    def createDaliyMenu(self):
+    def createDailyMenu(self):
         data = request.json_body
         dishList = data.get("dishes")
         date = data.get("menuDate")
