@@ -759,11 +759,11 @@ class RootController(BaseController):
         
     @expose('json')  
     # dining hall create a new daliy menu
-    def createDaliyMenu(self):
+    def createDailyMenu(self):
         data = request.json_body
         dishList = data.get("dishes")
         date = data.get("menuDate")
-        date = datetime.strptime(date, "%Y-%m-%d").date() # DELETE LATTER !!! OLNY FOR TESTING
+        # date = datetime.strptime(date, "%Y-%m-%d").date() # DELETE LATTER !!! OLNY FOR TESTING
         diningHallID = data.get("diningHallID")
         diningHall = session.query(DiningHall).filter_by(diningHallID = diningHallID).first()
         if not diningHall:
