@@ -6,6 +6,7 @@ import tg
 from webob.exc import WSGIHTTPException
 from tg import expose, flash, require, url, lurl
 from tg import request, redirect, tmpl_context, response
+from tg import jsonify
 from tg.i18n import ugettext as _, lazy_ugettext as l_
 from tg.exceptions import HTTPFound
 from tg import predicates
@@ -16,6 +17,7 @@ from tgext.admin.tgadminconfig import BootstrapTGAdminConfig as TGAdminConfig
 from tgext.admin.controller import AdminController
 from datetime import datetime, timedelta
 from datetime import date as dt_date
+
 from pytz import utc
 import jwt
 from jwt.exceptions import ExpiredSignatureError, DecodeError
@@ -521,7 +523,7 @@ class RootController(BaseController):
             for d in diningHalls:
                 nameList.append(d.name)
             # return {"message":"Dining Hall List Returned."}
-            return [name.encode('utf-8') for name in nameList]
+            return ",".join(nameList)
 
         else:
             return {"message":"Institution doesn't exist"}
@@ -531,29 +533,27 @@ class RootController(BaseController):
         data = request.json_body
         diningHallID = data.get("diningHallID")
         today = dt_date.today()
-        menus = session.query(DailyMenu).filter_by(date=today).filter_by(diningHallID = diningHallID).all()
+        menu = session.query(DailyMenu).filter_by(date=today).filter_by(diningHallID = diningHallID).first()
         diningHallExist = session.query(DiningHall).filter_by(diningHallID = diningHallID).first()
         if not diningHallExist:
             return {"message":"Dining Hall Doesn't Exist."}
-        if menus:
-            menuDic = {} # {menuID: dishLIst}
-            for menu in menus:
-                dishList = []
-                # dishIDs = session.query(MenuDish).filter_by(menuID=menu.menuID).all().dishID
-                dishIDs = [dish.id for dish in session.query(MenuDish).filter_by(menuID=menu.menuID).all()]
-                for id in dishIDs:
-                    dish = session.query(Dish).filter_by(dishID=id).filter_by(diningHallID = diningHallID).first()
-                    dishInfo = {
-                        "dishName": dish.dishName,
-                        "calorie": dish.calorie,
-                        "ingredients": dish.ingredients,
-                        "categories": dish.categories,
-                        "servingSize": dish.servingSize,
-                        "type": dish.type
-                    }
-                    dishList.append(json.dumps(dishInfo))
-                menuDic[menu.menuID]=dishList
-            return json.dumps(menuDic)
+        if menu:
+            dishList = []
+            # dishIDs = session.query(MenuDish).filter_by(menuID=menu.menuID).all().dishID
+            dishIDs = [dish.dishID for dish in session.query(MenuDish).filter_by(menuID=menu.menuID).all()]
+            for id in dishIDs:
+                dish = session.query(Dish).filter_by(dishID=id).filter_by(diningHallID = diningHallID).first()
+                dishInfo = {
+                    "dishName": dish.dishName,
+                    "calorie": dish.calorie,
+                    "ingredients": dish.ingredients,
+                    "categories": dish.categories,
+                    "servingSize": dish.servingSize,
+                    "type": dish.type
+                }
+                dishList.append(dishInfo)
+            
+            return {"dishList":dishList}
         else:
             return {"message": "Today's menu is not available."}
 
