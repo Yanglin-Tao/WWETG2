@@ -121,6 +121,7 @@ const DashboardLayout = ({ title, userId }) => {
 
     const handleLogout = () => {
         Cookies.remove('token');
+        Cookies.remove('selectedDiningHall');
         setAnchorEl(null);
         window.open("/", "_self");
     };
