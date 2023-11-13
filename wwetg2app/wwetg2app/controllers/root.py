@@ -15,6 +15,7 @@ from wwetg2app.model import DBSession
 from tgext.admin.tgadminconfig import BootstrapTGAdminConfig as TGAdminConfig
 from tgext.admin.controller import AdminController
 from datetime import datetime, timedelta
+from datetime import date as dt_date
 from pytz import utc
 import jwt
 from jwt.exceptions import ExpiredSignatureError, DecodeError
@@ -509,25 +510,52 @@ class RootController(BaseController):
                     return {"message":"Dining ID or password not correct"}
     
     @expose('json')
+    # return all the dining hall names under an institution
     def getAllDiningHalls(self):
         data = request.json_body
-        institution_id = data.get("institutionID")
-        # Check if the institutionID is provided and valid
-        if not institution_id:
-            return {"message": "Institution ID is missing."}
-        # Query the Institution
-        institution = session.query(Institution).filter_by(institutionID=institution_id).first()
+        institutionID = data.get("institutionID")
+        institution = session.query(Institution).filter_by(institutionID = institutionID).first()
         if institution:
-            diningHallList = []
-            # Query Dining Halls associated with the Institution
-            diningHalls = session.query(DiningHall).filter_by(institutionID=institution.institutionID).all()
+            nameList = []
+            diningHalls = session.query(DiningHall).filter_by(institutionID = institutionID).all()
             for d in diningHalls:
-                # Include both name and ID in the response
-                diningHallInfo = {"name": d.name, "id": d.diningHallID}
-                diningHallList.append(diningHallInfo)
-            return {"DiningHalls": diningHallList}
+                nameList.append(d.name)
+            # return {"message":"Dining Hall List Returned."}
+            return [name.encode('utf-8') for name in nameList]
+
         else:
-            return {"message": "Institution doesn't exist"}
+            return {"message":"Institution doesn't exist"}
+    @expose('json')
+    # return today's menu of a dining hall.
+    def getTodayMenu(self):
+        data = request.json_body
+        diningHallID = data.get("diningHallID")
+        today = dt_date.today()
+        menus = session.query(DailyMenu).filter_by(date=today).filter_by(diningHallID = diningHallID).all()
+        diningHallExist = session.query(DiningHall).filter_by(diningHallID = diningHallID).first()
+        if not diningHallExist:
+            return {"message":"Dining Hall Doesn't Exist."}
+        if menus:
+            menuDic = {} # {menuID: dishLIst}
+            for menu in menus:
+                dishList = []
+                # dishIDs = session.query(MenuDish).filter_by(menuID=menu.menuID).all().dishID
+                dishIDs = [dish.id for dish in session.query(MenuDish).filter_by(menuID=menu.menuID).all()]
+                for id in dishIDs:
+                    dish = session.query(Dish).filter_by(dishID=id).filter_by(diningHallID = diningHallID).first()
+                    dishInfo = {
+                        "dishName": dish.dishName,
+                        "calorie": dish.calorie,
+                        "ingredients": dish.ingredients,
+                        "categories": dish.categories,
+                        "servingSize": dish.servingSize,
+                        "type": dish.type
+                    }
+                    dishList.append(json.dumps(dishInfo))
+                menuDic[menu.menuID]=dishList
+            return json.dumps(menuDic)
+        else:
+            return {"message": "Today's menu is not available."}
 
         
 
