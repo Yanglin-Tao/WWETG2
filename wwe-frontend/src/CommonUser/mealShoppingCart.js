@@ -51,11 +51,33 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 function MealShoppingCart({ userId }) {
     const userCartCookieKey = `cart_${userId}`;
     const cartItemsFromCookie = JSON.parse(Cookies.get(userCartCookieKey) || '[]');
+    const diningHallID = Cookies.get('selectedDiningHallID');
     const [cartItems, setCartItems] = React.useState(cartItemsFromCookie);
     const [totalCalories, setTotalCalories] = React.useState(cartItemsFromCookie.reduce((acc, curr) => acc + (curr.calories * curr.count), 0));
     const [modalOpen, setModalOpen] = React.useState(false);
     const [open, setOpen] = React.useState(false);
     const [ratingMessage, setRatingMessage] = React.useState(false);
+
+    const trackMeals = async () => {
+        const dishNameList = cartItems.map(item => item.name);
+
+        try {
+            const response = await fetch('http://127.0.0.1:8080/track_meal', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userID: userId,
+                    dishList: dishNameList,
+                    diningHallID,
+                }),
+            });
+
+            const data = await response.json();
+            console.log(data.message);
+        } catch (error) {
+            console.error('Error tracking meals:', error);
+        }
+    };
 
     const handleMessage = (event, reason) => {  // New handleClose function
         if (reason === 'clickaway') {
@@ -73,24 +95,52 @@ function MealShoppingCart({ userId }) {
         setOpen(false);
     };
 
-    const handleCheckout = () => {
+    const handleCheckout = async () => {
+        await trackMeals();
         setOpen(true);
-        setModalOpen(true); 
-    }
+        setModalOpen(true);
+    };
 
     const handleCloseModal = () => {
-        setModalOpen(false);    
+        setModalOpen(false);
         setRatingMessage(true);
     }
 
+    const handleRatingSubmit = async (dishName, rating) => {
+
+        try {
+            const response = await fetch('http://127.0.0.1:8080/update_food_item_rating', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userID: userId,
+                    rating,
+                    diningHallID,
+                    dishName,
+                }),
+            });
+
+            const data = await response.json();
+            console.log(data.message);
+        } catch (error) {
+            console.error('Error updating food item rating:', error);
+        }
+    };
+
     const handleRatingComplete = () => {
-        setCartItems([]); 
-        setTotalCalories(0); 
-        handleCloseModal(); 
+        cartItems.forEach(item => {
+            handleRatingSubmit(item.name, item.rating); // Assume each item has a 'rating' field
+        });
+
+        setCartItems([]);
+        setTotalCalories(0);
+        handleCloseModal();
 
         Cookies.set(userCartCookieKey, JSON.stringify([]), { expires: 1 });
         window.dispatchEvent(new CustomEvent('cart-updated', { detail: [] }));
-    }
+    };
+
+
 
     const handleRemoveFromCart = (foodId) => {
         setCartItems((prevCartItems) => {
@@ -119,7 +169,7 @@ function MealShoppingCart({ userId }) {
         <ThemeProvider theme={createTheme()}>
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
-                <DashboardLayout title='Shopping Cart' userId={userId}/>
+                <DashboardLayout title='Shopping Cart' userId={userId} />
                 <Box
                     component="main"
                     sx={{

@@ -1,16 +1,10 @@
 import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import MuiDrawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
-import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import IconButton from '@mui/material/IconButton';
-import Badge from '@mui/material/Badge';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
@@ -19,6 +13,7 @@ import DashboardLayout from './DashboardLayout';
 import CalorieChart from './calorieChart';
 import DailyCalorieIntake from './dailyCalorieIntake';
 import RecentMeals from './recentMeals';
+import Cookies from 'js-cookie';
 
 /* TODO: This component should display common user's dashboard. It should navigate the common users to
 different use cases. 
@@ -78,7 +73,7 @@ function DisplayCommonUserDashboard({ userId }) {
     <ThemeProvider theme={defaultTheme}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
-        <DashboardLayout title = 'What We Eat Dashboard' userId={userId}/>
+        <DashboardLayout title='What We Eat Dashboard' userId={userId} />
         <Box
           component="main"
           sx={{

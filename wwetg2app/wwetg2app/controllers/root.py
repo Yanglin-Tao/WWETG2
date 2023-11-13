@@ -441,6 +441,22 @@ class RootController(BaseController):
             # Get the last login time based on role and user_id
             if role == "common":
                 user = session.query(UserProfile).filter_by(userID=user_id).first()
+                if user:
+                    insID = user.institutionID
+                    insName = ""
+                    if insID:
+                        institution = session.query(Institution).filter_by(institutionID=insID).first()
+                        if institution:
+                            insName = institution.name
+                    return {
+                        "status": "success", 
+                        "message": "User is logged in.", 
+                        "role": role, 
+                        "user_id": user_id,
+                        "institutionName": insName,
+                        "institutionID": insID,
+                        "email": user.email
+                    }
             elif role == "dining":
                 user = session.query(DiningHall).filter_by(diningHallID=user_id).first()
 
@@ -493,19 +509,25 @@ class RootController(BaseController):
                     return {"message":"Dining ID or password not correct"}
     
     @expose('json')
-    # return all the dining hall names under an institution
     def getAllDiningHalls(self):
         data = request.json_body
-        institutionID = data.get("institutionID")
-        institution = session.query(Institution).filter_by(institutionID = institutionID).first()
+        institution_id = data.get("institutionID")
+        # Check if the institutionID is provided and valid
+        if not institution_id:
+            return {"message": "Institution ID is missing."}
+        # Query the Institution
+        institution = session.query(Institution).filter_by(institutionID=institution_id).first()
         if institution:
-            nameList = []
-            diningHalls = session.query(DiningHall).filter_by(institutionID = institutionID).all()
+            diningHallList = []
+            # Query Dining Halls associated with the Institution
+            diningHalls = session.query(DiningHall).filter_by(institutionID=institution.institutionID).all()
             for d in diningHalls:
-                nameList.append(d.name)
-            return nameList
+                # Include both name and ID in the response
+                diningHallInfo = {"name": d.name, "id": d.diningHallID}
+                diningHallList.append(diningHallInfo)
+            return {"DiningHalls": diningHallList}
         else:
-            return {"message":"Institution doesn't exist"}
+            return {"message": "Institution doesn't exist"}
 
         
 
@@ -827,20 +849,27 @@ class RootController(BaseController):
         dishName = data.get("dishName")
         if userID:
             # Delete previous rating if has
-            dishID = session.query(Dish).filter_by(diningHallID = diningHallID).filter_by(dishName = dishName).first().dishID
-            toDrop = session.query(UserRating).filter_by(userID = userID).filter_by(dishID = dishID).first()
-            if toDrop:
-                session.delete(toDrop)
+            dish_record = session.query(Dish).filter_by(diningHallID=diningHallID, dishName=dishName).first()
+
+            if dish_record:
+                dishID = dish_record.dishID
+                # Delete previous rating if it exists
+                existing_rating = session.query(UserRating).filter_by(userID=userID, dishID=dishID).first()
+                if existing_rating:
+                    session.delete(existing_rating)
+                    session.commit()
+
+                # Add new rating
+                new_rating = UserRating(
+                    userID=userID,
+                    dishID=dishID,
+                    rating=rating
+                )
+                session.add(new_rating)
                 session.commit()
-            # Add new rating
-            new_rating = UserRating(
-                userID = userID,
-                dishID = dishID,
-                rating = rating
-            )
-            session.add(new_rating)
-            session.commit()
-            return {"message": "Successfully updated your rating"}
+                return {"message": "Successfully updated your rating"}
+            else:
+                return {"message": f"Dish '{dishName}' not found in dining hall ID {diningHallID}"}
         else:
             return {"message": "You have to login first."}
         
@@ -878,14 +907,19 @@ class RootController(BaseController):
         userID = data.get("userID")
         if userID:
             for dish in dishNameList:
-                dishID = session.query(Dish).filter_by(diningHallID = diningHallID).filter_by(dishName = dish).first().dishID
-                new_track_dish = MealTracking(
-                    userID = userID,
-                    dishID = dishID,
-                    date = datetime.today()
-                )
-                session.add(new_track_dish)
-                session.commit()
+                dish_record = session.query(Dish).filter_by(diningHallID = diningHallID).filter_by(dishName = dish).first()
+                if dish_record:
+                    dishID = dish_record.dishID
+                    new_track_dish = MealTracking(
+                        userID=userID,
+                        dishID=dishID,
+                        date=datetime.today()
+                    )
+                    session.add(new_track_dish)
+                    session.commit()
+                else:
+                    # Handle the case where the dish is not found
+                    return {"message": f"Dish '{dish}' not found in dining hall ID {diningHallID}"}
             return {"message": "Successfully updated your meal tracking"}
         else:
             return {"message": "You have to login first."}

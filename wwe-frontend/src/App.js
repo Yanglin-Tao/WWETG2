@@ -51,6 +51,16 @@ function App() {
                     setRole(data.role);
                     setIsAuthenticated(true);
                     setUserId(data.user_id);
+
+                    // Set user data in cookies
+                    Cookies.set('userData', JSON.stringify({
+                        role: data.role,
+                        user_id: data.user_id,
+                        institutionName: data.institutionName,
+                        email: data.email,
+                        institutionID: data.institutionID
+                    }, { expires: 1 }));
+
                 } else {
                     Cookies.remove('token');
                     console.log("role: ", role);
@@ -67,12 +77,12 @@ function App() {
     }, []);
 
     const renderPrivateRoute = (Component) => {
-        console.log("Private: ", Component)
+        //console.log("Private: ", Component)
         return isAuth ? <Component userId={userId} /> : <Navigate to="/" />
     };
 
     const renderLoginPageoginPage = (Component) => {
-        console.log("Login: ", Component)
+        //console.log("Login: ", Component)
         if (role === "common") {
             return isAuth ? <Navigate to="/displayCommonUserDashboard" /> : <Component />;
         } else if (role === "dining") {
