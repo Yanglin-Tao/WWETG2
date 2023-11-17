@@ -43,24 +43,11 @@ function Copyright() {
   );
 }
 
-const diningHallFoodItems = {
-  "123": [
-    { id: 1, name: 'Hall 123 Item 1', calories: 300, imageUrl: 'https://source.unsplash.com/random?food&101' },
-    { id: 2, name: 'Hall 123 Item 2', calories: 350, imageUrl: 'https://source.unsplash.com/random?food&102' },
-    // ... more items for dining hall 123
-  ],
-  "abc": [
-    { id: 3, name: 'Hall ABC Item 1', calories: 400, imageUrl: 'https://source.unsplash.com/random?food&201' },
-    { id: 4, name: 'Hall ABC Item 2', calories: 450, imageUrl: 'https://source.unsplash.com/random?food&202' },
-    // ... more items for dining hall abc
-  ],
-  // ... more dining halls and their items if needed
-};
-
 function BrowseDailyMenu({ userId }) {
   const [userData, setUserData] = useState(null);
   const [diningHalls, setDiningHalls] = useState([]);
   const [selectedDiningHall, setSelectedDiningHall] = useState('');
+  const [selectedDiningHallID, setSelectedDiningHallID] = useState('');
   const [currentMenuItems, setCurrentMenuItems] = useState([]);
   const [cartItems, setCartItems] = useState(() => {
     const userCartCookieName = `cart_${userId}`;
@@ -72,7 +59,8 @@ function BrowseDailyMenu({ userId }) {
     const selectedHall = diningHalls.find(hall => hall.name === event.target.value);
     if (selectedHall) {
       setSelectedDiningHall(selectedHall.name);
-      Cookies.set('selectedDiningHallID', selectedHall.id, { expires: 1 }); // Store the dining hall ID in cookies
+      setSelectedDiningHallID(selectedHall.id);
+      Cookies.set('selectedDiningHallID', selectedHall.id, { expires: 1 });
       setCartItems([]); // Clear the cart items in state
       Cookies.set(`cart_${userId}`, JSON.stringify([]), { expires: 1 });
       window.dispatchEvent(new CustomEvent('cart-updated', { detail: [] }));
@@ -108,8 +96,39 @@ function BrowseDailyMenu({ userId }) {
     if (selectedDiningHall) {
       Cookies.set('selectedDiningHall', selectedDiningHall, { expires: 1 });
     }
-    setCurrentMenuItems(diningHallFoodItems[selectedDiningHall] || []);
   }, [selectedDiningHall]);
+
+  useEffect(() => {
+    if (selectedDiningHallID) {
+      fetchMenuItems(selectedDiningHallID);
+    }
+  }, [selectedDiningHallID]);
+
+  const fetchMenuItems = async (diningHallID) => {
+    try {
+      const response = await fetch('http://127.0.0.1:8080/getTodayMenu', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ diningHallID })
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const menuData = await response.json();
+      if (menuData.dishList) {
+        setCurrentMenuItems(menuData.dishList);
+      } else {
+        console.error('No menu data returned');
+        setCurrentMenuItems([]);
+      }
+    } catch (error) {
+      console.error('Error fetching menu items:', error);
+    }
+  };
+
+
 
   const fetchDiningHalls = async (institutionID) => {
     console.log('Fetching dining halls for institutionID:', institutionID);
@@ -138,27 +157,29 @@ function BrowseDailyMenu({ userId }) {
     }
   };
 
-
   const handleAddToCart = (foodItem) => {
     setCartItems((prevCartItems) => {
-      const itemIndex = prevCartItems.findIndex(item => item.id === foodItem.id);
+      const itemIndex = prevCartItems.findIndex(item => item.dishID === foodItem.dishID);
       let newCartItems;
+
       if (itemIndex > -1) {
         newCartItems = [...prevCartItems];
         newCartItems[itemIndex].count += 1;
       } else {
         newCartItems = [...prevCartItems, { ...foodItem, count: 1 }];
       }
-
       console.log('New Cart Items:', newCartItems);
-
-      const userCartCookieName = `cart_${userId}`;
-      Cookies.set(userCartCookieName, JSON.stringify(newCartItems), { expires: 1 }); // Expires in 1 day
-
+      Cookies.set(`cart_${userId}`, JSON.stringify(newCartItems), { expires: 1 });
       window.dispatchEvent(new CustomEvent('cart-updated', { detail: newCartItems }));
-
       return newCartItems;
     });
+  };
+
+  const formatCategories = (categories) => {
+    if (categories) {
+      return categories.replace(/[{}"]/g, '');
+    }
+    return 'N/A'; // or any default string you wish to display
   };
 
   return (
@@ -202,37 +223,46 @@ function BrowseDailyMenu({ userId }) {
               {/* Display Demo Menu Items */}
               <Grid container spacing={4}>
                 {currentMenuItems.map((item) => (
-                  <Grid item key={item.id} xs={12} sm={6} md={4}>
+                  <Grid item key={item.dishID} xs={12} sm={6} md={4}>
                     <Card
                       sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
                     >
                       <CardMedia
                         component="div"
                         sx={{ pt: '56.25%' }}
-                        image={item.imageUrl}
+                        image={`https://source.unsplash.com/random?food&${item.dishID}`}
                       />
                       <CardContent sx={{ flexGrow: 1 }}>
                         <Typography gutterBottom variant="h5" component="h2">
-                          {item.name}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {item.calories} calories
+                          {item.dishName}
                         </Typography>
                         <Typography>
-                          Rating: 5 stars
+                          Calories:  {item.calorie}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Serving Size: {item.servingSize}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {formatCategories(item.categories)}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Ingredients: {item.ingredients}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Type: {item.type}
                         </Typography>
                       </CardContent>
                       <CardActions>
                         <Button size="small" color="primary" onClick={() => handleAddToCart(item)}>
                           Add to Cart
                         </Button>
-                        <Button size="small">View Details</Button>
                       </CardActions>
                     </Card>
                   </Grid>
                 ))}
               </Grid>
             </Container>
+            <Copyright sx={{ pt: 4 }} />
           </LocalizationProvider>
         </Box>
       </Box>

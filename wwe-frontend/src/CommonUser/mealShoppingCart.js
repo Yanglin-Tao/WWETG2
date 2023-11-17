@@ -53,13 +53,31 @@ function MealShoppingCart({ userId }) {
     const cartItemsFromCookie = JSON.parse(Cookies.get(userCartCookieKey) || '[]');
     const diningHallID = Cookies.get('selectedDiningHallID');
     const [cartItems, setCartItems] = React.useState(cartItemsFromCookie);
-    const [totalCalories, setTotalCalories] = React.useState(cartItemsFromCookie.reduce((acc, curr) => acc + (curr.calories * curr.count), 0));
+    const [totalCalories, setTotalCalories] = React.useState(cartItemsFromCookie.reduce((acc, curr) => acc + (curr.calorie * curr.count), 0));
     const [modalOpen, setModalOpen] = React.useState(false);
     const [open, setOpen] = React.useState(false);
-    const [ratingMessage, setRatingMessage] = React.useState(false);
+    const [snackBarInfo, setSnackBarInfo] = React.useState({
+        open: false,
+        message: '',
+        severity: 'info', // can be 'error', 'warning', 'info', 'success'
+    });
+
+    const openSnackBar = (message, severity = 'info') => {
+        setSnackBarInfo({ open: true, message, severity });
+    };
+
+    const handleCloseSnackBar = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setSnackBarInfo({ ...snackBarInfo, open: false });
+    };
 
     const trackMeals = async () => {
-        const dishNameList = cartItems.map(item => item.name);
+        const dishDetails = cartItems.map(item => ({
+            dishName: item.dishName,
+            quantity: item.count
+        }));
 
         try {
             const response = await fetch('http://127.0.0.1:8080/track_meal', {
@@ -67,32 +85,36 @@ function MealShoppingCart({ userId }) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     userID: userId,
-                    dishList: dishNameList,
+                    dishDetails,
                     diningHallID,
                 }),
             });
 
             const data = await response.json();
-            console.log(data.message);
+            if (response.ok) {
+                console.log(data.message);
+                showTotalCaloriesMessage();
+                setModalOpen(true); // Open rating modal only if the tracking was successful
+            } else {
+                // Handle unsuccessful response
+                console.error('Error: ', data.message);
+                openSnackBar(data.message || 'Error tracking meals', 'error');
+            }
         } catch (error) {
             console.error('Error tracking meals:', error);
+            openSnackBar('Error tracking meals', 'error');
         }
     };
 
-    const handleMessage = (event, reason) => {  // New handleClose function
-        if (reason === 'clickaway') {
-            setRatingMessage(false);
-        }
-
-        setRatingMessage(false);
+    const showTotalCaloriesMessage = () => {
+        const message = `Total Calories for this meal: ${totalCalories}!`;
+        openSnackBar(message, 'info');
     };
-
-    const handleClose = (event, reason) => {  // New handleClose function
-        if (reason === 'clickaway') {
-            setOpen(false);
-        }
-
-        setOpen(false);
+    
+    // Function to show rating message
+    const showRatingMessage = () => {
+        const message = 'Thank you for Rating!';
+        openSnackBar(message, 'success');
     };
 
     const handleCheckout = async () => {
@@ -103,7 +125,11 @@ function MealShoppingCart({ userId }) {
 
     const handleCloseModal = () => {
         setModalOpen(false);
-        setRatingMessage(true);
+        
+        setCartItems([]);
+        setTotalCalories(0);
+        Cookies.set(userCartCookieKey, JSON.stringify([]), { expires: 1 });
+        window.dispatchEvent(new CustomEvent('cart-updated', { detail: [] }));
     }
 
     const handleRatingSubmit = async (dishName, rating) => {
@@ -121,30 +147,36 @@ function MealShoppingCart({ userId }) {
             });
 
             const data = await response.json();
-            console.log(data.message);
+            if (!response.ok) {
+                // Handle unsuccessful response
+                console.error('Error: ', data.message);
+                openSnackBar(data.message || 'Error updating food item rating', 'error');
+            } else {
+                showRatingMessage();
+            }
         } catch (error) {
             console.error('Error updating food item rating:', error);
+            openSnackBar('Error updating food item rating', 'error');
         }
     };
 
-    const handleRatingComplete = () => {
-        cartItems.forEach(item => {
-            handleRatingSubmit(item.name, item.rating); // Assume each item has a 'rating' field
+    const handleRatingComplete = (ratings) => {
+        Object.entries(ratings).forEach(([dishID, rating]) => {
+            handleRatingSubmit(dishID, rating);
         });
 
-        setCartItems([]);
-        setTotalCalories(0);
         handleCloseModal();
-
-        Cookies.set(userCartCookieKey, JSON.stringify([]), { expires: 1 });
-        window.dispatchEvent(new CustomEvent('cart-updated', { detail: [] }));
     };
 
+    // const handleRatingChange = (dishName, newRating) => {
+    //     setCartItems(cartItems => cartItems.map(item =>
+    //         item.dishName === dishName ? { ...item, rating: newRating } : item
+    //     ));
+    // };
 
-
-    const handleRemoveFromCart = (foodId) => {
+    const handleRemoveFromCart = (dishId) => {
         setCartItems((prevCartItems) => {
-            const itemIndex = prevCartItems.findIndex(item => item.id === foodId);
+            const itemIndex = prevCartItems.findIndex(item => item.dishID === dishId);
             if (itemIndex === -1) return prevCartItems;
 
             const newCartItems = [...prevCartItems];
@@ -154,11 +186,10 @@ function MealShoppingCart({ userId }) {
             } else {
                 newCartItems.splice(itemIndex, 1);
             }
-            const newTotalCalories = newCartItems.reduce((acc, curr) => acc + (curr.calories * curr.count), 0);
+            const newTotalCalories = newCartItems.reduce((acc, curr) => acc + (curr.calorie * curr.count), 0);
             setTotalCalories(newTotalCalories);
 
-            Cookies.set(userCartCookieKey, JSON.stringify(newCartItems), { expires: 1 }); // Expires in 1 day
-
+            Cookies.set(userCartCookieKey, JSON.stringify(newCartItems), { expires: 1 });
             window.dispatchEvent(new CustomEvent('cart-updated', { detail: newCartItems }));
 
             return newCartItems;
@@ -200,7 +231,7 @@ function MealShoppingCart({ userId }) {
                                                     {/* Display the Shopping Cart using Cards */}
                                                     <Grid container spacing={4}>
                                                         {cartItems.map((item) => (
-                                                            <Grid item key={item.id} xs={12} sm={6} md={4}>
+                                                            <Grid item key={item.dishID} xs={12} sm={6} md={4}>
                                                                 <Badge badgeContent={item.count} color="primary" anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
                                                                     <Card sx={{ width: { xs: '100%', sm: '300px' }, height: '100%', display: 'flex', flexDirection: 'column' }}>
                                                                         <CardMedia
@@ -208,18 +239,18 @@ function MealShoppingCart({ userId }) {
                                                                             sx={{
                                                                                 pt: '56.25%',
                                                                             }}
-                                                                            image={item.imageUrl}
+                                                                            image={`https://source.unsplash.com/random?food`}
                                                                         />
                                                                         <CardContent sx={{ flexGrow: 1 }}>
                                                                             <Typography variant="h5" component="div">
-                                                                                {item.name}
+                                                                                {item.dishName}
                                                                             </Typography>
                                                                             <Typography variant="body2" color="text.secondary">
-                                                                                {item.calories} calories
+                                                                                Calories:  {item.calorie}
                                                                             </Typography>
                                                                         </CardContent>
                                                                         <CardActions>
-                                                                            <Button size="small" color="primary" onClick={() => handleRemoveFromCart(item.id)}>
+                                                                            <Button size="small" color="primary" onClick={() => handleRemoveFromCart(item.dishID)}>
                                                                                 Remove from Cart
                                                                             </Button>
                                                                         </CardActions>
@@ -245,28 +276,21 @@ function MealShoppingCart({ userId }) {
                                         >
                                             Check Out
                                         </Button>
-                                        <Snackbar
-                                            open={open}
-                                            autoHideDuration={6000}
-                                            onClose={handleClose}
-                                        >
-                                            <Alert onClose={handleClose} severity="info" sx={{ width: '100%' }}>
-                                                Total Calories for this meal: {totalCalories}!
-                                            </Alert>
-                                        </Snackbar>
+                                        
                                         <Rating
                                             openModel={modalOpen}
                                             handleClose={handleCloseModal}
                                             cartItems={cartItems}
                                             handleRatingComplete={handleRatingComplete}
+                                            // onRatingChange={handleRatingChange} // New prop
                                         />
                                         <Snackbar
-                                            open={ratingMessage}
+                                            open={snackBarInfo.open}
                                             autoHideDuration={6000}
-                                            onClose={handleMessage}
+                                            onClose={handleCloseSnackBar}
                                         >
-                                            <Alert onClose={handleMessage} severity="success" sx={{ width: '100%' }}>
-                                                Thank you for Rating!
+                                            <Alert onClose={handleCloseSnackBar} severity={snackBarInfo.severity} sx={{ width: '100%' }}>
+                                                {snackBarInfo.message}
                                             </Alert>
                                         </Snackbar>
                                     </Paper>

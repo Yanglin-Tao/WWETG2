@@ -17,20 +17,21 @@ const style = {
     p: 4,
 };
 
-export default function Rating({ openModel, handleClose, cartItems, handleRatingComplete }) {
-    const [ratings, setRatings] = useState(0);
+export default function Rating({ openModel, handleClose, cartItems, handleRatingComplete}) {
+    const [ratings, setRatings] = useState({});
 
-    const handleRatingChange = (itemId, newValue) => {
-        setRatings(prev => ({
-            ...prev,
-            [itemId]: newValue
+    const handleRatingChange = (dishName, rating) => {
+        setRatings(prevRatings => ({
+            ...prevRatings,
+            [dishName]: rating
         }));
+        //onRatingChange(dishId, rating); // Update the rating in the parent component
     };
 
     const handleSubmit = () => {
         console.log("Submitted Rating:", ratings);
         // Add your submission logic here
-        handleRatingComplete();
+        handleRatingComplete(ratings);
         handleClose();  // Close the modal after submission
     };
 
@@ -55,18 +56,18 @@ export default function Rating({ openModel, handleClose, cartItems, handleRating
                             Rate Our Food Items
                         </Typography>
                         {cartItems.map(item => (
-                            <Card key={item.id} sx={{ marginBottom: 2 }}>
+                            <Card key={item.dishID} sx={{ marginBottom: 2 }}> {/* Use dishID as key */}
                                 <CardMedia
                                     component="img"
-                                    height="140" // Adjust the height as necessary
-                                    image={item.imageUrl} // Assuming each item has an 'imageUrl' property
-                                    alt={item.name}
+                                    height="140"
+                                    image={`https://source.unsplash.com/random?food`}
+                                    alt={item.dishName}
                                 />
-                                <CardContent>
-                                    <Typography variant="body1">{item.name}</Typography>
+                                <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                    <Typography variant="body1">{item.dishName}</Typography>
                                     <RadioGroupRating
-                                        value={ratings[item.id] || 0}
-                                        onChange={(e, val) => handleRatingChange(item.id, val)}
+                                        value={ratings[item.dishName] || 0}
+                                        onChange={(e, val) => handleRatingChange(item.dishName, val)}
                                     />
                                 </CardContent>
                             </Card>

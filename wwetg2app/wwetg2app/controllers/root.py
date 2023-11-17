@@ -105,7 +105,8 @@ class MealTracking(Base):
     __tablename__ = 'meal_trackings'
     userID = Column(Integer, ForeignKey('user_profiles.userID'), primary_key=True)
     date = Column(Date, primary_key=True)
-    dishID = Column(Integer,ForeignKey('dish.dishID'), primary_key=True)
+    dishID = Column(Integer, ForeignKey('dish.dishID'), primary_key=True)
+    quantity = Column(Integer, default=1) 
 
 class UserRating(Base):
     __tablename__ = 'user_rating'
@@ -518,12 +519,13 @@ class RootController(BaseController):
         institutionID = data.get("institutionID")
         institution = session.query(Institution).filter_by(institutionID = institutionID).first()
         if institution:
-            nameList = []
+            diningHallList = []
             diningHalls = session.query(DiningHall).filter_by(institutionID = institutionID).all()
             for d in diningHalls:
-                nameList.append(d.name)
+                diningHallInfo = {"name": d.name, "id": d.diningHallID}
+                diningHallList.append(diningHallInfo)
             # return {"message":"Dining Hall List Returned."}
-            return ",".join(nameList)
+            return {"DiningHalls": diningHallList}
 
         else:
             return {"message":"Institution doesn't exist"}
@@ -544,6 +546,7 @@ class RootController(BaseController):
             for id in dishIDs:
                 dish = session.query(Dish).filter_by(dishID=id).filter_by(diningHallID = diningHallID).first()
                 dishInfo = {
+                    "dishID": dish.dishID,
                     "dishName": dish.dishName,
                     "calorie": dish.calorie,
                     "ingredients": dish.ingredients,
@@ -931,24 +934,42 @@ class RootController(BaseController):
     def track_meal(self):
         data = request.json_body
         diningHallID = data.get("diningHallID")
-        dishNameList = data.get("dishList")
+        dishDetails = data.get("dishDetails")  # This is now an array of objects
         userID = data.get("userID")
+
         if userID:
-            for dish in dishNameList:
-                dish_record = session.query(Dish).filter_by(diningHallID = diningHallID).filter_by(dishName = dish).first()
+            for dish_detail in dishDetails:
+                dish_name = dish_detail.get("dishName")
+                quantity = dish_detail.get("quantity")
+
+                dish_record = session.query(Dish).filter_by(diningHallID=diningHallID, dishName=dish_name).first()
                 if dish_record:
                     dishID = dish_record.dishID
-                    new_track_dish = MealTracking(
-                        userID=userID,
-                        dishID=dishID,
-                        date=datetime.today()
-                    )
-                    session.add(new_track_dish)
-                    session.commit()
+                    today = datetime.today().date()
+
+                    # Check if the meal is already tracked
+                    existing_track = session.query(MealTracking).filter_by(userID=userID, date=today, dishID=dishID ).first()
+                    if existing_track:
+                        # Increment the quantity for the existing record
+                        existing_track.quantity += quantity
+                        session.commit()
+                        print(f"Updated existing record for dishID {dishID} with new quantity {existing_track.quantity}")
+                    else:
+                        # Create a new tracking record
+                        new_track_dish = MealTracking(
+                            userID=userID,
+                            dishID=dishID,
+                            date=today,
+                            quantity=quantity
+                        )
+                        session.add(new_track_dish)
+                        session.commit()
+                        print(f"Inserted new tracking record for dishID {dishID}")
                 else:
-                    # Handle the case where the dish is not found
-                    return {"message": f"Dish '{dish}' not found in dining hall ID {diningHallID}"}
+                    print(f"Dish '{dish_name}' not found in dining hall ID {diningHallID}")
+                    return {"message": f"Dish '{dish_name}' not found in dining hall ID {diningHallID}"}
             return {"message": "Successfully updated your meal tracking"}
         else:
+            print("User not logged in")
             return {"message": "You have to login first."}
         
