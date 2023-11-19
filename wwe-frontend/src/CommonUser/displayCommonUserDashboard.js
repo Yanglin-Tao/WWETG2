@@ -97,7 +97,7 @@ function DisplayCommonUserDashboard({ userId }) {
                     p: 2,
                     display: 'flex',
                     flexDirection: 'column',
-                    height: 240,
+                    height: 400,
                   }}
                 >
                   <CalorieChart />
@@ -110,7 +110,7 @@ function DisplayCommonUserDashboard({ userId }) {
                     p: 2,
                     display: 'flex',
                     flexDirection: 'column',
-                    height: 240,
+                    height: 400,
                   }}
                 >
                   <DailyCalorieIntake />
