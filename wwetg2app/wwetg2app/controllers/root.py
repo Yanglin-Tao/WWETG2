@@ -28,7 +28,7 @@ from wwetg2app.controllers.error import ErrorController
 import psycopg2
 import json
 
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Date, Float, DateTime, func
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Date, Float, DateTime, func, desc
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 import schedule
@@ -1037,8 +1037,23 @@ class RootController(BaseController):
     def getDiningHallMonthlyReports(self):
         pass
 
+    @expose('json')
     def getCommonUserMonthlyReports(self):
-        pass
+        data = request.json_body
+        userID = data.get("userID")
+        reports = session.query(UserReports).filter_by(userID = userID).order_by(desc(UserReports.date)).all()
+        report_list = []
+        for i in range(min(10,len(reports))):
+            year = reports[i].date.year
+            month = reports[i].date.month
+            report_month = str(year) + "-" + str(month)
+            total_caloe_intake = reports[i].actualIntake
+            daily_average_calorie_intake = reports[i].dailyAverageIntake
+            report = {"report_month": report_month, "total_caloe_intake": total_caloe_intake, "daily_average_calorie_intake": daily_average_calorie_intake}
+            report_list.append(report)
+
+        return {"reports": report_list}
+
     
 
 # OUTSIDE THE CONTROLLER
