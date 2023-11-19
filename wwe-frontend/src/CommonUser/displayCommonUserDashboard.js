@@ -3,7 +3,6 @@ import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import List from '@mui/material/List';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
@@ -13,7 +12,6 @@ import DashboardLayout from './DashboardLayout';
 import CalorieChart from './calorieChart';
 import DailyCalorieIntake from './dailyCalorieIntake';
 import RecentMeals from './recentMeals';
-import Cookies from 'js-cookie';
 import DisplayCommonUserMontlyReport from './displayCommonUserMonthlyReport'
 
 /* TODO: This component should display common user's dashboard. It should navigate the common users to
