@@ -152,17 +152,17 @@ class UserReports(Base):
 
 
 def init_db():
-    Base.metadata.drop_all(engine)
+    #Base.metadata.drop_all(engine)
     Base.metadata.create_all(bind=engine)
     # Add food preferences
-    food_preferences = ['Halal', 'Vegetarian', 'Gluten Free', 'Balanced', 'Vegan', 'Pescatarian']
-    for i in range(len(food_preferences)):
-        new_preference = FoodPreferences(
-        preferenceID = i + 1, 
-        name = food_preferences[i]
-        )
-        session.add(new_preference)
-        session.commit()
+    # food_preferences = ['Halal', 'Vegetarian', 'Gluten Free', 'Balanced', 'Vegan', 'Pescatarian']
+    # for i in range(len(food_preferences)):
+    #     new_preference = FoodPreferences(
+    #     preferenceID = i + 1, 
+    #     name = food_preferences[i]
+    #     )
+    #     session.add(new_preference)
+    #     session.commit()
 
 
 init_db()
@@ -1035,6 +1035,7 @@ class RootController(BaseController):
 #--------------Get Reports------------------
     @expose('json')
     def getDiningHallMonthlyReports(self):
+        # To do
         pass
 
     @expose('json')
@@ -1100,6 +1101,52 @@ def generate_user_report():
             )
             session.add(new_report)
             session.commit()
+
+def generate_dining_report():
+    # Check if today is the last day of a month
+    #if is_last_day_of_the_month():
+        dinings = session.query(DiningHall).all()
+        for dining in dinings:
+            diningHallID = dining.diningHallID
+            print(diningHallID)
+
+            # Get Top 10 rated food
+            top_rated_list = []
+            topRates = session.query(
+            Dish.dishName,
+            func.avg(UserRating.rating).label('average_rating'),
+            func.count(UserRating.rating).label('rating_count')
+            ).join(
+                UserRating, Dish.dishID == UserRating.dishID,  # Assuming UserRating has a foreign key dish_id to Dish
+            ).filter(
+                Dish.diningHallID == diningHallID
+            ).group_by(
+                Dish.dishID
+            ).order_by(
+                func.avg(UserRating.rating).desc()
+            ).limit(10)  # Limit to top 10 dishes
+            top_ten_rated_food = []
+            for topRate in topRates:
+                top_ten_rated_food.append({"dish_name": topRate.dishName, "average_rating": round(topRate.average_rating,2), "num_rates": topRate.rating_count})
+            print(top_ten_rated_food)
+
+            # Get Top 10 allergies and their percentage
+            # Get the total number of users in this institution
+            total_users = session.query(
+                func.count(UserProfile.userID).label('total_users')
+            ).join(
+                DiningHall, DiningHall.institutionID == UserProfile.institutionID
+            ).filter(
+                DiningHall.diningHallID == diningHallID
+            ).scalar()
+            print(total_users)
+
+            # To Do
+
+            # Get Top food preference percentage
+            # To Do
+
+# generate_dining_report()
 
 async def async_task():
     schedule.every().day.at("20:00").do(generate_user_report)
