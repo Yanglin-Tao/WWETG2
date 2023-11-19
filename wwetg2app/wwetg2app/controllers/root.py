@@ -152,17 +152,17 @@ class UserReports(Base):
 
 
 def init_db():
-    #Base.metadata.drop_all(engine)
+    Base.metadata.drop_all(engine)
     Base.metadata.create_all(bind=engine)
     # Add food preferences
-    # food_preferences = ['Halal', 'Vegetarian', 'Gluten Free', 'Balanced', 'Vegan', 'Pescatarian']
-    # for i in range(len(food_preferences)):
-    #     new_preference = FoodPreferences(
-    #     preferenceID = i + 1, 
-    #     name = food_preferences[i]
-    #     )
-    #     session.add(new_preference)
-    #     session.commit()
+    food_preferences = ['Halal', 'Vegetarian', 'Gluten Free', 'Balanced', 'Vegan', 'Pescatarian']
+    for i in range(len(food_preferences)):
+        new_preference = FoodPreferences(
+        preferenceID = i + 1, 
+        name = food_preferences[i]
+        )
+        session.add(new_preference)
+        session.commit()
 
 
 init_db()
