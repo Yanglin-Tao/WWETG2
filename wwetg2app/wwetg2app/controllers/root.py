@@ -529,14 +529,72 @@ class RootController(BaseController):
 
         else:
             return {"message":"Institution doesn't exist"}
+
+    
     @expose('json')
-    # return today's menu of a dining hall.
-    def getTodayMenu(self):
+    # return a number representing if the dish is recommended (2), nothing (1), or warnning (0).
+    def customizedLabel(dishID,diningHallID,userID):
+        dish = session.query(Dish).filter_by(dishID=dishID).filter_by(diningHallID = diningHallID).first()
+        ingredientList = dish.ingredients.split(',')
+        categorieList = dish.categories.split(',')
+
+        allergyList = []
+        userAllergies = session.query(UserAllergy).filter_by(userID = userID).all()
+        for userAllergy in userAllergies:
+            allergyID = userAllergy.allergyID
+            allergyName = session.query(Allergy).filter_by(allergyID = allergyID).first().name
+            allergyList.append(allergyName)
+   
+        preferenceList = []
+        userPreferences = session.query(UserPreference).filter_by(userID = userID).all()
+        for userPreference in userPreferences:
+            preferenceID = userPreference.preferenceID
+            preferenceName = session.query(FoodPreferences).filter_by(preferenceID = preferenceID).first().name
+            preferenceList.append(preferenceName)
+        
+
+        for ingredient in ingredientList:
+            if ingredient in allergyList:
+                return 0
+        for categorie in categorieList:
+            if categorie in preferenceList:
+                return 2
+        return 1
+
+          
+    @expose('json')
+    # return user's own rating if exists, owse return the average rating.
+    def getFoodRating(dishName,diningHallID,userID):
+        dish_record = session.query(Dish).filter_by(diningHallID=diningHallID, dishName=dishName).first()
+        dishID = dish_record.dishID
+        user_rating = session.query(UserRating).filter_by(userID=userID, dishID=dishID).first()
+        if user_rating:
+            return user_rating.rating
+        else:
+            dishID = session.query(Dish).filter_by(diningHallID = diningHallID).filter_by(dishName = dishName).first().dishID
+            ratings = session.query(UserRating).filter_by(dishID = dishID).all()
+            rating_list = []
+            for rating in ratings:
+                rating_list.append(rating.rating)
+            if len(rating_list)>0:
+                return round(sum(rating_list) / len(rating_list),1)
+            else:
+                return 0
+
+    
+    @expose('json')
+    # return today's menu. Customized recommendation and warnning are added.
+    def browseMenu(self):
+        
         data = request.json_body
         diningHallID = data.get("diningHallID")
+        userID = data.get("userID")
         today = dt_date.today()
         menu = session.query(DailyMenu).filter_by(date=today).filter_by(diningHallID = diningHallID).first()
         diningHallExist = session.query(DiningHall).filter_by(diningHallID = diningHallID).first()
+        user = session.query(UserProfile).filter_by(userID = userID).first()
+        if not user:
+            return {"messate": "User doesn't exist."}
         if not diningHallExist:
             return {"message":"Dining Hall Doesn't Exist."}
         if menu:
@@ -545,6 +603,8 @@ class RootController(BaseController):
             dishIDs = [dish.dishID for dish in session.query(MenuDish).filter_by(menuID=menu.menuID).all()]
             for id in dishIDs:
                 dish = session.query(Dish).filter_by(dishID=id).filter_by(diningHallID = diningHallID).first()
+                rating = RootController.getFoodRating(dish.dishName,diningHallID,userID)
+                label = RootController.customizedLabel(id,diningHallID,userID)
                 dishInfo = {
                     "dishID": dish.dishID,
                     "dishName": dish.dishName,
@@ -552,15 +612,23 @@ class RootController(BaseController):
                     "ingredients": dish.ingredients,
                     "categories": dish.categories,
                     "servingSize": dish.servingSize,
-                    "type": dish.type
+                    "type": dish.type,
+                    "rating" : rating,
+                    "customizedLabel": label
                 }
                 dishList.append(dishInfo)
-            
-            return {"dishList":dishList}
+            sortedDishList = sorted(dishList, key=lambda x: (-x["customizedLabel"], x["rating"]))
+            return {"sortedDishList":sortedDishList}
         else:
             return {"message": "Today's menu is not available."}
 
+    
         
+        
+
+
+
+
 
 
 #---------PREFERENCE & ALLERGY--------------
