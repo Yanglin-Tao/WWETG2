@@ -14,6 +14,7 @@ import CalorieChart from './calorieChart';
 import DailyCalorieIntake from './dailyCalorieIntake';
 import RecentMeals from './recentMeals';
 import Cookies from 'js-cookie';
+import DisplayCommonUserMontlyReport from './displayCommonUserMonthlyReport'
 
 /* TODO: This component should display common user's dashboard. It should navigate the common users to
 different use cases. 
@@ -119,6 +120,12 @@ function DisplayCommonUserDashboard({ userId }) {
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
                   <RecentMeals />
+                </Paper>
+              </Grid>
+              {/* Monthly Reports */}
+              <Grid item xs={12}>
+                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+                  <DisplayCommonUserMontlyReport/>
                 </Paper>
               </Grid>
             </Grid>
