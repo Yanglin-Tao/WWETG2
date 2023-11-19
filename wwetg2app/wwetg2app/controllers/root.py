@@ -28,12 +28,12 @@ from wwetg2app.controllers.error import ErrorController
 import psycopg2
 import json
 
-from sqlalchemy import create_engine
-
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Date, Float, DateTime, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
-
+import schedule
+import asyncio
+import threading
 
 # repoze for user authentication 
 # from repoze.what.predicates import not_anonymous
@@ -130,7 +130,7 @@ class UserProfile(Base):
     email = Column(String)
     password = Column(String)
     institutionID = Column(Integer, ForeignKey('institutions.institutionID'))
-    dietPlan = Column(String)
+    dietGoal = Column(Float)
 
 class UserAllergy(Base):
     __tablename__ = 'user_allergy'
@@ -142,23 +142,14 @@ class UserPreference(Base):
     userID = Column(Integer, ForeignKey('user_profiles.userID'), primary_key=True)
     preferenceID = Column(Integer, ForeignKey('food_preference.preferenceID'), primary_key=True)
 
-class MonthlyReport(Base):
-    __tablename__ = 'monthly_reports'
+class UserReports(Base):
+    __tablename__ = 'user_reports'
     userID = Column(Integer, ForeignKey('user_profiles.userID'), primary_key=True)
     date = Column(Date, primary_key=True)
     dietGoal = Column(Float)
     actualIntake = Column(Float)
-    accompPercent = Column(Float)
+    dailyAverageIntake = Column(Float)
 
-class MenuItem(Base):
-    __tablename__ = 'menu_items'
-    dishID = Column(Integer, primary_key=True)
-    name = Column(String)
-    category = Column(String)
-    ingredients = Column(String)
-    allergens = Column(String)
-    dietaryTags = Column(String)
-    calories = Column(Float)
 
 def init_db():
     Base.metadata.drop_all(engine)
@@ -1041,3 +1032,72 @@ class RootController(BaseController):
             print("User not logged in")
             return {"message": "You have to login first."}
         
+#--------------Get Reports------------------
+    @expose('json')
+    def getDiningHallMonthlyReports(self):
+        pass
+
+    def getCommonUserMonthlyReports(self):
+        pass
+    
+
+# OUTSIDE THE CONTROLLER
+#-----------Generate Reports----------------
+schedule.clear()
+
+# Check if today is the last day of the month.
+def is_last_day_of_the_month():
+    today = datetime.now()
+    next_day = today.replace(day=today.day + 1)
+    return today.month != next_day.month
+
+def generate_user_report():
+    # Check if today is the last day of a month
+    if is_last_day_of_the_month():
+        users = session.query(UserProfile).all()
+        for user in users:
+            userID = user.userID
+            dietGoal = user.dietGoal
+            # Calculate totl intake of the months
+            actualIntake = 0
+            intakes = session.query(MealTracking).filter_by(userID = userID).all()
+            for intake in intakes:
+                dishID = intake.dishID
+                quantity = intake.quantity
+                calorie = session.query(Dish).filter_by(dishID = dishID).first().calorie
+                actualIntake += calorie * quantity
+
+            from datetime import datetime, timedelta
+
+            # Get the number of days of current month and daily average intake at the dining halls
+            current_date = datetime.now()
+            first_day_of_month = current_date.replace(day=1)
+            first_day_next_month = (first_day_of_month + timedelta(days=32)).replace(day=1)
+            number_of_days = (first_day_next_month - first_day_of_month).days
+            dailyAverageIntake = round(actualIntake / number_of_days, 2)
+
+            new_report = UserReports(
+                userID= userID,
+                date = datetime.today().date(),
+                dietGoal = dietGoal,
+                actualIntake = actualIntake,
+                dailyAverageIntake = dailyAverageIntake
+            )
+            session.add(new_report)
+            session.commit()
+
+async def async_task():
+    schedule.every().day.at("20:00").do(generate_user_report)
+    while True:
+        schedule.run_pending()
+        # await asyncio.sleep(1)
+
+def start_infinite_task():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(async_task())
+
+
+task_thread = threading.Thread(target=start_infinite_task)
+task_thread.start()
+
