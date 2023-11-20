@@ -16,7 +16,7 @@ function preventDefault(event) {
   window.open('/displayCommonUserGoals', '_self');
 }
 
-const dailyCalorieIntakeTotal = 1200;
+// const dailyCalorieIntakeTotal = 1200;
 const todayDate = new Date();
 const formattedDate = todayDate.toLocaleDateString();
 
@@ -49,22 +49,22 @@ CircularProgressWithLabel.propTypes = {
 };
 
 export default function DailyCalorieIntake({ userId }) {
-  // const [dailyCalorieIntakeTotal, setDailyCalorieIntakeTotal] = useState("");
+  const [dailyCalorieIntakeTotal, setDailyCalorieIntakeTotal] = useState("");
   const [progress, setProgress] = useState(70);
 
   useEffect(() => {
     const getDailyCalorieIntakeTotal = async () => {
       const token = Cookies.get('token');
-      const apiUrl = `http://127.0.0.1:8080/getRecentMeals`;
+      const apiUrl = `http://127.0.0.1:8080/getCommonUserMonthlyReports`;
       console.log(userId);
       const requestOptions = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Add Bearer prefix to the token
+          'Authorization': token,
         },
         body: JSON.stringify({
-          diningHallID: userId,
+          userID: userId,
         }),
       };
 
@@ -75,13 +75,13 @@ export default function DailyCalorieIntake({ userId }) {
         }
         const data = await response.json();
         console.log(data);
-        // setDailyCalorieIntakeTotal(data.total_calorie_intake);
+        setDailyCalorieIntakeTotal(data.total_calorie_intake);
       } catch (error) {
         console.error('There was a problem fetching daily calorie intake total:', error);
       }
     };
 
-    // getDailyCalorieIntakeTotal(); 
+    getDailyCalorieIntakeTotal(); 
   }, [userId]);
 
   return (

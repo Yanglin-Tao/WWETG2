@@ -13,6 +13,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import WhatWeEatIcon from '../WhatWeEatIcon';
 import Copyright from '../Copyright';
 import { Link } from 'react-router-dom';
 
@@ -123,8 +124,8 @@ function RegisterDiningHall() {
             alignItems: 'center',
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            <LockOutlinedIcon />
+          <Avatar sx={{ m: 1, bgcolor: 'white', width: 50, height: 50 }}>
+            <WhatWeEatIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
             Sign up

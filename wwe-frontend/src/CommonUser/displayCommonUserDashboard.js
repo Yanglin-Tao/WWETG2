@@ -100,7 +100,7 @@ function DisplayCommonUserDashboard({ userId }) {
                     height: 400,
                   }}
                 >
-                  <DailyCalorieIntake />
+                  <DailyCalorieIntake userId={userId} />
                 </Paper>
               </Grid>
               {/* Recent Meals */}
@@ -112,7 +112,7 @@ function DisplayCommonUserDashboard({ userId }) {
               {/* Monthly Reports */}
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  <DisplayCommonUserMontlyReport/>
+                  <DisplayCommonUserMontlyReport />
                 </Paper>
               </Grid>
             </Grid>

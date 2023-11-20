@@ -15,6 +15,7 @@ import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
 import Copyright from '../Copyright';
+import WhatWeEatIcon from '../WhatWeEatIcon';
 import Cookies from 'js-cookie';
 
 /* TODO: This component should provide a form to allow dining hall administrator login with email address 
@@ -117,8 +118,8 @@ function LoginDiningHall() {
               alignItems: 'center',
             }}
           >
-            <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-              <LockOutlinedIcon />
+            <Avatar sx={{ m: 1, bgcolor: 'white', width: 50, height: 50 }}>
+              <WhatWeEatIcon />
             </Avatar>
             <Typography component="h1" variant="h5">
               Dining Hall Admin Sign in

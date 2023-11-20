@@ -11,6 +11,7 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import WhatWeEatIcon from '../WhatWeEatIcon';
 import { Link } from 'react-router-dom';
 
 function Copyright(props) {
@@ -30,9 +31,9 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 
 function LoginUser() {
-    /* TODO: This component should provide a form to allow dining hall administrator login with email address 
-    and password.
-    */
+  /* TODO: This component should provide a form to allow dining hall administrator login with email address 
+  and password.
+  */
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -70,29 +71,29 @@ function LoginUser() {
               alignItems: 'center',
             }}
           >
-            <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-              <LockOutlinedIcon />
+            <Avatar sx={{ m: 1, bgcolor: 'white', width: 50, height: 50 }}>
+              <WhatWeEatIcon />
             </Avatar>
             <Typography component="h1" variant="h5">
               Welcome to What We Eat
             </Typography>
             <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
               {/* <Grid container> */}
-                <Grid item xs>
-                  <Link to="/loginCommonUser" variant="body2">
-                    I'm a Student/Employee
-                  </Link>
-                </Grid>
-                <Grid item xs>
-                  <Link to="/loginDiningHall" variant="body2">
-                    I'm a Dining Hall Admin
-                  </Link>
-                </Grid>
-                <Grid item xs>
-                  <Link to="/registerInstitution" variant="body2">
-                    I'm an Institution Admin
-                  </Link>
-                </Grid>
+              <Grid item xs>
+                <Link to="/loginCommonUser" variant="body2">
+                  I'm a Student/Employee
+                </Link>
+              </Grid>
+              <Grid item xs>
+                <Link to="/loginDiningHall" variant="body2">
+                  I'm a Dining Hall Admin
+                </Link>
+              </Grid>
+              <Grid item xs>
+                <Link to="/registerInstitution" variant="body2">
+                  I'm an Institution Admin
+                </Link>
+              </Grid>
               {/* </Grid> */}
               <Copyright sx={{ mt: 5 }} />
             </Box>
