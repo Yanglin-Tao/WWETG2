@@ -616,13 +616,6 @@ class RootController(BaseController):
         else:
             return {"message": "Today's menu is not available."}
 
-    
-        
-        
-
-
-
-
 
 
 #---------PREFERENCE & ALLERGY--------------
@@ -1131,10 +1124,9 @@ def generate_dining_report():
             top_ten_rated_food = []
             for topRate in topRates:
                 top_ten_rated_food.append({"dish_name": topRate.dishName, "average_rating": round(topRate.average_rating,2), "num_rates": topRate.rating_count})
-            print(top_ten_rated_food)
+            # print(top_ten_rated_food)
 
             # Get Top 10 allergies and their percentage
-            # Get the total number of users in this institution
             total_users = session.query(
                 func.count(UserProfile.userID).label('total_users')
             ).join(
@@ -1142,9 +1134,27 @@ def generate_dining_report():
             ).filter(
                 DiningHall.diningHallID == diningHallID
             ).scalar()
-            print(total_users)
 
-            # To Do
+            allergyInfo = session.query(
+            Allergy.name,
+            func.count(UserAllergy.userID).label('user_count')
+            ).join(
+                UserAllergy, UserAllergy.allergyID == Allergy.allergyID
+            ).join(
+                UserProfile, UserProfile.userID == UserAllergy.userID
+            ).join(
+                DiningHall, DiningHall.institutionID == UserProfile.institutionID
+            ).filter(
+                DiningHall.diningHallID == diningHallID
+            ).group_by(
+                Allergy.name
+            ).order_by(
+                func.count(UserAllergy.userID).desc()
+            )
+            for allergyIn in allergyInfo:
+                print(allergyIn.name)
+                print(allergyIn.user_count)
+                print(round(allergyIn.user_count/ total_users,3))
 
             # Get Top food preference percentage
             # To Do
