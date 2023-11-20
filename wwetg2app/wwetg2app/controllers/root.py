@@ -918,12 +918,39 @@ class RootController(BaseController):
     def getHistoricalMenu(self):
         data = request.json_body
         diningHallID = data.get("diningHallID")
-        # get all the menu ID and created date
-        menus = session.query(DailyMenu).filter_by(diningHallID = diningHallID).all()
+
+        # Query all menus for the specified dining hall
+        menus = session.query(DailyMenu).filter_by(diningHallID=diningHallID).all()
         menuList = {}
+
         for menu in menus:
-            menuList[menu.menuID] =  session.query(DailyMenu).filter_by(menuID = menu.menuID).first().date
-        return menuList  
+            # Query all dish IDs associated with the current menu
+            menuDishes = session.query(MenuDish).filter_by(menuID=menu.menuID).all()
+            dishList = []
+
+            for menuDish in menuDishes:
+                # Query details of each dish
+                dish = session.query(Dish).filter_by(dishID=menuDish.dishID).first()
+
+                if dish:
+                    dishDetails = {
+                        "dishID": dish.dishID,
+                        "dishName": dish.dishName,
+                        "calorie": dish.calorie,
+                        "ingredients": dish.ingredients,
+                        "categories": dish.categories,
+                        "servingSize": dish.servingSize,
+                        "type": dish.type
+                    }
+                    dishList.append(dishDetails)
+
+            # Store the menu with its associated dishes
+            menuList[menu.menuID] = {
+                "date": menu.date,
+                "dishes": dishList
+            }
+
+        return menuList
     
 #-----------------Ratings-------------------
     @expose('json')

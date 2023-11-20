@@ -1,49 +1,37 @@
-import * as React from 'react';
-import AppBar from '@mui/material/AppBar';
-import Button from '@mui/material/Button';
+import React from 'react';
+import { useLocation } from 'react-router-dom';
+import {
+    AppBar, Button, Card, CardActions, CardContent, CardMedia, CssBaseline,
+    Grid, Stack, Box, Toolbar, Typography, Container, Link,
+    ThemeProvider, createTheme
+} from '@mui/material';
+import StarRateIcon from '@mui/icons-material/StarRate';
+import DashboardLayout from '../DiningHall/DashboardLayout';
 import Title from '../DiningHall/Title';
-import Paper from '@mui/material/Paper';
-import Divider from '@mui/material/Divider';
+import Copyright from '../Copyright';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import CssBaseline from '@mui/material/CssBaseline';
-import Grid from '@mui/material/Grid';
-import Stack from '@mui/material/Stack';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import DashboardLayout from '../DiningHall/DashboardLayout';
-import StarRateIcon from '@mui/icons-material/StarRate';
-import Link from '@mui/material/Link';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import Copyright from '../Copyright';
-/* TODO: This component should display the details of a menuItem, including a name, calories per serving, ingredients,
-    customer rating, food warning/recommendation, and a button to add the menuItem to shopping cart
-*/
 
-
-function DisplayMenuItem({userId}) {
-    const menu = () => {
-        window.open("/displayDailyMenu", "_self");
-    };
-    const sampleMenuItem = {
-        name: 'Delicious Dish',
-        calories: 400,
-        ingredients: 'Chicken, Vegetables, Spices',
-        customerRating: 4.5,
-        warning: 'Contains peanuts',
+function DisplayMenuItem({ userId }) {
+    const location = useLocation();
+    const dishes = location.state?.menuDetails || {
+        name: 'Unknown Dish',
+        calories: 'N/A',
+        ingredients: 'N/A',
+        customerRating: 'N/A',
+        warning: 'N/A',
         imageUrl: 'https://source.unsplash.com/random?food'
     };
+    console.log("dishes: ", dishes);
+    const goBack = () => {
+        window.open("/displayDailyMenu", "_self");
+    };
+
     return (
         <ThemeProvider theme={createTheme()}>
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
-                <DashboardLayout title="Menu" userId={userId}/>
+                <DashboardLayout title="Menu Item Details" userId={userId} />
                 <Box
                     component="main"
                     sx={{
@@ -59,55 +47,52 @@ function DisplayMenuItem({userId}) {
                     <Toolbar />
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-                            <Grid container spacing={3}>
-                                <Grid item xs={12}>
-
-                                    <Card>
-                                        <CardMedia
-                                            component="img"
-                                            height="240"
-                                            image={sampleMenuItem.imageUrl}
-                                            alt={sampleMenuItem.name}
-                                        />
-                                        <CardContent>
-                                            <Typography variant="h5" component="div">
-                                                {sampleMenuItem.name}
-                                            </Typography>
-                                            <Typography variant="subtitle1" color="text.secondary">
-                                                {sampleMenuItem.calories} calories per serving
-                                            </Typography>
-                                            <Typography variant="body1" color="text.secondary">
-                                                Ingredients: {sampleMenuItem.ingredients}
-                                            </Typography>
-                                            <Stack direction="row" alignItems="center">
-                                                <StarRateIcon color="primary" />
-                                                <Typography variant="body2" color="text.secondary">
-                                                    {sampleMenuItem.customerRating} / 5
+                            {dishes.map((dish, index) => (
+                                <Grid container spacing={3} key={index}>
+                                    <Grid item xs={12}>
+                                        <Card>
+                                            <CardMedia
+                                                component="img"
+                                                height="240"
+                                                image={`https://source.unsplash.com/random?food&${dish.dishID}`}
+                                                alt={dish.dishName}
+                                            />
+                                            <CardContent>
+                                                <Typography variant="h5" component="div">
+                                                    {dish.dishName}
                                                 </Typography>
-                                            </Stack>
-                                            <Typography variant="body2" color="error">
-                                                Warning: {sampleMenuItem.warning}
-                                            </Typography>
-                                        </CardContent>
-                                        <CardActions>
-                                            <Box sx={{ flexGrow: 1 }}>
-                                                <Button size="large" color="primary" onClick={menu}>
-                                                    Back to Menu
-                                                </Button>
-                                            </Box>
-                                        </CardActions>
-                                    </Card>
-
+                                                <Typography variant="subtitle1" color="text.secondary">
+                                                    {dish.calories} calories per serving
+                                                </Typography>
+                                                <Typography variant="body1" color="text.secondary">
+                                                    Ingredients: {dish.ingredients}
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    Category: {dish.categories.replace(/[{}]/g, '')}
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    Serving Size: {dish.servingSize}
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    Type: {dish.type}
+                                                </Typography>
+                                            </CardContent>
+                                        </Card>
+                                    </Grid>
                                 </Grid>
-                            </Grid>
+                            ))}
+                            <CardActions sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                <Button size="large" color="primary" onClick={goBack}>
+                                    Back to Menu
+                                </Button>
+                            </CardActions>
                             <Copyright sx={{ pt: 4 }} />
                         </Container>
                     </LocalizationProvider>
-                </Box >
+                </Box>
             </Box>
-        </ThemeProvider >
+        </ThemeProvider>
     );
-
 }
 
 export default DisplayMenuItem;

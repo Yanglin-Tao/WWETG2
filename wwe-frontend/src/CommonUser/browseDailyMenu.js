@@ -116,7 +116,18 @@ function BrowseDailyMenu({ userId }) {
     }
   };
 
-
+  const renderCustomLabel = (customizedLabel) => {
+    switch (customizedLabel) {
+      case 2:
+        return <Typography color="green">Recommended</Typography>;
+      case 1:
+        return null; // Do nothing for 'nothing'
+      case 0:
+        return <Typography color="red">Warning</Typography>;
+      default:
+        return null;
+    }
+  };
 
   const fetchDiningHalls = async (institutionID) => {
     console.log('Fetching dining halls for institutionID:', institutionID);
@@ -228,19 +239,22 @@ function BrowseDailyMenu({ userId }) {
                           Calories:  {item.calorie}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          Rating: {item.rating}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          Serving Size: {item.servingSize}
+                          {item.rating === 0 ? "No rating" : "Rating: " + item.rating}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
                           {formatCategories(item.categories)}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Serving Size: {item.servingSize}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
                           Ingredients: {item.ingredients}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
                           Type: {item.type}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {renderCustomLabel(item.customizedLabel)}
                         </Typography>
                       </CardContent>
                       <CardActions>

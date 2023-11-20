@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Button from '@mui/material/Button';
 import Title from '../DiningHall/Title';
@@ -12,7 +12,7 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import CssBaseline from '@mui/material/CssBaseline';
 import Grid from '@mui/material/Grid';
-import Stack from '@mui/material/Stack';
+import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
@@ -27,19 +27,43 @@ import Copyright from '../Copyright';
     When click on the menuItem, it should show displayMenuItem component.
     */
 
-const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-
-// TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
-function DisplayDailyMenu({userId}) {
-    const item = () => {
-        window.open("/displayMenuItem", "_self");
+function DisplayDailyMenu({ userId }) {
+
+    const [menuList, setMenuList] = useState({});
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchMenu = async () => {
+            const apiUrl = 'http://127.0.0.1:8080/getHistoricalMenu';
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ diningHallID: userId })
+            };
+
+            try {
+                const response = await fetch(apiUrl, requestOptions);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                setMenuList(data);
+            } catch (error) {
+                console.error('Error fetching menu:', error);
+            }
+        };
+        fetchMenu();
+    }, [userId]);
+
+    const editMenu = (menuDetails) => {
+        navigate('/displayMenuItem', { state: { menuDetails } });
     };
     return (
         <ThemeProvider theme={createTheme()}>
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
-                <DashboardLayout title="Menu" userId={userId}/>
+                <DashboardLayout title="History Menus" userId={userId} />
                 <Box
                     component="main"
                     sx={{
@@ -58,40 +82,34 @@ function DisplayDailyMenu({userId}) {
                             <Grid container spacing={3}>
                                 <Grid item xs={12}>
                                     <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                                        <Title>Today's Menu</Title>
+                                        <Title>History Menus</Title>
                                         <Box sx={{ width: '100%', bgcolor: 'background.paper' }}>
                                             <Box sx={{ my: 3, mx: 2 }}>
                                                 <Grid container alignItems="center">
                                                     <Grid item xs>
                                                         <Typography gutterBottom variant="h4" component="div">
-                                                            Food Items:
+                                                            Menus:
                                                         </Typography>
                                                     </Grid>
                                                     <Grid container spacing={4}>
-                                                        {cards.map((card) => (
-                                                            <Grid item key={card} xs={12} sm={6} md={4}>
-                                                                <Card
-                                                                    sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-                                                                >
+                                                        {Object.entries(menuList).map(([menuID, details]) => (
+                                                            <Grid item key={menuID} xs={12} sm={6} md={4}>
+                                                                <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                                                                     <CardMedia
                                                                         component="div"
-                                                                        sx={{
-                                                                            // 16:9
-                                                                            pt: '56.25%',
-                                                                        }}
-                                                                        image={`https://source.unsplash.com/random?food&${card}`}
+                                                                        sx={{ pt: '56.25%' }}
+                                                                        image={`https://source.unsplash.com/random?food&${menuID}`}
                                                                     />
                                                                     <CardContent sx={{ flexGrow: 1 }}>
                                                                         <Typography gutterBottom variant="h5" component="h2">
-                                                                            Food Item Name
+                                                                            Menu ID: {menuID}
                                                                         </Typography>
                                                                         <Typography>
-                                                                            Rating: 5 stars
+                                                                            Date: {details.date}
                                                                         </Typography>
                                                                     </CardContent>
-                                                                    <CardActions>
-                                                                        <Button size="small" onClick={item}>View Details</Button>
-                                                                        <Button size="small">Edit</Button>
+                                                                    <CardActions sx={{ justifyContent: 'flex-end', mt: 'auto' }}>
+                                                                        <Button size="small" onClick={() => editMenu(details.dishes)}>Edit</Button>
                                                                     </CardActions>
                                                                 </Card>
                                                             </Grid>

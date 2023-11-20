@@ -48,7 +48,7 @@ export const mainListItems = (
       <ListItemIcon>
         <ShoppingCartIcon />
       </ListItemIcon>
-      <ListItemText primary="Today's Menu" />
+      <ListItemText primary="History Menus" />
     </ListItemButton>
     <ListItemButton onClick={create}>
       <ListItemIcon>
