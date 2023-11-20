@@ -12,6 +12,7 @@ import DashboardLayout from './DashboardLayout';
 import TopTenRatedFood from './topTenRatedFood';
 import TopTenFoodAllergies from './topTenFoodAllergies';
 import DisplayDingHallMonthlyReport from './displayDiningHallMonthlyReport';
+import Copyright from '../Copyright';
 
 /* TODO: This component should display dining hall user's dashboard. It should navigate the dining hall users to
 different use cases. 
@@ -22,18 +23,6 @@ My Reports -> displayDiningHallMonthlyReport
 My Account -> displayDininghallAccount
 */
 
-function Copyright(props) {
-  return (
-      <Typography variant="body2" color="text.secondary" align="center" {...props}>
-          {'Copyright © '}
-          <Link color="inherit" to="/">
-              What We Eat
-          </Link>{' '}
-          {new Date().getFullYear()}
-          {'.'}
-      </Typography>
-  );
-}
 
 function DisplayDiningHallDashboard() {
   const [open, setOpen] = React.useState(true);

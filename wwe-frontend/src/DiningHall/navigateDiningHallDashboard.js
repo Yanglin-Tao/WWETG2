@@ -32,6 +32,10 @@ const account = () => {
   window.open("/displayDiningHallAccount", "_self");
 };
 
+const report = () => {
+  window.open("/displayDiningHallReports", "_self");
+};
+
 export const mainListItems = (
   <React.Fragment>
     <ListItemButton onClick={dashboard}>
@@ -52,7 +56,7 @@ export const mainListItems = (
       </ListItemIcon>
       <ListItemText primary="Create Menu" />
     </ListItemButton>
-    <ListItemButton onClick={dashboard}>
+    <ListItemButton onClick={report}>
       <ListItemIcon>
         <BarChartIcon />
       </ListItemIcon>

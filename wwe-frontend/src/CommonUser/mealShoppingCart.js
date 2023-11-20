@@ -23,6 +23,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import DashboardLayout from './DashboardLayout';
 import Rating from './rating';
 import Cookies from 'js-cookie';
+import Copyright from '../Copyright';
 
 /* TODO: This component should display a shopping cart interface to users. 
     The component should display a list of foot item names and quantities. 
@@ -30,18 +31,6 @@ import Cookies from 'js-cookie';
     The component should have a check out button to calculate the total calories intake and add to user's monthly intake.
 */
 
-function Copyright() {
-    return (
-        <Typography variant="body2" color="text.secondary" align="center">
-            {'Copyright © '}
-            <Link color="inherit" href="https://mui.com/">
-                What We Eat
-            </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
-}
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;

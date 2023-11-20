@@ -152,7 +152,10 @@ class UserReports(Base):
 
 
 def init_db():
-    Base.metadata.drop_all(engine)
+    with engine.connect() as connection:
+        connection.execute("DROP TABLE IF EXISTS user_profiles CASCADE")
+        # Drop other tables similarly if needed
+    Base.metadata.drop_all(engine, checkfirst=True)
     Base.metadata.create_all(bind=engine)
     # Add food preferences
     food_preferences = ['Halal', 'Vegetarian', 'Gluten Free', 'Balanced', 'Vegan', 'Pescatarian']

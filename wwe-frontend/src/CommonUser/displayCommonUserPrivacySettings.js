@@ -14,22 +14,11 @@ import DashboardLayout from './DashboardLayout';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
+import Copyright from '../Copyright';
 
 /* TODO: This component should display common user's privacy settings
 */
-function Copyright(props) {
-    return (
-        <Typography variant="body2" color="text.secondary" align="center" {...props}>
-            {'Copyright © '}
-            <Link color="inherit" to="/">
-                What We Eat
-            </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
-    }
-    
+
 function DisplayCommonUserPrivacySettings({userId}) {
     const [open, setOpen] = React.useState(true);
     const toggleDrawer = () => {

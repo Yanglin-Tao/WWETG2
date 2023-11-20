@@ -20,24 +20,12 @@ import Container from '@mui/material/Container';
 import Link from '@mui/material/Link';
 import DashboardLayout from '../DiningHall/DashboardLayout';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Copyright from '../Copyright';
 /* TODO: This component should display a list of menuItems in dailyMenu. 
     Each item displays a name, customer rating, food warning/recommendation and a button to add 
     the menuItem to shopping cart. 
     When click on the menuItem, it should show displayMenuItem component.
     */
-
-function Copyright() {
-    return (
-        <Typography variant="body2" color="text.secondary" align="center">
-            {'Copyright © '}
-            <Link color="inherit" href="https://mui.com/">
-                What We Eat
-            </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
-}
 
 const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 

@@ -25,24 +25,13 @@ import Select from '@mui/material/Select';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import Cookies from 'js-cookie';
+import Copyright from '../Copyright';
 
 /* TODO: This component should allow dining hall administrator create a new dailyMenu. 
     The component should have a button to display createMenuItem component and allow dining hall 
     administrator to add new menuItem to dailyMenu.
 */
 
-function Copyright(props) {
-    return (
-        <Typography variant="body2" color="text.secondary" align="center" {...props}>
-            {'Copyright © '}
-            <Link color="inherit" to="/">
-                What We Eat
-            </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
-}
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;

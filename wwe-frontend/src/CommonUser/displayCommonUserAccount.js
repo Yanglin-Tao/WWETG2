@@ -11,22 +11,10 @@ import Paper from '@mui/material/Paper';
 import Link from '@mui/material/Link';
 import Title from './Title';
 import DashboardLayout from './DashboardLayout';
+import Copyright from '../Copyright';
 import Cookies from 'js-cookie';
 /* TODO: This component should display common user's email and institution.
 */
-
-function Copyright(props) {
-return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-        {'Copyright © '}
-        <Link color="inherit" to="/">
-            What We Eat
-        </Link>{' '}
-        {new Date().getFullYear()}
-        {'.'}
-    </Typography>
-);
-}
 
 function DisplayCommonUserAccount({userId}) {
 

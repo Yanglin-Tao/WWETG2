@@ -22,6 +22,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import DashboardLayout from './DashboardLayout';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Copyright from '../Copyright';
 import Cookies from 'js-cookie';
 
 /* TODO: This component should let common user browse a list of menuItems in dailyMenu. 
@@ -29,19 +30,6 @@ import Cookies from 'js-cookie';
     the menuItem to shopping cart. 
     When click on the menuItem to view details, it should show displayMenuItem component. 
 */
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        What We Eat
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
 
 function BrowseDailyMenu({ userId }) {
   const [userData, setUserData] = useState(null);
@@ -106,10 +94,10 @@ function BrowseDailyMenu({ userId }) {
 
   const fetchMenuItems = async (diningHallID) => {
     try {
-      const response = await fetch('http://127.0.0.1:8080/getTodayMenu', {
+      const response = await fetch('http://127.0.0.1:8080/browseMenu', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ diningHallID })
+        body: JSON.stringify({ diningHallID, userID: userId })
       });
 
       if (!response.ok) {
@@ -117,8 +105,8 @@ function BrowseDailyMenu({ userId }) {
       }
 
       const menuData = await response.json();
-      if (menuData.dishList) {
-        setCurrentMenuItems(menuData.dishList);
+      if (menuData.sortedDishList) {
+        setCurrentMenuItems(menuData.sortedDishList);
       } else {
         console.error('No menu data returned');
         setCurrentMenuItems([]);
@@ -177,7 +165,7 @@ function BrowseDailyMenu({ userId }) {
 
   const formatCategories = (categories) => {
     if (categories) {
-      return categories.replace(/[{}"]/g, '');
+      return categories.replace(/[{}"]/g, '').split(',').join(', ');
     }
     return 'N/A'; // or any default string you wish to display
   };
@@ -238,6 +226,9 @@ function BrowseDailyMenu({ userId }) {
                         </Typography>
                         <Typography>
                           Calories:  {item.calorie}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Rating: {item.rating}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
                           Serving Size: {item.servingSize}

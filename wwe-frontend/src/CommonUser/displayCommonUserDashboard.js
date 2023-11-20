@@ -13,6 +13,7 @@ import CalorieChart from './calorieChart';
 import DailyCalorieIntake from './dailyCalorieIntake';
 import RecentMeals from './recentMeals';
 import DisplayCommonUserMontlyReport from './displayCommonUserMonthlyReport'
+import Copyright from '../Copyright';
 
 /* TODO: This component should display common user's dashboard. It should navigate the common users to
 different use cases. 
@@ -30,18 +31,6 @@ Privacy Settings -> displayCommonUserPrivacySettings / editCommonUserPrivacySett
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
-function Copyright(props) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" to="/">
-        What We Eat
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
 
 function DisplayCommonUserDashboard({ userId }) {
   const [open, setOpen] = React.useState(true);

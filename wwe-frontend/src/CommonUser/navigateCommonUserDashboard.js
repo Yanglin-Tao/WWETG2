@@ -33,6 +33,9 @@ const account = () => {
 const privacy = () => {
   window.open("/displayCommonUserPrivacySettings", "_self");
 };
+const report = () => {
+  window.open("/displayCommonUserReports", "_self");
+};
 export const mainListItems = (
   <React.Fragment>
     <ListItemButton onClick={dashboard}>
@@ -53,7 +56,7 @@ export const mainListItems = (
       </ListItemIcon>
       <ListItemText primary="My Goals" />
     </ListItemButton>
-    <ListItemButton onClick={dashboard}>
+    <ListItemButton onClick={report}>
       <ListItemIcon>
         <BarChartIcon />
       </ListItemIcon>

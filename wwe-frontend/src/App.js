@@ -21,6 +21,8 @@ import CreateDailyMenu from "./Menu/createDailyMenu";
 import DisplayDiningHallAccount from "./DiningHall/displayDininghallAccount";
 import DisplayCommonUserAccount from "./CommonUser/displayCommonUserAccount";
 import DisplayCommonUserPrivacySettings from "./CommonUser/displayCommonUserPrivacySettings";
+import DisplayCommonUserReports from "./CommonUser/displayCommonUserReports";
+import DisplayDiningHallReports from "./DiningHall/displayDiningHallReports";
 import Cookies from 'js-cookie';
 
 function App() {
@@ -113,12 +115,14 @@ function App() {
                     <Route path="/displayCommonUserGoals" element={renderPrivateRoute(DisplayCommonUserGoals)} />
                     <Route path="/displayCommonUserAccount" element={renderPrivateRoute(DisplayCommonUserAccount)} />
                     <Route path="/displayCommonUserPrivacySettings" element={renderPrivateRoute(DisplayCommonUserPrivacySettings)} />
+                    <Route path="/displayCommonUserReports" element={renderPrivateRoute(DisplayCommonUserReports)} />
                     <Route path="/mealShoppingCart" element={renderPrivateRoute(MealShoppingCart)} />
                     {/* Dining Hall route */}
                     <Route path="/loginDiningHall" element={renderLoginPageoginPage(LoginDiningHall)} />
                     <Route path="/registerDiningHall" element={renderLoginPageoginPage(RegisterDiningHall)} />
                     <Route path="/displayDiningHallDashboard" element={renderPrivateRoute(DisplayDiningHallDashboard)} />
                     <Route path="/displayDiningHallAccount" element={renderPrivateRoute(DisplayDiningHallAccount)} />
+                    <Route path="/displayDiningHallReports" element={renderPrivateRoute(DisplayDiningHallReports)} />
                     {/* Menu route */}
                     <Route path="/displayDailyMenu" element={renderPrivateRoute(DisplayDailyMenu)} />
                     <Route path="/displayMenuItem" element={renderPrivateRoute(DisplayMenuItem)} />

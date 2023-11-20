@@ -21,21 +21,11 @@ import DashboardLayout from '../DiningHall/DashboardLayout';
 import StarRateIcon from '@mui/icons-material/StarRate';
 import Link from '@mui/material/Link';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Copyright from '../Copyright';
 /* TODO: This component should display the details of a menuItem, including a name, calories per serving, ingredients,
     customer rating, food warning/recommendation, and a button to add the menuItem to shopping cart
 */
-function Copyright() {
-    return (
-        <Typography variant="body2" color="text.secondary" align="center">
-            {'Copyright © '}
-            <Link color="inherit" href="https://mui.com/">
-                What We Eat
-            </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
-}
+
 
 function DisplayMenuItem({userId}) {
     const menu = () => {

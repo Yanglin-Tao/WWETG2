@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
+import { Navigate } from "react-router-dom";
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import Title from './Title';
@@ -12,7 +13,7 @@ import PropTypes from 'prop-types';
 */
 
 function preventDefault(event) {
-  event.preventDefault();
+  window.open('/displayCommonUserGoals', '_self');
 }
 
 const dailyCalorieIntakeTotal = 1200;
@@ -53,8 +54,8 @@ export default function DailyCalorieIntake({ userId }) {
 
   useEffect(() => {
     const getDailyCalorieIntakeTotal = async () => {
-      const token = Cookies.get('token'); 
-      const apiUrl = `http://127.0.0.1:8080/getRecentMeals`; 
+      const token = Cookies.get('token');
+      const apiUrl = `http://127.0.0.1:8080/getRecentMeals`;
       console.log(userId);
       const requestOptions = {
         method: 'POST',
@@ -62,7 +63,7 @@ export default function DailyCalorieIntake({ userId }) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`, // Add Bearer prefix to the token
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           diningHallID: userId,
         }),
       };

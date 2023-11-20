@@ -18,6 +18,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import TextField from '@mui/material/TextField';
 import DashboardLayout from './DashboardLayout';
+import Copyright from '../Copyright';
 import dayjs from 'dayjs';
 
 /* TODO: This component should display common user's dietary goals
@@ -25,19 +26,6 @@ import dayjs from 'dayjs';
 
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
-
-function Copyright(props) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" to="/">
-        What We Eat
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
 
 function DisplayCommonUserGoals({userId}) {
   const [open, setOpen] = React.useState(true);
