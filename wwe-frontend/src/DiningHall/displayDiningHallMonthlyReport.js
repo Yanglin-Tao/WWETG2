@@ -12,9 +12,10 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import { Bar } from 'react-chartjs-2';
-import { Chart, CategoryScale, LinearScale, BarController, BarElement } from 'chart.js';
+import { PieChart, pieArcLabelClasses } from '@mui/x-charts/PieChart';
+import { Chart, CategoryScale, LinearScale, BarController, BarElement, ArcElement } from 'chart.js';
 
-Chart.register(CategoryScale, LinearScale, BarController, BarElement);
+Chart.register(CategoryScale, LinearScale, BarController, BarElement, ArcElement);
 
 export default function DisplayDiningHallMonthlyReport({ userId }) {
   // const [monthlyReports, setMonthlyReports] = useState([]);
@@ -75,8 +76,8 @@ export default function DisplayDiningHallMonthlyReport({ userId }) {
           gap: '16px', // Adjust the gap between cards
         }}
       >
-        {monthlyReports.reports.map((report) => (
-          <Card key={report.id} sx={{ maxWidth: 275 }}>
+        {monthlyReports.reports.map((report, index) => (
+          <Card key={index} sx={{ maxWidth: 275 }}>
             <CardContent>
               <Typography variant="h5" component="div" gutterBottom>
                 {report.report_month} Report
@@ -112,7 +113,6 @@ export default function DisplayDiningHallMonthlyReport({ userId }) {
               <Typography variant="h6">
                 Top Ten Rated Food
               </Typography>
-              {/* Bar chart for top ten rated food */}
               <Bar
                 data={{
                   labels: selectedReport.top_ten_rated_food.map((food) => `${food.dish_name} (${food.num_rates} rates)`),
@@ -138,7 +138,6 @@ export default function DisplayDiningHallMonthlyReport({ userId }) {
               <Typography variant="h6">
                 Top Ten Food Allergies
               </Typography>
-              {/* Bar chart for top ten allergies */}
               <Bar
                 data={{
                   labels: selectedReport.top_ten_allergies.map((allergy) => `${allergy.allergy} (${allergy.num_users} users)`),
@@ -161,6 +160,29 @@ export default function DisplayDiningHallMonthlyReport({ userId }) {
                   },
                 }}
               />
+              <Typography variant="h6">
+                Food Preferences
+              </Typography>
+              <PieChart
+              series={[
+                {
+                  arcLabel: (item) => `${item.label} (${item.value}%)`,
+                  arcLabelMinAngle: 0,
+                  data: selectedReport.foodPreferences.map((pref) => ({
+                    value: pref.percentage,
+                    label: pref.food_preference,
+                  })),
+                },
+              ]}
+              sx={{
+                [`& .${pieArcLabelClasses.root}`]: {
+                  fill: 'white',
+                  fontWeight: 'bold',
+                },
+              }}
+              width={1000}
+              height={600}
+            />
             </div>
           )}
         </DialogContent>
@@ -282,6 +304,32 @@ const monthlyReports = {
             percentage: 0.08,
           },
         ],
+        foodPreferences: [
+          {
+            food_preference: "Halal",
+            percentage: 10,
+          },
+          {
+            food_preference: "Vegetarian",
+            percentage: 20,
+          },
+          {
+            food_preference: "Gluten Free",
+            percentage: 15,
+          },
+          {
+            food_preference: "Balanced",
+            percentage: 10,
+          },
+          {
+            food_preference: "Vegan",
+            percentage: 25,
+          },
+          {
+            food_preference: "Pescatarian",
+            percentage: 20,
+          },
+        ],
       },
       {
         report_month: "2023-10",
@@ -389,6 +437,32 @@ const monthlyReports = {
             percentage: 0.10,
           },
         ],
+        foodPreferences: [
+          {
+            food_preference: "Halal",
+            percentage: 10,
+          },
+          {
+            food_preference: "Vegetarian",
+            percentage: 20,
+          },
+          {
+            food_preference: "Gluten Free",
+            percentage: 15,
+          },
+          {
+            food_preference: "Balanced",
+            percentage: 10,
+          },
+          {
+            food_preference: "Vegan",
+            percentage: 25,
+          },
+          {
+            food_preference: "Pescatarian",
+            percentage: 20,
+          },
+        ],
       },
       {
         report_month: "2023-09",
@@ -494,6 +568,32 @@ const monthlyReports = {
             allergy: "Sesame",
             num_users: 3,
             percentage: 0.06,
+          },
+        ],
+        foodPreferences: [
+          {
+            food_preference: "Halal",
+            percentage: 10,
+          },
+          {
+            food_preference: "Vegetarian",
+            percentage: 20,
+          },
+          {
+            food_preference: "Gluten Free",
+            percentage: 15,
+          },
+          {
+            food_preference: "Balanced",
+            percentage: 10,
+          },
+          {
+            food_preference: "Vegan",
+            percentage: 25,
+          },
+          {
+            food_preference: "Pescatarian",
+            percentage: 20,
           },
         ],
       },
