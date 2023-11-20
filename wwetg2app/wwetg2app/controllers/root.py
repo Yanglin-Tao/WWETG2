@@ -104,7 +104,7 @@ class MenuDish(Base):
 class MealTracking(Base):
     __tablename__ = 'meal_trackings'
     userID = Column(Integer, ForeignKey('user_profiles.userID'), primary_key=True)
-    date = Column(Date, primary_key=True)
+    date = Column(DateTime, primary_key=True)
     dishID = Column(Integer, ForeignKey('dish.dishID'), primary_key=True)
     quantity = Column(Integer, default=1) 
 
@@ -1135,7 +1135,7 @@ def generate_dining_report():
                 DiningHall.diningHallID == diningHallID
             ).scalar()
 
-            allergyInfo = session.query(
+            topAllergies = session.query(
             Allergy.name,
             func.count(UserAllergy.userID).label('user_count')
             ).join(
@@ -1150,16 +1150,33 @@ def generate_dining_report():
                 Allergy.name
             ).order_by(
                 func.count(UserAllergy.userID).desc()
-            )
-            for allergyIn in allergyInfo:
-                print(allergyIn.name)
-                print(allergyIn.user_count)
-                print(round(allergyIn.user_count/ total_users,3))
+            ).limit(10)
+
+            top_ten_allergies = []
+            for topAllergy in topAllergies:
+                top_ten_allergies.append({"allergy": topAllergy.name, "num_users": topAllergy.user_count, "percentage": round(topAllergy.user_count/ total_users,3)})
+            print(top_ten_allergies)
 
             # Get Top food preference percentage
+            # preferenceInfo = session.query(
+            # FoodPreferences.name,
+            # func.count(UserPreference.userID).label('user_count')
+            # ).join(
+            #     UserAllergy, UserAllergy.allergyID == Allergy.allergyID
+            # ).join(
+            #     UserProfile, UserProfile.userID == UserAllergy.userID
+            # ).join(
+            #     DiningHall, DiningHall.institutionID == UserProfile.institutionID
+            # ).filter(
+            #     DiningHall.diningHallID == diningHallID
+            # ).group_by(
+            #     Allergy.name
+            # ).order_by(
+            #     func.count(UserAllergy.userID).desc()
+            # )
             # To Do
 
-# generate_dining_report()
+generate_dining_report()
 
 async def async_task():
     schedule.every().day.at("20:00").do(generate_user_report)
