@@ -1138,7 +1138,22 @@ class RootController(BaseController):
     @expose('json')
     def getDiningHallMonthlyReports(self):
         # Todo
-        pass
+        data = request.json_body
+        diningHallID = data.get("diningHallID")
+        reports = session.query(DiningHallReport).filter_by(diningHallID = diningHallID).order_by(desc(DiningHallReport.date)).limit(10)
+        report_list = []
+        for report in reports:
+            year = report.date.year
+            month = report.date.month
+            report_month = str(year) + "-" + str(month)
+            top_ten_rated_food = json.loads(report.top10HighestRatedDishes)
+            top_ten_allergies = json.loads(report.top10PriorityFoodAllergies)
+            top_preferences = json.loads(report.dietPreferences)
+            report = {"report_month": report_month, "top_ten_rated_food": top_ten_rated_food, 
+                      "top_ten_allergies":top_ten_allergies, "top_preferences": top_preferences}
+            report_list.append(report)
+
+        return {"reports": report_list}
 
     @expose('json')
     def getCommonUserMonthlyReports(self):
