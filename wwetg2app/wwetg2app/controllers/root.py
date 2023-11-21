@@ -1043,8 +1043,7 @@ class RootController(BaseController):
                             userID=userID,
                             dishID=dishID,
                             date=today,
-                            quantity=quantity,
-                            diningHallID = diningHallID
+                            quantity=quantity
                         )
                         session.add(new_track_dish)
                         session.commit()
@@ -1057,26 +1056,35 @@ class RootController(BaseController):
             print("User not logged in")
             return {"message": "You have to login first."}
         
-    '''
     @expose('json')
     # return 5 the most recent meals
     def getRecentMeals(self):
         data = request.json_body
         userID = data.get('userID')
-        recentMeals = []
-        firstFiveMeals = session.query(MealTracking).filter_by(userID = userID).order_by(MealTracking.date.desc()).limit(5).all()
-        for meal in firstFiveMeals:
-            dish = session.query(Dish).filter_by(diningHallID = meal.diningHallID).filter_by(dishID = meal.dishID).first()
-            quantity = meal.quantity
-            calorieIntake = quantity * dish.calorie
+        recentMealsList = []
+
+        recentMeals = session.query(
+            MealTracking.date,
+            DiningHall.name,
+            func.sum(Dish.calorie * MealTracking.quantity).label('total_calories')
+        ).join(Dish, MealTracking.dishID == Dish.dishID
+        ).join(DiningHall, Dish.diningHallID == DiningHall.diningHallID
+        ).filter(MealTracking.userID == userID
+        ).group_by(MealTracking.date
+        ).group_by(DiningHall.name
+        ).order_by(MealTracking.date.desc()
+        ).limit(5).all()
+
+        for recentMeal in recentMeals:      
             pastMeal = {
-                "date": meal.date.date(),
-                "time": meal.date.time(),
-                "calories": calorieIntake,
-                "dining_hall": meal.diningHallID
+                "date": recentMeal.date.date(),
+                "time": recentMeal.date.time().replace(microsecond=0),
+                "calories": recentMeal.total_calories,
+                "dining_hall": recentMeal.name
             }
-            recentMeals.append(pastMeal)
-        return {"recentMeals": recentMeals}
+            recentMealsList.append(pastMeal)
+        return {"recentMeals": recentMealsList}
+    
     @expose('json')
     # return the calorie intake by time on that day.
     def calcDailyCalorieIntakeByTime(userID):
@@ -1119,7 +1127,6 @@ class RootController(BaseController):
         calorieIntake = RootController.calcDailyCalorieIntakeByTime(userID)
         return {"calorie_intake": calorieIntake}
 
-
     @expose('json')
     # get total calorie intake on that day
     def getDailyCalorieIntakeTotal(self):
@@ -1130,7 +1137,6 @@ class RootController(BaseController):
         for period in calorieIntake:
             total_calorie += period["calorie_intake"]
         return {"total_calorie_intake":total_calorie}
-        '''
 
 
 
