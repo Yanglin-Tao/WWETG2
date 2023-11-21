@@ -108,7 +108,6 @@ class MealTracking(Base):
     date = Column(DateTime, primary_key=True)
     dishID = Column(Integer, ForeignKey('dish.dishID'), primary_key=True)
     quantity = Column(Integer, default=1) 
-    diningHallID =  Column(Integer, ForeignKey('dining_halls.diningHallID'), primary_key=True)
 
 class UserRating(Base):
     __tablename__ = 'user_rating'
@@ -1057,6 +1056,8 @@ class RootController(BaseController):
         else:
             print("User not logged in")
             return {"message": "You have to login first."}
+        
+    '''
     @expose('json')
     # return 5 the most recent meals
     def getRecentMeals(self):
@@ -1129,16 +1130,14 @@ class RootController(BaseController):
         for period in calorieIntake:
             total_calorie += period["calorie_intake"]
         return {"total_calorie_intake":total_calorie}
-
-
-
+        '''
 
 
 
 #--------------Get Reports------------------
     @expose('json')
     def getDiningHallMonthlyReports(self):
-        # To do
+        # Todo
         pass
 
     @expose('json')
@@ -1207,11 +1206,11 @@ def generate_user_report():
 
 def generate_dining_report():
     # Check if today is the last day of a month
-    #if is_last_day_of_the_month():
+    if is_last_day_of_the_month():
         dinings = session.query(DiningHall).all()
         for dining in dinings:
             diningHallID = dining.diningHallID
-            print(diningHallID)
+            # print(diningHallID)
 
             # Get Top 10 rated food
             top_rated_list = []
@@ -1230,7 +1229,7 @@ def generate_dining_report():
             ).limit(10)  # Limit to top 10 dishes
             top_ten_rated_food = []
             for topRate in topRates:
-                top_ten_rated_food.append({"dish_name": topRate.dishName, "average_rating": round(topRate.average_rating,2), "num_rates": topRate.rating_count})
+                top_ten_rated_food.append({"dish_name": topRate.dishName, "average_rating": float(round(topRate.average_rating,2)), "num_rates": topRate.rating_count})
             # print(top_ten_rated_food)
 
             # Get Top 10 allergies and their percentage
@@ -1262,31 +1261,50 @@ def generate_dining_report():
             top_ten_allergies = []
             for topAllergy in topAllergies:
                 top_ten_allergies.append({"allergy": topAllergy.name, "num_users": topAllergy.user_count, "percentage": round(topAllergy.user_count/ total_users,3)})
-            print(top_ten_allergies)
+            # print(top_ten_allergies)
 
             # Get Top food preference percentage
-            # preferenceInfo = session.query(
-            # FoodPreferences.name,
-            # func.count(UserPreference.userID).label('user_count')
-            # ).join(
-            #     UserAllergy, UserAllergy.allergyID == Allergy.allergyID
-            # ).join(
-            #     UserProfile, UserProfile.userID == UserAllergy.userID
-            # ).join(
-            #     DiningHall, DiningHall.institutionID == UserProfile.institutionID
-            # ).filter(
-            #     DiningHall.diningHallID == diningHallID
-            # ).group_by(
-            #     Allergy.name
-            # ).order_by(
-            #     func.count(UserAllergy.userID).desc()
-            # )
-            # To Do
+            topPreferences = session.query(
+            FoodPreferences.name,
+            func.count(UserPreference.userID).label('user_count')
+            ).join(
+                UserPreference, UserPreference.preferenceID == FoodPreferences.preferenceID
+            ).join(
+                UserProfile, UserProfile.userID == UserPreference.userID
+            ).join(
+                DiningHall, DiningHall.institutionID == UserProfile.institutionID
+            ).filter(
+                DiningHall.diningHallID == diningHallID
+            ).group_by(
+                FoodPreferences.name
+            ).order_by(
+                func.count(UserPreference.userID).desc()
+            )
 
-generate_dining_report()
+            top_preferences = []
+            for topPreference in topPreferences:
+                top_preferences.append({"preference": topPreference.name, "num_users": topPreference.user_count, "percentage": round(topPreference.user_count/ total_users,3)})
+            # print(top_ten_preferences)
+
+            top_preferences = json.dumps(top_preferences)
+            top_ten_allergies = json.dumps(top_ten_allergies)
+            top_ten_rated_food = json.dumps(top_ten_rated_food)
+
+            # Todo: Add to database
+            new_report = DiningHallReport(
+                diningHallID= diningHallID,
+                date = datetime.today().date(),
+                dietPreferences = top_preferences,
+                top10PriorityFoodAllergies = top_ten_allergies,
+                top10HighestRatedDishes = top_ten_rated_food
+            )
+            session.add(new_report)
+            session.commit()
+
 
 async def async_task():
     schedule.every().day.at("20:00").do(generate_user_report)
+    schedule.every().day.at("17:00").do(generate_dining_report)
     while True:
         schedule.run_pending()
         # await asyncio.sleep(1)
