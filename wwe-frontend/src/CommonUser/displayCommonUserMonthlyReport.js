@@ -53,7 +53,7 @@ export default function DisplayCommonUserMonthlyReport({ userId }) {
         );
       }
     };
-    // getDiningHallMonthlyReports();
+    // getCommonUserMonthlyReports();
   }, [userId]);
 
   const handleViewDetailsClick = (report) => {
@@ -135,17 +135,40 @@ const monthlyReports = {
         {
         report_month: "2023-11",
         total_calorie_intake: 30000,
-        daily_average_calorie_intake: 1000
+        daily_average_calorie_intake: 1000,
         },
         {
         report_month: "2023-10",
         total_calorie_intake: 28000,
-        daily_average_calorie_intake: 933.33
+        daily_average_calorie_intake: 933.33,
         },
         {
         report_month: "2023-09",
         total_calorie_intake: 27000,
-        daily_average_calorie_intake: 900
+        daily_average_calorie_intake: 900,
         }
     ]
+}
+
+const dietGoalReports = {
+  reports: [
+    {
+    daysFullfilledGoal: 15,
+    daysNotFullfilledGoal: 10,		
+    daysWithoutData: 5,	
+    progressPercentage: 0.5
+    },
+    {
+    daysFullfilledGoal: 15,
+    daysNotFullfilledGoal: 10,		
+    daysWithoutData: 5,	
+    progressPercentage: 0.5
+    },
+    {
+    daysFullfilledGoal: 15,
+    daysNotFullfilledGoal: 10,		
+    daysWithoutData: 5,	
+    progressPercentage: 0.5
+    }
+]
 }
