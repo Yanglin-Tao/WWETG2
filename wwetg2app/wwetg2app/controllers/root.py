@@ -1176,9 +1176,9 @@ class RootController(BaseController):
             year = reports[i].date.year
             month = reports[i].date.month
             report_month = str(year) + "-" + str(month)
-            total_caloe_intake = reports[i].actualIntake
+            total_calorie_intake = reports[i].actualIntake
             daily_average_calorie_intake = reports[i].dailyAverageIntake
-            report = {"report_month": report_month, "total_caloe_intake": total_caloe_intake, "daily_average_calorie_intake": daily_average_calorie_intake}
+            report = {"report_month": report_month, "total_calorie_intake": total_calorie_intake, "daily_average_calorie_intake": daily_average_calorie_intake}
             report_list.append(report)
 
         return {"reports": report_list}
@@ -1203,7 +1203,11 @@ def generate_user_report():
             userID = user.userID
             # Calculate total intake of the months
             actualIntake = 0
-            intakes = session.query(MealTracking).filter_by(userID = userID).all()
+            current_date = datetime.now()
+            first_day_of_month = current_date.replace(day=1)
+            first_day_next_month = (first_day_of_month + timedelta(days=32)).replace(day=1)
+            intakes = session.query(MealTracking).filter_by(userID = userID).filter(
+                and_(MealTracking.date >= first_day_of_month, MealTracking.date < first_day_next_month)).all()
             for intake in intakes:
                 dishID = intake.dishID
                 quantity = intake.quantity
@@ -1211,9 +1215,6 @@ def generate_user_report():
                 actualIntake += calorie * quantity
 
             # Get the number of days of current month and daily average intake at the dining halls
-            current_date = datetime.now()
-            first_day_of_month = current_date.replace(day=1)
-            first_day_next_month = (first_day_of_month + timedelta(days=32)).replace(day=1)
             number_of_days = (first_day_next_month - first_day_of_month).days
             dailyAverageIntake = round(actualIntake / number_of_days, 2)
 
