@@ -68,7 +68,7 @@ function CreateDailyMenu({userId}) {
                 if (i === index) {
                     return {
                         ...item,
-                        categories: typeof newSelection === 'string' ? newSelection.split(',') : newSelection,
+                        categories: typeof newSelection === 'string' ? newSelection.replace(/[{}"]/g, '').split(',') : newSelection,
                     };
                 }
                 return item; 
@@ -117,6 +117,7 @@ function CreateDailyMenu({userId}) {
         }
         try {
             const token = Cookies.get('token'); 
+            console.log("foodItems ", foodItems);
             const response = await fetch('http://127.0.0.1:8080/createDailyMenu', {
                 method: 'POST',
                 headers: {

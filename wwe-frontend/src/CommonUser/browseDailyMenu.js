@@ -119,11 +119,11 @@ function BrowseDailyMenu({ userId }) {
   const renderCustomLabel = (customizedLabel) => {
     switch (customizedLabel) {
       case 2:
-        return <Typography color="green">Recommended</Typography>;
+        return <Typography variant="body1" color="green">Recommended!</Typography>;
       case 1:
-        return null; // Do nothing for 'nothing'
+        return <Typography variant="body1" color="green"></Typography>;; // Do nothing for 'nothing'
       case 0:
-        return <Typography color="red">Warning</Typography>;
+        return <Typography variant="body1" color="red">Warning!</Typography>;
       default:
         return null;
     }
@@ -176,7 +176,7 @@ function BrowseDailyMenu({ userId }) {
 
   const formatCategories = (categories) => {
     if (categories) {
-      return categories.replace(/[{}"]/g, '').split(',').join(', ');
+      return categories.replace(/[\[\]{}"]/g, '').split(',').join(', ');
     }
     return 'N/A'; // or any default string you wish to display
   };
@@ -253,9 +253,7 @@ function BrowseDailyMenu({ userId }) {
                         <Typography variant="body2" color="text.secondary">
                           Type: {item.type}
                         </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {renderCustomLabel(item.customizedLabel)}
-                        </Typography>
+                        {renderCustomLabel(item.customizedLabel)}
                       </CardContent>
                       <CardActions>
                         <Button size="small" color="primary" onClick={() => handleAddToCart(item)}>

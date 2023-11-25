@@ -35,6 +35,7 @@ from sqlalchemy import and_
 import schedule
 import asyncio
 import threading
+import re
 
 # repoze for user authentication 
 # from repoze.what.predicates import not_anonymous
@@ -531,7 +532,7 @@ class RootController(BaseController):
     def customizedLabel(dishID,diningHallID,userID):
         dish = session.query(Dish).filter_by(dishID=dishID).filter_by(diningHallID = diningHallID).first()
         ingredientList = dish.ingredients.split(',')
-        categorieList = dish.categories.split(',')
+        categorieList = json.loads(dish.categories)
 
         allergyList = []
         userAllergies = session.query(UserAllergy).filter_by(userID = userID).all()
@@ -600,12 +601,13 @@ class RootController(BaseController):
                 dish = session.query(Dish).filter_by(dishID=id).filter_by(diningHallID = diningHallID).first()
                 rating = RootController.getFoodRating(dish.dishName,diningHallID,userID)
                 label = RootController.customizedLabel(id,diningHallID,userID)
+                cleaned_categories = re.sub(r'[{}"]', '', dish.categories)
                 dishInfo = {
                     "dishID": dish.dishID,
                     "dishName": dish.dishName,
                     "calorie": dish.calorie,
                     "ingredients": dish.ingredients,
-                    "categories": dish.categories,
+                    "categories": ', '.join(cleaned_categories.split(',')),
                     "servingSize": dish.servingSize,
                     "type": dish.type,
                     "rating" : rating,
@@ -898,7 +900,7 @@ class RootController(BaseController):
                     dishName = dish["dishName"],
                     calorie = dish["calories"],
                     ingredients = dish["ingredients"],
-                    categories = dish["categories"],
+                    categories = json.dumps(dish['categories']),
                     servingSize = dish["serving_size"],
                     type = dish["type"]
                 )
@@ -932,14 +934,13 @@ class RootController(BaseController):
             for menuDish in menuDishes:
                 # Query details of each dish
                 dish = session.query(Dish).filter_by(dishID=menuDish.dishID).first()
-
                 if dish:
                     dishDetails = {
                         "dishID": dish.dishID,
                         "dishName": dish.dishName,
                         "calorie": dish.calorie,
                         "ingredients": dish.ingredients,
-                        "categories": dish.categories,
+                        'categories': json.loads(dish.categories),
                         "servingSize": dish.servingSize,
                         "type": dish.type
                     }

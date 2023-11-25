@@ -68,7 +68,7 @@ function DisplayMenuItem({ userId }) {
                                                     Ingredients: {dish.ingredients}
                                                 </Typography>
                                                 <Typography variant="body2" color="text.secondary">
-                                                    Category: {dish.categories.replace(/[{}]/g, '')}
+                                                    Category: {dish.categories.replace(/[{}"]/g, '')}
                                                 </Typography>
                                                 <Typography variant="body2" color="text.secondary">
                                                     Serving Size: {dish.servingSize}
