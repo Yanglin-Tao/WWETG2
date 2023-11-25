@@ -153,7 +153,6 @@ class UserReports(Base):
     __tablename__ = 'user_reports'
     userID = Column(Integer, ForeignKey('user_profiles.userID'), primary_key=True)
     date = Column(Date, primary_key=True)
-    dietGoal = Column(Float)
     actualIntake = Column(Float)
     dailyAverageIntake = Column(Float)
 
@@ -1202,8 +1201,7 @@ def generate_user_report():
         users = session.query(UserProfile).all()
         for user in users:
             userID = user.userID
-            dietGoal = user.dietGoal
-            # Calculate totl intake of the months
+            # Calculate total intake of the months
             actualIntake = 0
             intakes = session.query(MealTracking).filter_by(userID = userID).all()
             for intake in intakes:
@@ -1222,7 +1220,6 @@ def generate_user_report():
             new_report = UserReports(
                 userID= userID,
                 date = datetime.today().date(),
-                dietGoal = dietGoal,
                 actualIntake = actualIntake,
                 dailyAverageIntake = dailyAverageIntake
             )
