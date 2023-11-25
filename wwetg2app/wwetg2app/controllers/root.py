@@ -132,7 +132,12 @@ class UserProfile(Base):
     email = Column(String)
     password = Column(String)
     institutionID = Column(Integer, ForeignKey('institutions.institutionID'))
-    dietGoal = Column(Float)
+
+class DietGoal(Base):
+    __tablename__ = 'diet_goal'
+    userID = Column(Integer, ForeignKey('institutions.institutionID'), primary_key=True)
+    startDate = Column(Date, primary_key=True)
+    endDate = Column(Date)
 
 class UserAllergy(Base):
     __tablename__ = 'user_allergy'
@@ -1206,8 +1211,6 @@ def generate_user_report():
                 quantity = intake.quantity
                 calorie = session.query(Dish).filter_by(dishID = dishID).first().calorie
                 actualIntake += calorie * quantity
-
-            from datetime import datetime, timedelta
 
             # Get the number of days of current month and daily average intake at the dining halls
             current_date = datetime.now()
