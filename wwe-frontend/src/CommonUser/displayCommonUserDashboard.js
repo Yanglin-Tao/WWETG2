@@ -11,6 +11,7 @@ import CalorieChart from './calorieChart';
 import DailyCalorieIntake from './dailyCalorieIntake';
 import RecentMeals from './recentMeals';
 import DisplayCommonUserMontlyReport from './displayCommonUserMonthlyReport'
+import DisplayCommonUserDietGoalReports from './displayCommonUserDietGoalReports';
 import Copyright from '../Copyright';
 
 /* TODO: This component should display common user's dashboard. It should navigate the common users to
@@ -111,6 +112,12 @@ function DisplayCommonUserDashboard({ userId }) {
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
                   <DisplayCommonUserMontlyReport />
+                </Paper>
+              </Grid>
+              {/* Diet Goal Reports */}
+              <Grid item xs={12}>
+                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+                  <DisplayCommonUserDietGoalReports />
                 </Paper>
               </Grid>
             </Grid>

@@ -39,7 +39,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 
 function CreateDailyMenu({userId}) {
     const [isEditable, setIsEditable] = useState(false);
-    const possibleCategories = ['Halal', 'Vegetarian', 'Gluten Free', 'Balanced', 'Vegan', 'Pescatarian'];
+    const possibleCategories = ['Halal', 'Vegetarian', 'Gluten Free', 'Balanced', 'Vegan', 'Pescatarian', 'None'];
     const possibleFoodTypes = ['Salad', 'Side', 'Main', 'Drink'];
     const [historicalMenus, setHistoricalMenus] = useState([]);
     const [menuDate, setMenuDate] = useState("");

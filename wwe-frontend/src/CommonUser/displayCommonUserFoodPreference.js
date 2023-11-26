@@ -33,7 +33,7 @@ function DisplayCommonUserFoodPreference({ userId }) {
     const [isEditable, setIsEditable] = useState(false);
     const [preferences, setPreferences] = useState([]);
     const [selectedPreference, setSelectedPreference] = useState('');
-    const possiblePreferences = ['Halal', 'Vegetarian', 'Gluten Free', 'Balanced', 'Vegan', 'Pescatarian']; 
+    const possiblePreferences = ['Halal', 'Vegetarian', 'Gluten Free', 'Balanced', 'Vegan', 'Pescatarian', 'None']; 
     const [open, setOpen] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [alertSeverity, setAlertSeverity] = useState('info');

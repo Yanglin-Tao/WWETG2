@@ -23,7 +23,7 @@ function DisplayMenuItem({ userId }) {
     const [isEditMode, setIsEditMode] = useState(false);
     const [editableDish, setEditableDish] = useState(null);
     const [showNewDishForm, setShowNewDishForm] = useState(false);
-    const possibleCategories = ['Halal', 'Vegetarian', 'Gluten Free', 'Balanced', 'Vegan', 'Pescatarian'];
+    const possibleCategories = ['Halal', 'Vegetarian', 'Gluten Free', 'Balanced', 'Vegan', 'Pescatarian', 'None'];
     const possibleFoodTypes = ['Salad', 'Side', 'Main', 'Drink'];
     const [snackBarInfo, setSnackBarInfo] = React.useState({
         open: false,

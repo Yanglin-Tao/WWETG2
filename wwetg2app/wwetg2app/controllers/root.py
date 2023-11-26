@@ -43,7 +43,7 @@ import re
 __all__ = ['RootController']
 
 SECRET_KEY = 'WhatWeEat'
-FOOD_PREF = ('Halal', 'Vegetarian', 'Gluten Free', 'Balanced', 'Vegan', 'Pescatarian')
+FOOD_PREF = ('Halal', 'Vegetarian', 'Gluten Free', 'Balanced', 'Vegan', 'Pescatarian', 'None')
 
 
 # connect to database
@@ -164,7 +164,7 @@ def init_db():
     Base.metadata.drop_all(engine, checkfirst=True)
     Base.metadata.create_all(bind=engine)
     # Add food preferences
-    food_preferences = ['Halal', 'Vegetarian', 'Gluten Free', 'Balanced', 'Vegan', 'Pescatarian']
+    food_preferences = ['Halal', 'Vegetarian', 'Gluten Free', 'Balanced', 'Vegan', 'Pescatarian', 'None']
     for i in range(len(food_preferences)):
         new_preference = FoodPreferences(
         preferenceID = i + 1, 
