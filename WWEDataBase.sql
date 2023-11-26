@@ -32,4 +32,55 @@ INSERT INTO "allergy" ("allergyID", "name") VALUES (8, 'sesame');
 
 INSERT INTO "dish" ("dishID", "diningHallID", "dishName", "calorie", "ingredients",
 "categories", "servingSize", "type") VALUES (1, 1, 'Bacon Cheeseburger', 500, 
-'Beef, Hamburger Bun, Bacon, American Cheese', '[None]', 1, 'Main');
+'Beef, Hamburger Bun, Bacon, American Cheese', '["None"]', 1, 'Main');
+
+INSERT INTO "dish" ("dishID", "diningHallID", "dishName", "calorie", "ingredients",
+"categories", "servingSize", "type") VALUES (2, 1, 'Veggie Fries', 310, 
+'Black bean, Hamburger Bun, Tomatoes, Lettuce Leaf, Oil', '["Halal", "Vegetarian", "Balanced", "Vegan",
+"Pescatarian"]', 1, 'Main');
+
+INSERT INTO "dish" ("dishID", "diningHallID", "dishName", "calorie", "ingredients",
+"categories", "servingSize", "type") VALUES (3, 1, 'French Fries', 150, 
+'Potato, Oil, Salt', '["None"]', 1, 'Side');
+
+INSERT INTO "dish" ("dishID", "diningHallID", "dishName", "calorie", "ingredients",
+"categories", "servingSize", "type") VALUES (4, 1, 'Buffalo Wings', 690, 
+'Chicken, Buffalo Wing Sauce, Blue Cheese Dressing, Celery', '["Gluten Free"]', 1, 'Side');
+
+INSERT INTO "dish" ("dishID", "diningHallID", "dishName", "calorie", "ingredients",
+"categories", "servingSize", "type") VALUES (5, 1, 'Cola', 182, 
+'Cola', '["Halal", "Vegetarian", "Gluten Free", "Vegan", "Pescatarian"]', 1, 'Drink');
+
+INSERT INTO "dish" ("dishID", "diningHallID", "dishName", "calorie", "ingredients",
+"categories", "servingSize", "type") VALUES (6, 1, 'Plain Coffee', 3, 
+'Coffee', '["Halal", "Vegetarian", "Vegan", "Pescatarian"]', 1, 'Drink');
+
+INSERT INTO "dish" ("dishID", "diningHallID", "dishName", "calorie", "ingredients",
+"categories", "servingSize", "type") VALUES (7, 1, 'Latte', 200, 
+'Coffee, Milk, Sugar', '["Halal", "Vegetarian", "Pescatarian"]', 1, 'Drink');
+
+INSERT INTO "dish" ("dishID", "diningHallID", "dishName", "calorie", "ingredients",
+"categories", "servingSize", "type") VALUES (8, 2, 'Carrot Cake Muffin', 220, 
+'Muffin Mix, Carrot, Pure Vanilla Extract, Cinnamon, Ginger, Nutmeg', '["Halal", "Vegetarian", "Pescatarian"]', 1, 'Side');
+
+INSERT INTO "dish" ("dishID", "diningHallID", "dishName", "calorie", "ingredients",
+"categories", "servingSize", "type") VALUES (9, 2, 'Pork Sausage Patty', 360, 
+'Pork', '["Gluten Freen"]', 1, 'Side');
+
+INSERT INTO "dish" ("dishID", "diningHallID", "dishName", "calorie", "ingredients",
+"categories", "servingSize", "type") VALUES (10, 2, 'Eggs', 170, 
+'Egg', '["Halal", "Vegetarian", "Balanced", "Gluten Free", "Pescatarian"]', 1, 'Side');
+
+INSERT INTO "dish" ("dishID", "diningHallID", "dishName", "calorie", "ingredients",
+"categories", "servingSize", "type") VALUES (11, 2, 'Sauteed Broccoli', 50, 
+'Broccoli, Salt', '["Halal", "Vegetarian", "Balanced", "Vegan", "Gluten Free", "Pescatarian"]', 1, 'Side');
+
+INSERT INTO "dish" ("dishID", "diningHallID", "dishName", "calorie", "ingredients",
+"categories", "servingSize", "type") VALUES (12, 2, 'Brown Rice Salad', 140, 
+'Brown Rice, Chick peas, Cucumber, Green Bell Peppers, Green Onions, Red Bell Peppers, Parsley,
+ White Wine Vinegar, Cilantro, Lemon Juice, Canola Oil, Honey, Salt, Oregano, Garlic, Black Pepper', 
+ '["Halal", "Vegetarian", "Balanced", "Pescatarian"]', 1, 'Main');
+
+ INSERT INTO "dish" ("dishID", "diningHallID", "dishName", "calorie", "ingredients",
+"categories", "servingSize", "type") VALUES (13, 2, 'Apple Juice', 113, 
+'Apple, Sugar', '["Halal", "Vegetarian", "Vegan", "Gluten Free", "Pescatarian"]', 1, 'Drink');
