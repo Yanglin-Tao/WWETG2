@@ -132,7 +132,12 @@ class UserProfile(Base):
     email = Column(String)
     password = Column(String)
     institutionID = Column(Integer, ForeignKey('institutions.institutionID'))
-    dietGoal = Column(Float)
+
+class DietGoal(Base):
+    __tablename__ = 'diet_goal'
+    userID = Column(Integer, ForeignKey('institutions.institutionID'), primary_key=True)
+    startDate = Column(Date, primary_key=True)
+    endDate = Column(Date)
 
 class UserAllergy(Base):
     __tablename__ = 'user_allergy'
@@ -148,7 +153,6 @@ class UserReports(Base):
     __tablename__ = 'user_reports'
     userID = Column(Integer, ForeignKey('user_profiles.userID'), primary_key=True)
     date = Column(Date, primary_key=True)
-    dietGoal = Column(Float)
     actualIntake = Column(Float)
     dailyAverageIntake = Column(Float)
 
@@ -1174,9 +1178,9 @@ class RootController(BaseController):
             year = reports[i].date.year
             month = reports[i].date.month
             report_month = str(year) + "-" + str(month)
-            total_caloe_intake = reports[i].actualIntake
+            total_calorie_intake = reports[i].actualIntake
             daily_average_calorie_intake = reports[i].dailyAverageIntake
-            report = {"report_month": report_month, "total_caloe_intake": total_caloe_intake, "daily_average_calorie_intake": daily_average_calorie_intake}
+            report = {"report_month": report_month, "total_calorie_intake": total_calorie_intake, "daily_average_calorie_intake": daily_average_calorie_intake}
             report_list.append(report)
 
         return {"reports": report_list}
@@ -1199,29 +1203,26 @@ def generate_user_report():
         users = session.query(UserProfile).all()
         for user in users:
             userID = user.userID
-            dietGoal = user.dietGoal
-            # Calculate totl intake of the months
+            # Calculate total intake of the months
             actualIntake = 0
-            intakes = session.query(MealTracking).filter_by(userID = userID).all()
+            current_date = datetime.now()
+            first_day_of_month = current_date.replace(day=1)
+            first_day_next_month = (first_day_of_month + timedelta(days=32)).replace(day=1)
+            intakes = session.query(MealTracking).filter_by(userID = userID).filter(
+                and_(MealTracking.date >= first_day_of_month, MealTracking.date < first_day_next_month)).all()
             for intake in intakes:
                 dishID = intake.dishID
                 quantity = intake.quantity
                 calorie = session.query(Dish).filter_by(dishID = dishID).first().calorie
                 actualIntake += calorie * quantity
 
-            from datetime import datetime, timedelta
-
             # Get the number of days of current month and daily average intake at the dining halls
-            current_date = datetime.now()
-            first_day_of_month = current_date.replace(day=1)
-            first_day_next_month = (first_day_of_month + timedelta(days=32)).replace(day=1)
             number_of_days = (first_day_next_month - first_day_of_month).days
             dailyAverageIntake = round(actualIntake / number_of_days, 2)
 
             new_report = UserReports(
                 userID= userID,
                 date = datetime.today().date(),
-                dietGoal = dietGoal,
                 actualIntake = actualIntake,
                 dailyAverageIntake = dailyAverageIntake
             )
