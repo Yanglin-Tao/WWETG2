@@ -17,7 +17,6 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import Link from '@mui/material/Link';
 import DashboardLayout from '../DiningHall/DashboardLayout';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Copyright from '../Copyright';
@@ -56,8 +55,8 @@ function DisplayDailyMenu({ userId }) {
         fetchMenu();
     }, [userId]);
 
-    const editMenu = (menuDetails) => {
-        navigate('/displayMenuItem', { state: { menuDetails } });
+    const editMenu = (menuDetails, menuID) => {
+        navigate('/displayMenuItem', { state: { menuDetails, menuID } });
     };
     return (
         <ThemeProvider theme={createTheme()}>
@@ -109,7 +108,7 @@ function DisplayDailyMenu({ userId }) {
                                                                         </Typography>
                                                                     </CardContent>
                                                                     <CardActions sx={{ justifyContent: 'flex-end', mt: 'auto' }}>
-                                                                        <Button size="small" onClick={() => editMenu(details.dishes)}>Edit</Button>
+                                                                        <Button size="small" onClick={() => editMenu(details.dishes, menuID)}>Edit</Button>
                                                                     </CardActions>
                                                                 </Card>
                                                             </Grid>

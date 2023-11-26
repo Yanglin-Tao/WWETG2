@@ -762,49 +762,50 @@ class RootController(BaseController):
       
 #---------UPLOAD MENU & MENUITEM------------
     @expose('json')
-    # dining hall adds a new dish to an existing  menu
     def addDish(self):
         data = request.json_body
         menuID = data.get("menuID")
         name = data.get("name")
         diningHallID = data.get("diningHallID")
-
         ingredients = data.get("ingredients")
         calorie = data.get("calories")
-        categories = data.get("categories")
+        categories = json.dumps(data.get("categories"))
         servingSize = data.get("serving_size")
         type = data.get("type")
+        
         # check if the menu exists
-        menuExit = session.query(DailyMenu).filter_by(menuID = menuID).first()
-        if not menuExit:
-            return {"message":"Menu doesn't exist."}
+        menuExist = session.query(DailyMenu).filter_by(menuID=menuID).first()
+        if not menuExist:
+            return {"message": "Menu doesn't exist."}
+
         # check if the dish has been created before
-        dishExist = session.query(Dish).filter_by(diningHallID = diningHallID).filter_by(dishName = name).first()
+        dishExist = session.query(Dish).filter_by(diningHallID=diningHallID, dishName=name).first()
         if not dishExist:
-            # create the new dish, add to Dish table
+            # create the new dish and add to Dish table
             dishID = session.query(Dish).count() + 1
             newDish = Dish(
-                dishID = dishID,
-                diningHallID = diningHallID,
-                dishName = name,
-                calorie = calorie,
-                ingredients = ingredients,
-                categories = categories,
-                servingSize = servingSize,
-                type = type
+                dishID=dishID,
+                diningHallID=diningHallID,
+                dishName=name,
+                calorie=calorie,
+                ingredients=ingredients,
+                categories=categories,
+                servingSize=servingSize,
+                type=type
             )
             session.add(newDish)
             session.commit()
+            # After adding the dish, also add the relationship to MenuDish
+            newMenuDish = MenuDish(
+                dishID=dishID,
+                menuID=menuID
+            )
+            session.add(newMenuDish)
+            session.commit()
+            return {"message": "finish uploading", "dishID": dishID}
         else:
-            dishID = dishExist.dishID
-        # add new dish to menuDish table.
-        newMenuDish = MenuDish(
-            dishID = dishID,
-            menuID = menuID
-        )
-        session.add(newMenuDish)
-        session.commit()
-        return {"message":"finish uploading"}
+            return {"message": "Dish exists"}
+        
     
     @expose('json')
     # update information of an existing dish, changing the information in Dish table
@@ -813,8 +814,8 @@ class RootController(BaseController):
         name = data.get("name")
         diningHallID = data.get("diningHallID")
         ingredients = data.get("ingredients")
-        calorie = data.get("calories")
-        categories = data.get("categories")
+        calorie = int(data.get("calories"))
+        categories = json.dumps(data.get("categories"))
         servingSize = data.get("servingSize") 
         type = data.get("type")
 
@@ -837,7 +838,7 @@ class RootController(BaseController):
     @expose('json')
     def deleteDishFromMenu(self):
         data = request.json_body
-        menuID = data.get("menuID")
+        menuID = int(data.get("menuID"))
         dishID = data.get("dishID")
         # check existence
         dish = session.query(MenuDish).filter_by(dishID=dishID).filter_by(menuID=menuID).first()
@@ -845,6 +846,7 @@ class RootController(BaseController):
         if dish:
             session.delete(dish)
             session.commit()
+            return {"message":"Deleted Successfully"}
         else:
             return {"message":"Item not found or already deleted"}
     
