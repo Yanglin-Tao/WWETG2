@@ -84,3 +84,132 @@ INSERT INTO "dish" ("dishID", "diningHallID", "dishName", "calorie", "ingredient
  INSERT INTO "dish" ("dishID", "diningHallID", "dishName", "calorie", "ingredients",
 "categories", "servingSize", "type") VALUES (13, 2, 'Apple Juice', 113, 
 'Apple, Sugar', '["Halal", "Vegetarian", "Vegan", "Gluten Free", "Pescatarian"]', 1, 'Drink');
+
+INSERT INTO "dish" ("dishID", "diningHallID", "dishName", "calorie", "ingredients",
+"categories", "servingSize", "type") VALUES (14, 3, 'French Fries', 145, 
+'Potato, Oil, Salt', '["None"]', 1, 'Side');
+
+ INSERT INTO "dish" ("dishID", "diningHallID", "dishName", "calorie", "ingredients",
+"categories", "servingSize", "type") VALUES (15, 3, 'Orange Juice', 110, 
+'Apple, Sugar', '["Halal", "Vegetarian", "Vegan", "Gluten Free", "Pescatarian"]', 1, 'Drink');
+
+INSERT INTO "dish" ("dishID", "diningHallID", "dishName", "calorie", "ingredients",
+"categories", "servingSize", "type") VALUES (16, 3, 'Jasmine Rice', 140, 
+'Jasmine Rice, Canola Oil, Salt, Parsley', '["Halal", "Vegetarian", "Vegan", "Gluten Free", "Pescatarian"]', 
+1, 'Main');
+
+INSERT INTO "dish" ("dishID", "diningHallID", "dishName", "calorie", "ingredients",
+"categories", "servingSize", "type") VALUES (17, 3, 'Marinated Tofu', 110, 
+'Tofu, Unseasoned Rice Wine Vinegar, Soy Sauce, Sesame Tahini Paste, Sesame Oil, Thick and Easy, 
+Green Onions, Hot Chili Sauce, Ginger, Garlic, Cilantro', '["Halal", "Balanced", "Vegetarian", "Vegan",
+ "Pescatarian"]', 1, 'Main');
+
+ INSERT INTO "dish" ("dishID", "diningHallID", "dishName", "calorie", "ingredients",
+"categories", "servingSize", "type") VALUES (18, 3, 'Grilled Chicken', 150, 
+'Chicken, Canola Oil, Salt, Black Pepper', '["Gluten Freen"]', 1, 'Main');
+
+INSERT INTO "dish" ("dishID", "diningHallID", "dishName", "calorie", "ingredients",
+"categories", "servingSize", "type") VALUES (19, 4, 'Sauteed Broccoli', 50, 
+'Broccoli, Salt', '["Halal", "Vegetarian", "Balanced", "Vegan", "Gluten Free", "Pescatarian"]', 1, 'Side');
+
+INSERT INTO "dish" ("dishID", "diningHallID", "dishName", "calorie", "ingredients",
+"categories", "servingSize", "type") VALUES (20, 4, 'Brown Rice Salad', 140, 
+'Brown Rice, Chick peas, Cucumber, Green Bell Peppers, Green Onions, Red Bell Peppers, Parsley,
+ White Wine Vinegar, Cilantro, Lemon Juice, Canola Oil, Honey, Salt, Oregano, Garlic, Black Pepper', 
+ '["Halal", "Vegetarian", "Balanced", "Pescatarian"]', 1, 'Main');
+
+ INSERT INTO "dish" ("dishID", "diningHallID", "dishName", "calorie", "ingredients",
+"categories", "servingSize", "type") VALUES (21, 4, 'Apple Juice', 113, 
+'Apple, Sugar', '["Halal", "Vegetarian", "Vegan", "Gluten Free", "Pescatarian"]', 1, 'Drink');
+
+INSERT INTO "dish" ("dishID", "diningHallID", "dishName", "calorie", "ingredients",
+"categories", "servingSize", "type") VALUES (22, 4, 'French Fries', 145, 
+'Potato, Oil, Salt', '["None"]', 1, 'Side');
+
+ INSERT INTO "dish" ("dishID", "diningHallID", "dishName", "calorie", "ingredients",
+"categories", "servingSize", "type") VALUES (23, 4, 'Orange Juice', 110, 
+'Apple, Sugar', '["Halal", "Vegetarian", "Vegan", "Gluten Free", "Pescatarian"]', 1, 'Drink');
+
+INSERT INTO "dish" ("dishID", "diningHallID", "dishName", "calorie", "ingredients",
+"categories", "servingSize", "type") VALUES (24, 4, 'Jasmine Rice', 140, 
+'Jasmine Rice, Canola Oil, Salt, Parsley', '["Halal", "Vegetarian", "Vegan", "Gluten Free", "Pescatarian"]', 
+1, 'Main');
+
+INSERT INTO "daily_menu" ("menuID", "date", "diningHallID") VALUES 
+(1, '2023-10-30', 1);
+
+INSERT INTO "daily_menu" ("menuID", "date", "diningHallID") VALUES 
+(2, '2023-10-31', 1);
+
+INSERT INTO "daily_menu" ("menuID", "date", "diningHallID") VALUES 
+(3, '2023-11-01', 1);
+
+INSERT INTO "daily_menu" ("menuID", "date", "diningHallID") VALUES 
+(4, '2023-10-30', 2);
+
+INSERT INTO "daily_menu" ("menuID", "date", "diningHallID") VALUES 
+(5, '2023-10-31', 2);
+
+INSERT INTO "daily_menu" ("menuID", "date", "diningHallID") VALUES 
+(6, '2023-11-01', 2);
+
+INSERT INTO "daily_menu" ("menuID", "date", "diningHallID") VALUES 
+(7, '2023-10-31', 3);
+
+INSERT INTO "daily_menu" ("menuID", "date", "diningHallID") VALUES 
+(8, '2023-11-01', 3);
+
+INSERT INTO "daily_menu" ("menuID", "date", "diningHallID") VALUES 
+(9, '2023-10-31', 4);
+
+INSERT INTO "daily_menu" ("menuID", "date", "diningHallID") VALUES 
+(10, '2023-11-01', 4);
+
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (1,1);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (2,1);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (4,1);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (6,1);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (2,2);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (3,2);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (4,2);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (5,2);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (6,2);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (7,2);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (1,3);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (2,3);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (4,3);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (6,3);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (8,4);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (9,4);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (10,4);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (11,4);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (12,4);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (13,4);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (8,5);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (9,5);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (10,5);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (11,5);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (12,5);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (8,6);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (11,6);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (12,6);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (13,6);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (15,7);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (16,7);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (14,8);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (15,8);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (16,8);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (17,8);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (18,8);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (19,9);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (20,9);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (21,9);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (22,9);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (23,9);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (24,9);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (19,10);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (20,10);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (21,10);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (22,10);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (23,10);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (24,10);
