@@ -76,7 +76,7 @@ class DiningHall(Base):
 class DiningHallReport(Base):
     __tablename__ = 'dining_hall_reports'
     diningHallID = Column(Integer, primary_key=True)
-    date = Column(Date)
+    date = Column(Date, primary_key=True)
     dietPreferences = Column(String)
     top10PriorityFoodAllergies = Column(String)
     top10HighestRatedDishes = Column(String)

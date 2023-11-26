@@ -213,3 +213,88 @@ INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (21,10);
 INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (22,10);
 INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (23,10);
 INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (24,10);
+
+-- All common user passwords before hash: Abc123!!
+INSERT INTO "user_profiles" ("userID", "email", "password", "institutionID") VALUES (1, 'user1@nyu.edu', 
+'09d723dcba27c57054faa197e630226df6a40eb322bf565ff532b74bf81e2952', 1);
+INSERT INTO "user_profiles" ("userID", "email", "password", "institutionID") VALUES (2, 'user2@nyu.edu', 
+'09d723dcba27c57054faa197e630226df6a40eb322bf565ff532b74bf81e2952', 1);
+INSERT INTO "user_profiles" ("userID", "email", "password", "institutionID") VALUES (3, 'user3@bu.edu', 
+'09d723dcba27c57054faa197e630226df6a40eb322bf565ff532b74bf81e2952', 2);
+INSERT INTO "user_profiles" ("userID", "email", "password", "institutionID") VALUES (4, 'user4@nyu.edu', 
+'09d723dcba27c57054faa197e630226df6a40eb322bf565ff532b74bf81e2952', 1);
+
+INSERT INTO "user_preference" ("userID", "preferenceID") VALUES (1,1);
+INSERT INTO "user_preference" ("userID", "preferenceID") VALUES (2,2);
+INSERT INTO "user_preference" ("userID", "preferenceID") VALUES (2,4);
+INSERT INTO "user_preference" ("userID", "preferenceID") VALUES (3,3);
+INSERT INTO "user_preference" ("userID", "preferenceID") VALUES (4,3);
+
+INSERT INTO "user_allergy" ("userID", "allergyID") VALUES (1,5);
+INSERT INTO "user_allergy" ("userID", "allergyID") VALUES (1,3);
+INSERT INTO "user_allergy" ("userID", "allergyID") VALUES (2,3);
+INSERT INTO "user_allergy" ("userID", "allergyID") VALUES (3,1);
+INSERT INTO "user_allergy" ("userID", "allergyID") VALUES (4,1);
+
+INSERT INTO "user_rating" ("userID", "dishID", "rating") VALUES (1, 4, 5);
+INSERT INTO "user_rating" ("userID", "dishID", "rating") VALUES (1, 6, 2);
+INSERT INTO "user_rating" ("userID", "dishID", "rating") VALUES (2, 2, 3);
+INSERT INTO "user_rating" ("userID", "dishID", "rating") VALUES (2, 3, 3);
+INSERT INTO "user_rating" ("userID", "dishID", "rating") VALUES (2, 4, 2);
+INSERT INTO "user_rating" ("userID", "dishID", "rating") VALUES (2, 6, 4);
+INSERT INTO "user_rating" ("userID", "dishID", "rating") VALUES (2, 7, 5);
+INSERT INTO "user_rating" ("userID", "dishID", "rating") VALUES (2, 8, 4);
+INSERT INTO "user_rating" ("userID", "dishID", "rating") VALUES (2, 10, 4);
+INSERT INTO "user_rating" ("userID", "dishID", "rating") VALUES (2, 11, 2);
+INSERT INTO "user_rating" ("userID", "dishID", "rating") VALUES (2, 15, 5);
+INSERT INTO "user_rating" ("userID", "dishID", "rating") VALUES (2, 16, 5);
+INSERT INTO "user_rating" ("userID", "dishID", "rating") VALUES (3, 21, 4);
+INSERT INTO "user_rating" ("userID", "dishID", "rating") VALUES (3, 22, 2);
+INSERT INTO "user_rating" ("userID", "dishID", "rating") VALUES (3, 23, 5);
+INSERT INTO "user_rating" ("userID", "dishID", "rating") VALUES (3, 24, 5);
+INSERT INTO "user_rating" ("userID", "dishID", "rating") VALUES (4, 2, 3);
+INSERT INTO "user_rating" ("userID", "dishID", "rating") VALUES (4, 4, 3);
+INSERT INTO "user_rating" ("userID", "dishID", "rating") VALUES (4, 6, 2);
+INSERT INTO "user_rating" ("userID", "dishID", "rating") VALUES (4, 15, 5);
+INSERT INTO "user_rating" ("userID", "dishID", "rating") VALUES (4, 16, 5);
+INSERT INTO "user_rating" ("userID", "dishID", "rating") VALUES (4, 18, 5);
+
+INSERT INTO "dining_hall_reports" ("diningHallID", "date", "dietPreferences", "top10PriorityFoodAllergies", 
+"top10HighestRatedDishes") VALUES (1, '2023-09-30', '[{"preference": "Balanced", "num_users": 1, "percentage": 0.333}, {"preference": "Gluten Free", "num_users": 1, "percentage": 0.333}, {"preference": "Halal", "num_users": 1, "percentage": 0.333}]', 
+'[{"allergy": "fish", "num_users": 2, "percentage": 0.667}, {"allergy": "egg", "num_users": 1, "percentage": 0.333}, {"allergy": "peanut", "num_users": 1, "percentage": 0.333}]', 
+'[{"dish_name": "Latte", "average_rating": 5.0, "num_rates": 1}, {"dish_name": "Buffalo Wings", "average_rating": 3.33, "num_rates": 3}, {"dish_name": "Veggie Fries", "average_rating": 3.0, "num_rates": 2}, {"dish_name": "French Fries", "average_rating": 3.0, "num_rates": 1}, {"dish_name": "Plain Coffee", "average_rating": 2.5, "num_rates": 2}]');
+
+INSERT INTO "dining_hall_reports" ("diningHallID", "date", "dietPreferences", "top10PriorityFoodAllergies", 
+"top10HighestRatedDishes") VALUES (2, '2023-09-30', '[{"preference": "Balanced", "num_users": 1, "percentage": 0.333}, {"preference": "Gluten Free", "num_users": 1, "percentage": 0.333}, {"preference": "Halal", "num_users": 1, "percentage": 0.333}]',
+'[{"allergy": "fish", "num_users": 2, "percentage": 0.667}, {"allergy": "egg", "num_users": 1, "percentage": 0.333}, {"allergy": "peanut", "num_users": 1, "percentage": 0.333}]', 
+'[{"dish_name": "Carrot Cake Muffin", "average_rating": 4.0, "num_rates": 1}, {"dish_name": "Eggs", "average_rating": 5, "num_rates": 1}, {"dish_name": "Sauteed Broccoli", "average_rating": 2.0, "num_rates": 1}]');
+
+INSERT INTO "dining_hall_reports" ("diningHallID", "date", "dietPreferences", "top10PriorityFoodAllergies", 
+"top10HighestRatedDishes") VALUES (3, '2023-09-30', '[{"preference": "Balanced", "num_users": 1, "percentage": 0.333}, {"preference": "Gluten Free", "num_users": 1, "percentage": 0.333}, {"preference": "Halal", "num_users": 1, "percentage": 0.333}', 
+'[{"allergy": "fish", "num_users": 2, "percentage": 0.667}], {"allergy": "egg", "num_users": 1, "percentage": 0.333}, {"allergy": "peanut", "num_users": 1, "percentage": 0.333}]',
+'[{"dish_name": "Orange Juice", "average_rating": 5.0, "num_rates": 2}, {"dish_name": "Jasmine Rice", "average_rating": 5.0, "num_rates": 2}, {"dish_name": "Grilled Chicken", "average_rating": 4.0, "num_rates": 1}]');
+
+INSERT INTO "dining_hall_reports" ("diningHallID", "date", "dietPreferences", "top10PriorityFoodAllergies", 
+"top10HighestRatedDishes") VALUES (4, '2023-09-30', '[{"preference": "Gluten Free", "num_users": 1, "percentage": 1.0}]', 
+'[{"allergy": "egg", "num_users": 1, "percentage": 1.0}]', 
+'[{"dish_name": "Orange Juice", "average_rating": 5.0, "num_rates": 1}, {"dish_name": "Jasmine Rice", "average_rating": 5.0, "num_rates": 1}, {"dish_name": "Apple Juice", "average_rating": 4.0, "num_rates": 1}, {"dish_name": "French Fries", "average_rating": 3.0, "num_rates": 1}]');
+
+INSERT INTO "dining_hall_reports" ("diningHallID", "date", "dietPreferences", "top10PriorityFoodAllergies", 
+"top10HighestRatedDishes") VALUES (1, '2023-10-31', '[{"preference": "Balanced", "num_users": 1, "percentage": 0.333}, {"preference": "Gluten Free", "num_users": 1, "percentage": 0.333}, {"preference": "Halal", "num_users": 1, "percentage": 0.333}, {"preference": "Vegetarian", "num_users": 1, "percentage": 0.333}]', 
+'[{"allergy": "fish", "num_users": 2, "percentage": 0.667}, {"allergy": "egg", "num_users": 1, "percentage": 0.333}, {"allergy": "peanut", "num_users": 1, "percentage": 0.333}]', 
+'[{"dish_name": "Latte", "average_rating": 5.0, "num_rates": 1}, {"dish_name": "Buffalo Wings", "average_rating": 3.33, "num_rates": 3}, {"dish_name": "Veggie Fries", "average_rating": 3.0, "num_rates": 2}, {"dish_name": "French Fries", "average_rating": 3.0, "num_rates": 1}, {"dish_name": "Plain Coffee", "average_rating": 2.67, "num_rates": 3}]');
+
+INSERT INTO "dining_hall_reports" ("diningHallID", "date", "dietPreferences", "top10PriorityFoodAllergies", 
+"top10HighestRatedDishes") VALUES (2, '2023-10-31', '[{"preference": "Balanced", "num_users": 1, "percentage": 0.333}, {"preference": "Gluten Free", "num_users": 1, "percentage": 0.333}, {"preference": "Halal", "num_users": 1, "percentage": 0.333}, {"preference": "Vegetarian", "num_users": 1, "percentage": 0.333}]', 
+'[{"allergy": "fish", "num_users": 2, "percentage": 0.667}, {"allergy": "egg", "num_users": 1, "percentage": 0.333}, {"allergy": "peanut", "num_users": 1, "percentage": 0.333}]', 
+'[{"dish_name": "Carrot Cake Muffin", "average_rating": 4.0, "num_rates": 1}, {"dish_name": "Eggs", "average_rating": 4.0, "num_rates": 1}, {"dish_name": "Sauteed Broccoli", "average_rating": 2.0, "num_rates": 1}]');
+
+INSERT INTO "dining_hall_reports" ("diningHallID", "date", "dietPreferences", "top10PriorityFoodAllergies", 
+"top10HighestRatedDishes") VALUES (3, '2023-10-31', '[{"preference": "Balanced", "num_users": 1, "percentage": 0.333}, {"preference": "Gluten Free", "num_users": 1, "percentage": 0.333}, {"preference": "Halal", "num_users": 1, "percentage": 0.333}, {"preference": "Vegetarian", "num_users": 1, "percentage": 0.333}]', 
+'[{"allergy": "fish", "num_users": 2, "percentage": 0.667}, {"allergy": "egg", "num_users": 1, "percentage": 0.333}, {"allergy": "peanut", "num_users": 1, "percentage": 0.333}]',
+'[{"dish_name": "Orange Juice", "average_rating": 5.0, "num_rates": 2}, {"dish_name": "Jasmine Rice", "average_rating": 5.0, "num_rates": 2}, {"dish_name": "Grilled Chicken", "average_rating": 5.0, "num_rates": 1}]');
+
+INSERT INTO "dining_hall_reports" ("diningHallID", "date", "dietPreferences", "top10PriorityFoodAllergies", 
+"top10HighestRatedDishes") VALUES (4, '2023-10-31', '[{"preference": "Gluten Free", "num_users": 1, "percentage": 1.0}]', 
+'[{"allergy": "egg", "num_users": 1, "percentage": 1.0}]', 
+'[{"dish_name": "Orange Juice", "average_rating": 5.0, "num_rates": 1}, {"dish_name": "Jasmine Rice", "average_rating": 5.0, "num_rates": 1}, {"dish_name": "Apple Juice", "average_rating": 4.0, "num_rates": 1}, {"dish_name": "French Fries", "average_rating": 2.0, "num_rates": 1}]');

@@ -17,6 +17,7 @@ React (assuming you already installed React)
 3. Run `npm start`
 
 ## Database
+### Set up
 Postgresql
 1. Download Postgresql
 2. Create a database named 'whatweeatapp'
@@ -29,6 +30,13 @@ ALTER DATABASE "whatweeatapp" OWNER TO "[your_name]";
 SELECT * FROM user_profiles;
 ```
 Notice that I used 'yanglintao' in main.py in the backend folder. To avoid merging issues, it's better to use the same name. You can create a new role named 'yanglintao' and set passwords. But feel free to change to your role name as long as you do not commit that change.
+
+### Insert data
+1. Open pgAdmin4 and start the server.
+2. Run the backend and go to localhost:8080.
+3. In pgAdmin4, select "Tools" -> "Query Tool." If you are using macOS, "Tools" is located on the top left corner of your screen.
+4. Drag the file WWEDataBase.sql into the window and click the "execute" symbol.
+5. Congratulations! The data has been inserted!
 
 ## The HelloWorld example
 In `/WWETG2/wwetg2app/wwetg2app/controllers/root.py`, define an API endpoint named 'helloworld'
