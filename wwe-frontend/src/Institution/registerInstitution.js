@@ -51,8 +51,14 @@ function RegisterInstitution() {
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-
     const name = data.get('name');
+    if (!name.trim()) {
+      setAlertMessage('Institution name cannot be empty.');
+      setAlertSeverity('error');
+      setOpen(true);
+      return;
+    }
+
     const apiUrl = `http://127.0.0.1:8080/register_institution`;
 
     const requestOptions = {
