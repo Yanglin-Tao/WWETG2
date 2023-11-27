@@ -350,3 +350,11 @@ INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4,
 INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-11-01 12:30:00', 18, 1);
 INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-11-01 18:30:00', 2, 1);
 
+INSERT INTO "diet_goal" ("userID", "startDate", "endDate", "minCal", "maxCal") VALUES (1, '2023-10-29', '2023-10-31', 1350, 1950);
+INSERT INTO "diet_goal" ("userID", "startDate", "endDate", "minCal", "maxCal") VALUES (1, '2023-11-01', '2023-11-30', 1400, 2000);
+INSERT INTO "diet_goal" ("userID", "startDate", "endDate", "minCal", "maxCal") VALUES (2, '2023-10-29', '2023-11-30', 2100, 2550);
+INSERT INTO "diet_goal" ("userID", "startDate", "endDate", "minCal", "maxCal") VALUES (3, '2023-10-30', '2023-10-31', 1400, 2000);
+INSERT INTO "diet_goal" ("userID", "startDate", "endDate", "minCal", "maxCal") VALUES (3, '2023-11-01', '2023-11-30', 1500, 2000);
+INSERT INTO "diet_goal" ("userID", "startDate", "endDate", "minCal", "maxCal") VALUES (4, '2023-10-29', '2023-10-31', 1350, 1950);
+INSERT INTO "diet_goal" ("userID", "startDate", "endDate", "minCal", "maxCal") VALUES (4, '2023-11-01', '2023-11-30', 1400, 2000);
+

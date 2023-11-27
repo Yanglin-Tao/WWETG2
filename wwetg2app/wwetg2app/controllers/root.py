@@ -135,7 +135,7 @@ class UserProfile(Base):
 
 class DietGoal(Base):
     __tablename__ = 'diet_goal'
-    userID = Column(Integer, ForeignKey('institutions.institutionID'), primary_key=True)
+    userID = Column(Integer, ForeignKey('user_profiles.userID'), primary_key=True)
     startDate = Column(Date, primary_key=True)
     endDate = Column(Date)
     minCal = Column(Integer)
