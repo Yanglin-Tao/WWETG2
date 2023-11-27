@@ -1125,8 +1125,32 @@ class RootController(BaseController):
                 "calorie_intake": period_intake
             }
             calorieIntake.append(period)
-
         return calorieIntake
+
+    # time is in the form of datetime.now(), must include day, month, year
+    def calcTotalCalorieIntakeByDate(userID, time):
+        tYear = time.year
+        tMonth = time.month
+        tDay = time.day
+        start_time = datetime(tYear, tMonth, tDay, 0, 0, 0)
+        end_time = datetime(tYear, tMonth, tDay, 23, 59, 0)
+        # how many meals are consumed on that day
+        meals_in_time_period = (
+            session.query(MealTracking)
+            .filter_by(userID=userID)
+            .filter(and_(MealTracking.date >= start_time, MealTracking.date < end_time))
+            .all()
+        )
+        period_intake =0 
+        for meal in meals_in_time_period:
+            # if meal.date.date() == today:
+            dish_calorie = session.query(Dish).filter_by(dishID = meal.dishID).filter_by(diningHallID = meal.diningHallID).first().calorie
+            period_intake += dish_calorie * meal.quantity
+        return period_intake
+
+
+
+        
 
     @expose('json')
     def getDailyCalorieIntakeByTime(self):
@@ -1159,6 +1183,14 @@ class RootController(BaseController):
         dailyCalorieIntakeMinimum = data.get("dailyCalorieIntakeMinimum")
         userExist = session.query(UserProfile).filter_by(userID=userID).first()
         if userExist:
+            overlap = (session.query(DietGoal)
+            .filter_by(userID=userID)
+            .filter(DietGoal.endDate >= startDate)
+            .all()
+            )
+            if overlap:
+                return {"message": "The periods of different goals can't overlap with each other."}
+
             newGoal = DietGoal(
                 userID = userID,
                 startDate = startDate,
@@ -1171,10 +1203,49 @@ class RootController(BaseController):
             return {"message":"The goal is sucessfully created"}
         return {"message":"User not found."}
     
-    # @expose('json')
-    # def getDietGoalLiveProgress(self):
-    #     data = request.json_body
-    #     userID = data.get("userID")
+    @expose('json')
+    def getDietGoalLiveProgress(self):
+        data = request.json_body
+        userID = data.get("userID")
+        today = dt_date.today()
+        # today = datetime.date.today()
+        # find the current goal
+        currentGoal = (session.query(DietGoal)
+                       .filter_by(userID=userID)
+                       .filter(and_(DietGoal.startDate <= today, DietGoal.endDate > today))
+                       .first())
+        if currentGoal:
+            # goalProgress = [0] * (currentGoal.endDate - currentGoal.startDate).days
+            goalProgress = []
+            totalDays = (currentGoal.endDate - currentGoal.startDate).days
+            # if on a given day the intake fullfill the goal, record 1; exceeds the goal, record 2; no data, record 0.
+            currentDate = currentGoal.startDate
+            while currentDate <= currentGoal.endDate:
+                if currentDate <= today:
+                    time = datetime(currentDate.year, currentDate.month, currentDate.day)
+                    dailyIntake = RootController.calcTotalCalorieIntakeByDate(userID, time)
+                    if dailyIntake > currentGoal.maxCal or dailyIntake < currentGoal.minCal:
+                        goalProgress.append(2)
+                    else:
+                        goalProgress.append(1)
+                else:
+                    goalProgress.append(0)
+                current_date += timedelta(days=1)
+            # check
+            if len(goalProgress) != totalDays:
+                return {"message":"There are some problem when claculating the live progress"}
+            # sum up
+            daysFullfilledGoal = goalProgress.count(1)
+            daysNotFullfilledGoal=goalProgress.count(2)
+            daysWithoutData = goalProgress.count(0)
+            progressPercentage = daysFullfilledGoal / totalDays
+            return {"daysFullfilledGoal":daysFullfilledGoal,
+                    "daysNotFullfilledGoal":daysNotFullfilledGoal,
+                    "daysWithoutData":daysWithoutData,
+                    "progressPercentage":progressPercentage}
+
+        else:
+            return {"message":"Current goal doesn't exist."}
 
 #--------------Get Reports------------------
     @expose('json')
