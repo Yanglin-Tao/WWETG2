@@ -218,52 +218,58 @@ function BrowseDailyMenu({ userId }) {
                   </Select>
                 </FormControl>
               </Grid>
-
-              {/* Display Demo Menu Items */}
-              <Grid container spacing={4}>
-                {currentMenuItems.map((item) => (
-                  <Grid item key={item.dishID} xs={12} sm={6} md={4}>
-                    <Card
-                      sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-                    >
-                      <CardMedia
-                        component="div"
-                        sx={{ pt: '56.25%' }}
-                        image={`https://source.unsplash.com/random?food&${item.dishID}`}
-                      />
-                      <CardContent sx={{ flexGrow: 1 }}>
-                        <Typography gutterBottom variant="h5" component="h2">
-                          {item.dishName}
-                        </Typography>
-                        <Typography>
-                          Calories:  {item.calorie}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {item.rating === 0 ? "No rating" : "Rating: " + item.rating}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {formatCategories(item.categories)}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          Serving Size: {item.servingSize}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          Ingredients: {item.ingredients}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          Type: {item.type}
-                        </Typography>
-                        {renderCustomLabel(item.customizedLabel)}
-                      </CardContent>
-                      <CardActions>
-                        <Button size="small" color="primary" onClick={() => handleAddToCart(item)}>
-                          Add to Cart
-                        </Button>
-                      </CardActions>
-                    </Card>
+              <Container>
+                {currentMenuItems.length > 0 ? (
+                  <Grid container spacing={4}>
+                    {currentMenuItems.map((item) => (
+                      <Grid item key={item.dishID} xs={12} sm={6} md={4}>
+                        <Card
+                          sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+                        >
+                          <CardMedia
+                            component="div"
+                            sx={{ pt: '56.25%' }}
+                            image={`https://source.unsplash.com/random?food&${item.dishID}`}
+                          />
+                          <CardContent sx={{ flexGrow: 1 }}>
+                            <Typography gutterBottom variant="h5" component="h2">
+                              {item.dishName}
+                            </Typography>
+                            <Typography>
+                              Calories:  {item.calorie}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              {item.rating === 0 ? "No rating" : "Rating: " + item.rating}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              {formatCategories(item.categories)}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              Serving Size: {item.servingSize}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              Ingredients: {item.ingredients}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              Type: {item.type}
+                            </Typography>
+                            {renderCustomLabel(item.customizedLabel)}
+                          </CardContent>
+                          <CardActions>
+                            <Button size="small" color="primary" onClick={() => handleAddToCart(item)}>
+                              Add to Cart
+                            </Button>
+                          </CardActions>
+                        </Card>
+                      </Grid>
+                    ))}
                   </Grid>
-                ))}
-              </Grid>
+                ) : (
+                  <Typography variant="h6" align="center" style={{ margin: '20px' }}>
+                    The dining hall hasn't uploaded the menu for today.
+                  </Typography>
+                )}
+              </Container>
             </Container>
             <Copyright sx={{ pt: 4 }} />
           </LocalizationProvider>
