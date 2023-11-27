@@ -101,10 +101,7 @@ function DisplayDailyMenu({ userId }) {
                                                                     />
                                                                     <CardContent sx={{ flexGrow: 1 }}>
                                                                         <Typography gutterBottom variant="h5" component="h2">
-                                                                            Menu ID: {menuID}
-                                                                        </Typography>
-                                                                        <Typography>
-                                                                            Date: {details.date}
+                                                                            Menu Date: {details.date}
                                                                         </Typography>
                                                                     </CardContent>
                                                                     <CardActions sx={{ justifyContent: 'flex-end', mt: 'auto' }}>
