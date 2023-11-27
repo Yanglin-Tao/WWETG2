@@ -7,46 +7,8 @@ import TableRow from '@mui/material/TableRow';
 import Title from './Title';
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
-
-
 /* TODO: This component shows a list of common user's recent meals. This component is optional to have.
 */
-
-const recentMeals = {
-  recentMeals: [
-    {
-      date: '2023-11-15',
-      time: '12:30 PM',
-      calories: 550,
-      dining_hall: 'Main Dining Hall',
-    },
-    {
-      date: '2023-11-14',
-      time: '7:45 AM',
-      calories: 320,
-      dining_hall: 'Student Center Cafeteria',
-    },
-    {
-      date: '2023-11-13',
-      time: '6:15 PM',
-      calories: 720,
-      dining_hall: 'West Campus Dining',
-    },
-    {
-      date: '2023-11-12',
-      time: '1:00 PM',
-      calories: 450,
-      dining_hall: 'East Campus Dining',
-    },
-    {
-      date: '2023-11-11',
-      time: '8:30 AM',
-      calories: 280,
-      dining_hall: 'Main Dining Hall',
-    },
-  ],
-};
-
 function mapMealData(meals) {
   return meals.map((meal, index) => ({
     ...meal,
@@ -55,12 +17,8 @@ function mapMealData(meals) {
 }
 
 export default function RecentMeals({ userId }) {
-
-  const { recentMeals: mealData } = recentMeals;
-
-  const mappedMealData = mapMealData(mealData);
-
-  // const [recentMeals, setRecentMeals] = useState([]);
+  const [recentMeals, setRecentMeals] = useState([]);
+  let mappedMealData = useState([]);
 
   useEffect(() => {
     const getRecentMeals = async () => {
@@ -71,10 +29,10 @@ export default function RecentMeals({ userId }) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`, // Add Bearer prefix to the token
+          'Authorization': token,
         },
         body: JSON.stringify({ 
-          diningHallID: userId,
+          userID: userId,
         }),
       };
 
@@ -85,13 +43,14 @@ export default function RecentMeals({ userId }) {
         }
         const data = await response.json();
         console.log(data);
-        // setRecentMeals(data.recentMeals);
+        setRecentMeals(data.recentMeals);
+        mappedMealData = mapMealData(recentMeals);
       } catch (error) {
         console.error('There was a problem fetching recent meals:', error);
       }
     };
 
-    // getRecentMeals(); 
+    getRecentMeals(); 
   }, [userId]);
 
   return (
@@ -107,7 +66,7 @@ export default function RecentMeals({ userId }) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {mappedMealData.map((meal) => (
+          {recentMeals.map((meal) => (
             <TableRow key={meal.key}>
               <TableCell>{meal.date}</TableCell>
               <TableCell>{meal.time}</TableCell>

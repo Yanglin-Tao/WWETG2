@@ -105,19 +105,19 @@ function DisplayCommonUserDashboard({ userId }) {
               {/* Recent Meals */}
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  <RecentMeals />
+                  <RecentMeals userId={userId} />
                 </Paper>
               </Grid>
               {/* Monthly Reports */}
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  <DisplayCommonUserMontlyReport />
+                  <DisplayCommonUserMontlyReport userId={userId}/>
                 </Paper>
               </Grid>
               {/* Diet Goal Reports */}
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  <DisplayCommonUserDietGoalReports />
+                  <DisplayCommonUserDietGoalReports userId={userId} />
                 </Paper>
               </Grid>
             </Grid>
