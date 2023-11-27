@@ -34,7 +34,7 @@ export default function DisplayCommonUserDietGoalReports({ userId }) {
           'Authorization': token,
         },
         body: JSON.stringify({
-          diningHallID: userId,
+          userID: userId,
         }),
       };
 
@@ -108,19 +108,19 @@ export default function DisplayCommonUserDietGoalReports({ userId }) {
           {selectedReport && (
             <div>
               <Typography variant="h6">
-                Report start date: {selectedReport.startDate}
+                Report start date: {selectedReport.startDate} <br />
                 Report end date: {selectedReport.endDate}
               </Typography>
               <Typography variant="h6">
-                Daily calorie intake maximum: {selectedReport.dailyCalorieIntakeMaximum}
+                Daily calorie intake maximum: {selectedReport.dailyCalorieIntakeMaximum} <br />
                 Daily calorie intake minimum: {selectedReport.dailyCalorieIntakeMinimum}
               </Typography>
               <Typography variant="h6">
-                Report progress: {selectedReport.progressPercentage}
+                Report progress: {selectedReport.progressPercentage} 
               </Typography>
               <Typography variant="h6">
-                Days fullfilled goal: {selectedReport.daysFullfilledGoal}
-                Days not fullfilled goal: {selectedReport.daysNotFullfilledGoal}
+                Days fullfilled goal: {selectedReport.daysFullfilledGoal} <br />
+                Days not fullfilled goal: {selectedReport.daysNotFullfilledGoal} <br />
                 Days without data: {selectedReport.daysWithoutData}
               </Typography>
             </div>
@@ -140,7 +140,7 @@ const dietGoalReports = {
   reports: [
     {
     startDate: '2023-10-01',
-    endDate: '2023-10-8',
+    endDate: '2023-10-30',
     dailyCalorieIntakeMaximum: 2000,
     dailyCalorieIntakeMinimum: 1000,
     daysFullfilledGoal: 15,
@@ -149,8 +149,8 @@ const dietGoalReports = {
     progressPercentage: 0.5
     },
     {
-    startDate: '2023-9-11',
-    endDate: '2023-9-29',
+    startDate: '2023-09-11',
+    endDate: '2023-10-10',
     dailyCalorieIntakeMaximum: 2000,
     dailyCalorieIntakeMinimum: 1000,
     daysFullfilledGoal: 15,
@@ -160,7 +160,7 @@ const dietGoalReports = {
     },
     {
     startDate: '2023-07-01',
-    endDate: '2023-08-23',
+    endDate: '2023-07-30',
     dailyCalorieIntakeMaximum: 2000,
     dailyCalorieIntakeMinimum: 1000,
     daysFullfilledGoal: 15,

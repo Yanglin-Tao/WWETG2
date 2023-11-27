@@ -15,19 +15,6 @@ import DisplayCommonUserDietGoalReports from './displayCommonUserDietGoalReports
 const defaultTheme = createTheme();
 
 export default function DisplayCommonUserReports({ userId }) {
-    const [selectedReport, setSelectedReport] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-
-    const handleViewDetailsClick = (report) => {
-        setSelectedReport(report);
-        setIsModalOpen(true);
-    };
-
-    const handleCloseModal = () => {
-        setSelectedReport(null);
-        setIsModalOpen(false);
-    };
-    
     return (
         <ThemeProvider theme={defaultTheme}>
         <Box sx={{ display: 'flex' }}>
