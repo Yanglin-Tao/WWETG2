@@ -61,7 +61,7 @@ export default function DailyCalorieIntake({ userId }) {
   useEffect(() => {
     const getDailyCalorieIntakeTotal = async () => {
       const token = Cookies.get('token');
-      const apiUrl = `http://127.0.0.1:8080/getCommonUserMonthlyReports`;
+      const apiUrl = `http://127.0.0.1:8080/getDailyCalorieIntakeTotal`;
       console.log(userId);
       const requestOptions = {
         method: 'POST',

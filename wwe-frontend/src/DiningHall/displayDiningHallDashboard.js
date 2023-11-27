@@ -24,7 +24,7 @@ My Account -> displayDininghallAccount
 */
 
 
-function DisplayDiningHallDashboard() {
+function DisplayDiningHallDashboard({ userId }) {
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
@@ -54,17 +54,17 @@ function DisplayDiningHallDashboard() {
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  <TopTenRatedFood />
+                  <TopTenRatedFood userId={userId}/>
                 </Paper>
               </Grid>
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  <TopTenFoodAllergies />
+                  <TopTenFoodAllergies userId={userId}/>
                 </Paper>
               </Grid>
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  <DisplayDingHallMonthlyReport />
+                  <DisplayDingHallMonthlyReport userId={userId}/>
                 </Paper>
               </Grid>
             </Grid>
