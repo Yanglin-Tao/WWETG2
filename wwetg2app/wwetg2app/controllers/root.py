@@ -845,16 +845,25 @@ class RootController(BaseController):
     def deleteDishFromMenu(self):
         data = request.json_body
         menuID = int(data.get("menuID"))
-        dishID = data.get("dishID")
-        # check existence
-        dish = session.query(MenuDish).filter_by(dishID=dishID).filter_by(menuID=menuID).first()
-        # delete item
+        dishID = int(data.get("dishID"))
+        # check existence in MenuDish
+        menuDish = session.query(MenuDish).filter_by(dishID=dishID).filter_by(menuID=menuID).first()
+        # delete item from MenuDish
+        if menuDish:
+            session.delete(menuDish)
+            session.commit()
+        else:
+            return {"message": "Item not found or already deleted from MenuDish"}
+
+        # check existence in Dish
+        dish = session.query(Dish).filter_by(dishID=dishID).first()
+        # delete item from Dish
         if dish:
             session.delete(dish)
             session.commit()
-            return {"message":"Deleted Successfully"}
+            return {"message": "Deleted Successfully"}
         else:
-            return {"message":"Item not found or already deleted"}
+            return {"message": "Item not found or already deleted from Dish"}
     
     
     @expose('json')
