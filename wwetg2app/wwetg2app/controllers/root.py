@@ -537,14 +537,14 @@ class RootController(BaseController):
     # return a number representing if the dish is recommended (2), nothing (1), or warnning (0).
     def customizedLabel(dishID,diningHallID,userID):
         dish = session.query(Dish).filter_by(dishID=dishID).filter_by(diningHallID = diningHallID).first()
-        ingredientList = dish.ingredients.split(',')
+        ingredientList = [ingredient.lower() for ingredient in dish.ingredients.split(',')]
         categorieList = json.loads(dish.categories)
 
         allergyList = []
         userAllergies = session.query(UserAllergy).filter_by(userID = userID).all()
         for userAllergy in userAllergies:
             allergyID = userAllergy.allergyID
-            allergyName = session.query(Allergy).filter_by(allergyID = allergyID).first().name
+            allergyName = session.query(Allergy).filter_by(allergyID=allergyID).first().name.lower()
             allergyList.append(allergyName)
    
         preferenceList = []
