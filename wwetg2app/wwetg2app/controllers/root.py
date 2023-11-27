@@ -138,6 +138,8 @@ class DietGoal(Base):
     userID = Column(Integer, ForeignKey('institutions.institutionID'), primary_key=True)
     startDate = Column(Date, primary_key=True)
     endDate = Column(Date)
+    minCal = Column(Integer)
+    maxCal = Column(Integer)
 
 class UserAllergy(Base):
     __tablename__ = 'user_allergy'
