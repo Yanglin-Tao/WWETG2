@@ -18,7 +18,7 @@ import { Chart, CategoryScale, LinearScale, BarController, BarElement } from 'ch
 Chart.register(CategoryScale, LinearScale, BarController, BarElement);
 
 export default function DisplayCommonUserMonthlyReport({ userId }) {
-  // const [monthlyReports, setMonthlyReports] = useState([]);
+  const [monthlyReports, setMonthlyReports] = useState([]);
   const [selectedReport, setSelectedReport] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -34,7 +34,7 @@ export default function DisplayCommonUserMonthlyReport({ userId }) {
           'Authorization': token,
         },
         body: JSON.stringify({
-          diningHallID: userId,
+          userID: userId,
         }),
       };
 
@@ -45,7 +45,7 @@ export default function DisplayCommonUserMonthlyReport({ userId }) {
         }
         const data = await response.json();
         console.log(data);
-        // setMonthlyReports(data.reports);
+        setMonthlyReports(data.reports);
       } catch (error) {
         console.error(
           'There was a problem fetching dining hall monthly reports:',
@@ -53,7 +53,7 @@ export default function DisplayCommonUserMonthlyReport({ userId }) {
         );
       }
     };
-    // getCommonUserMonthlyReports();
+    getCommonUserMonthlyReports();
   }, [userId]);
 
   const handleViewDetailsClick = (report) => {
@@ -76,7 +76,7 @@ export default function DisplayCommonUserMonthlyReport({ userId }) {
           gap: '16px', 
         }}
       >
-        {monthlyReports.reports.map((report) => (
+        {monthlyReports.map((report) => (
           <Card key={report.id} sx={{ maxWidth: 275 }}>
             <CardContent>
               <Typography variant="h5" component="div" gutterBottom>
