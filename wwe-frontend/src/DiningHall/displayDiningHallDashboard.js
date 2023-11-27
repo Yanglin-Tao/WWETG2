@@ -11,7 +11,7 @@ import Link from '@mui/material/Link';
 import DashboardLayout from './DashboardLayout';
 import TopTenRatedFood from './topTenRatedFood';
 import TopTenFoodAllergies from './topTenFoodAllergies';
-import DisplayDingHallMonthlyReport from './displayDiningHallMonthlyReport';
+import DisplayDiningHallMonthlyReport from './displayDiningHallMonthlyReport';
 import Copyright from '../Copyright';
 
 /* TODO: This component should display dining hall user's dashboard. It should navigate the dining hall users to
@@ -64,7 +64,7 @@ function DisplayDiningHallDashboard({ userId }) {
               </Grid>
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  <DisplayDingHallMonthlyReport userId={userId}/>
+                  <DisplayDiningHallMonthlyReport userId={userId}/>
                 </Paper>
               </Grid>
             </Grid>
