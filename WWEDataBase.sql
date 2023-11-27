@@ -468,3 +468,17 @@ INSERT INTO "user_reports" ("userID", "date", "actualIntake", "dailyAverageIntak
 (3, '2023-10-31', 40920, 1320);
 INSERT INTO "user_reports" ("userID", "date", "actualIntake", "dailyAverageIntake") VALUES 
 (4, '2023-10-31', 44330, 1430);
+
+
+
+INSERT INTO "daily_menu" ("menuID", "date", "diningHallID") VALUES (19, '2023-11-26', 1);
+
+INSERT INTO "daily_menu" ("menuID", "date", "diningHallID") VALUES (20, '2023-11-27', 1);
+
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (1,4);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (3,4);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (5,4);
+
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (2,5);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (4,5);
+INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (6,5);

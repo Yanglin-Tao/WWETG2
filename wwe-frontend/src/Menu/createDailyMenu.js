@@ -102,7 +102,7 @@ function CreateDailyMenu({userId}) {
             const data = await response.json();
             const menusArray = Object.keys(data).map(key => ({
               id: key,
-              menu: `${data[key]} Daily Menu`
+              menu: `Menu ${key}`
             }));
             setHistoricalMenus(menusArray);
         } catch (error) {
