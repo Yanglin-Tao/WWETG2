@@ -9,16 +9,9 @@ import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 /* TODO: This component shows a list of common user's recent meals. This component is optional to have.
 */
-function mapMealData(meals) {
-  return meals.map((meal, index) => ({
-    ...meal,
-    key: `meal-${index}`,
-  }));
-}
 
 export default function RecentMeals({ userId }) {
   const [recentMeals, setRecentMeals] = useState([]);
-  let mappedMealData = useState([]);
 
   useEffect(() => {
     const getRecentMeals = async () => {
@@ -44,7 +37,6 @@ export default function RecentMeals({ userId }) {
         const data = await response.json();
         console.log(data);
         setRecentMeals(data.recentMeals);
-        mappedMealData = mapMealData(recentMeals);
       } catch (error) {
         console.error('There was a problem fetching recent meals:', error);
       }
