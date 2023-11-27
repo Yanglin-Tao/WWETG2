@@ -1148,6 +1148,33 @@ class RootController(BaseController):
         return {"total_calorie_intake":total_calorie}
 
 
+#--------------Set & Get Personal Diet Goal---------------
+    @expose('json')
+    def setPersonalDietGoal(self):
+        data = request.json_body
+        userID = data.get("userID")
+        startDate = data.get("startDate")
+        endDate = data.get("endDate")
+        dailyCalorieIntakeMaximum = data.get("dailyCalorieIntakeMaximum")
+        dailyCalorieIntakeMinimum = data.get("dailyCalorieIntakeMinimum")
+        userExist = session.query(UserProfile).filter_by(userID=userID).first()
+        if userExist:
+            newGoal = DietGoal(
+                userID = userID,
+                startDate = startDate,
+                endDate = endDate,
+                minCal = dailyCalorieIntakeMaximum,
+                maxCal = dailyCalorieIntakeMinimum
+            )
+            session.add(newGoal)
+            session.commit()
+            return {"message":"The goal is sucessfully created"}
+        return {"message":"User not found."}
+    
+    # @expose('json')
+    # def getDietGoalLiveProgress(self):
+    #     data = request.json_body
+    #     userID = data.get("userID")
 
 #--------------Get Reports------------------
     @expose('json')
@@ -1327,6 +1354,7 @@ def generate_dining_report():
             )
             session.add(new_report)
             session.commit()
+    
 
 
 async def async_task():
