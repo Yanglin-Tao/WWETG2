@@ -1235,8 +1235,8 @@ def generate_user_report():
             # Calculate total intake of the months
             actualIntake = 0
             current_date = datetime.now()
-            first_day_of_month = current_date.replace(day=1)
-            first_day_next_month = (first_day_of_month + timedelta(days=32)).replace(day=1)
+            first_day_of_month = current_date.replace(day=1, hour = 0, minute=0, second=0, microsecond=0)
+            first_day_next_month = (first_day_of_month + timedelta(days=32)).replace(day=1, hour = 0, minute=0, second=0, microsecond=0)
             intakes = session.query(MealTracking).filter_by(userID = userID).filter(
                 and_(MealTracking.date >= first_day_of_month, MealTracking.date < first_day_next_month)).all()
             for intake in intakes:

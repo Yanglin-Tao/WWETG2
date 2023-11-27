@@ -299,6 +299,32 @@ INSERT INTO "dining_hall_reports" ("diningHallID", "date", "dietPreferences", "t
 '[{"allergy": "egg", "num_users": 1, "percentage": 1.0}]', 
 '[{"dish_name": "Orange Juice", "average_rating": 5.0, "num_rates": 1}, {"dish_name": "Jasmine Rice", "average_rating": 5.0, "num_rates": 1}, {"dish_name": "Apple Juice", "average_rating": 4.0, "num_rates": 1}, {"dish_name": "French Fries", "average_rating": 2.0, "num_rates": 1}]');
 
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-22 12:30:00', 4, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-22 12:30:00', 6, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-22 18:30:00', 4, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-22 18:30:00', 11, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-23 13:10:00', 1, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-23 17:40:00', 13, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-23 17:40:00', 10, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-23 17:40:00', 9, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-24 18:27:15', 4, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-24 18:27:15', 11, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-25 07:14:12', 16, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-25 07:14:12', 17, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-25 12:30:00', 4, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-25 12:30:00', 6, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-25 18:30:00', 4, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-25 18:30:00', 11, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-26 12:30:00', 4, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-26 12:30:00', 6, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-26 18:30:00', 4, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-26 18:30:00', 11, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-27 13:10:00', 1, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-27 17:40:00', 13, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-27 17:40:00', 10, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-27 17:40:00', 9, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-28 18:27:15', 4, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-28 18:27:15', 11, 1);
 INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-29 07:14:12', 16, 1);
 INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-29 07:14:12', 17, 1);
 INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-10-29 12:30:00', 4, 1);
@@ -316,6 +342,22 @@ INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1,
 INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-11-01 18:27:15', 4, 1);
 INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (1, '2023-11-01 18:27:15', 11, 1);
 
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (2, '2023-10-23 07:57:00', 3, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (2, '2023-10-23 07:57:00', 6, 2);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (2, '2023-10-23 11:57:00', 7, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (2, '2023-10-24 18:27:15', 2, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (2, '2023-10-24 18:27:15', 11, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (2, '2023-10-25 11:50:24', 8, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (2, '2023-10-25 17:40:00', 14, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (2, '2023-10-25 17:40:00', 16, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (2, '2023-10-25 17:40:00', 17, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (2, '2023-10-26 12:30:00', 4, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (2, '2023-10-26 12:30:00', 6, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (2, '2023-10-26 18:30:00', 4, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (2, '2023-10-26 18:30:00', 11, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (2, '2023-10-27 12:26:00', 10, 2);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (2, '2023-10-27 12:26:00', 15, 2);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (2, '2023-10-28 11:10:43', 8, 1);
 INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (2, '2023-10-29 07:57:00', 3, 1);
 INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (2, '2023-10-29 07:57:00', 6, 2);
 INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (2, '2023-10-29 11:57:00', 7, 1);
@@ -333,6 +375,29 @@ INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (2,
 INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (2, '2023-11-02 12:26:00', 15, 2);
 INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (2, '2023-11-03 11:10:43', 8, 1);
 
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3, '2023-10-22 17:11:18', 20, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3, '2023-10-22 17:11:18', 24, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3, '2023-10-23 13:52:40', 21, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3, '2023-10-23 13:52:40', 22, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3, '2023-10-24 12:30:00', 19, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3, '2023-10-24 12:30:00', 23, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3, '2023-10-24 12:30:00', 24, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3, '2023-10-24 17:11:18', 20, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3, '2023-10-24 17:11:18', 24, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3, '2023-10-25 17:11:18', 20, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3, '2023-10-25 17:11:18', 24, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3, '2023-10-26 13:52:40', 21, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3, '2023-10-26 13:52:40', 22, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3, '2023-10-27 12:30:00', 19, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3, '2023-10-27 12:30:00', 23, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3, '2023-10-27 12:30:00', 24, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3, '2023-10-27 17:11:18', 20, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3, '2023-10-27 17:11:18', 24, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3, '2023-10-28 13:52:40', 21, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3, '2023-10-28 13:52:40', 22, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3, '2023-10-29 12:30:00', 19, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3, '2023-10-29 12:30:00', 23, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3, '2023-10-29 12:30:00', 24, 1);
 INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3, '2023-10-30 17:11:18', 20, 1);
 INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3, '2023-10-30 17:11:18', 24, 1);
 INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3, '2023-10-31 13:52:40', 21, 1);
@@ -341,6 +406,35 @@ INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3,
 INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3, '2023-11-01 12:30:00', 23, 1);
 INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (3, '2023-11-01 12:30:00', 24, 1);
 
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-24 11:25:52', 6, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-24 11:25:52', 4, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-24 18:51:34', 12, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-24 18:51:34', 10, 2);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-24 18:51:34', 13, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-25 7:31:47', 8, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-25 17:40:00', 2, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-25 17:40:00', 4, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-25 17:40:00', 6, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-26 12:30:00', 15, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-26 12:30:00', 16, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-26 12:30:00', 18, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-26 18:30:00', 2, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-27 7:31:47', 8, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-27 17:40:00', 2, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-27 17:40:00', 4, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-27 17:40:00', 6, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-28 12:30:00', 15, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-28 12:30:00', 16, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-28 12:30:00', 18, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-28 18:30:00', 2, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-29 7:31:47', 8, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-29 17:40:00', 2, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-29 17:40:00', 4, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-29 17:40:00', 6, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-30 12:30:00', 15, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-30 12:30:00', 16, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-30 12:30:00', 18, 1);
+INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-30 18:30:00', 2, 1);
 INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-31 7:31:47', 8, 1);
 INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-31 17:40:00', 2, 1);
 INSERT INTO "meal_trackings" ("userID", "date", "dishID", "quantity") VALUES (4, '2023-10-31 17:40:00', 4, 1);
@@ -358,3 +452,19 @@ INSERT INTO "diet_goal" ("userID", "startDate", "endDate", "minCal", "maxCal") V
 INSERT INTO "diet_goal" ("userID", "startDate", "endDate", "minCal", "maxCal") VALUES (4, '2023-10-29', '2023-10-31', 1350, 1950);
 INSERT INTO "diet_goal" ("userID", "startDate", "endDate", "minCal", "maxCal") VALUES (4, '2023-11-01', '2023-11-30', 1400, 2000);
 
+INSERT INTO "user_reports" ("userID", "date", "actualIntake", "dailyAverageIntake") VALUES 
+(1, '2023-09-30', 46500, 1550);
+INSERT INTO "user_reports" ("userID", "date", "actualIntake", "dailyAverageIntake") VALUES 
+(2, '2023-09-30', 72000, 2400);
+INSERT INTO "user_reports" ("userID", "date", "actualIntake", "dailyAverageIntake") VALUES 
+(3, '2023-09-30', 55200, 1880);
+INSERT INTO "user_reports" ("userID", "date", "actualIntake", "dailyAverageIntake") VALUES 
+(4, '2023-09-30', 56400, 1430);
+INSERT INTO "user_reports" ("userID", "date", "actualIntake", "dailyAverageIntake") VALUES 
+(1, '2023-10-31', 46500, 1500);
+INSERT INTO "user_reports" ("userID", "date", "actualIntake", "dailyAverageIntake") VALUES 
+(2, '2023-10-31', 74400, 2400);
+INSERT INTO "user_reports" ("userID", "date", "actualIntake", "dailyAverageIntake") VALUES 
+(3, '2023-10-31', 40920, 1320);
+INSERT INTO "user_reports" ("userID", "date", "actualIntake", "dailyAverageIntake") VALUES 
+(4, '2023-10-31', 44330, 1430);
