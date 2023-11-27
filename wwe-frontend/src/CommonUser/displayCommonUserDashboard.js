@@ -86,7 +86,7 @@ function DisplayCommonUserDashboard({ userId }) {
                     height: 400,
                   }}
                 >
-                  <CalorieChart />
+                  <CalorieChart userId={userId}/>
                 </Paper>
               </Grid>
               {/* Daily calorie intake */}

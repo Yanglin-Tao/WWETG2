@@ -18,7 +18,7 @@ import { Chart, CategoryScale, LinearScale, BarController, BarElement, ArcElemen
 Chart.register(CategoryScale, LinearScale, BarController, BarElement, ArcElement);
 
 export default function DisplayDiningHallMonthlyReport({ userId }) {
-  // const [monthlyReports, setMonthlyReports] = useState([]);
+  const [monthlyReports, setMonthlyReports] = useState([]);
   const [selectedReport, setSelectedReport] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -45,7 +45,7 @@ export default function DisplayDiningHallMonthlyReport({ userId }) {
         }
         const data = await response.json();
         console.log(data);
-        // setMonthlyReports(data.reports);
+        setMonthlyReports(data.reports);
       } catch (error) {
         console.error(
           'There was a problem fetching dining hall monthly reports:',
@@ -53,7 +53,7 @@ export default function DisplayDiningHallMonthlyReport({ userId }) {
         );
       }
     };
-    // getDiningHallMonthlyReports();
+    getDiningHallMonthlyReports();
   }, [userId]);
 
   const handleViewDetailsClick = (report) => {
@@ -76,7 +76,7 @@ export default function DisplayDiningHallMonthlyReport({ userId }) {
           gap: '16px', // Adjust the gap between cards
         }}
       >
-        {monthlyReports.reports.map((report, index) => (
+        {monthlyReports.map((report, index) => (
           <Card key={index} sx={{ maxWidth: 275 }}>
             <CardContent>
               <Typography variant="h5" component="div" gutterBottom>
@@ -168,9 +168,9 @@ export default function DisplayDiningHallMonthlyReport({ userId }) {
                 {
                   arcLabel: (item) => `${item.label} (${item.value}%)`,
                   arcLabelMinAngle: 0,
-                  data: selectedReport.foodPreferences.map((pref) => ({
+                  data: selectedReport.top_preferences.map((pref) => ({
                     value: pref.percentage,
-                    label: pref.food_preference,
+                    label: pref.preference,
                   })),
                 },
               ]}
@@ -195,408 +195,3 @@ export default function DisplayDiningHallMonthlyReport({ userId }) {
     </React.Fragment>
   );
 }
-
-const monthlyReports = {
-    reports: [
-      {
-        report_month: "2023-11",
-        top_ten_rated_food: [
-          {
-            dish_name: "Spaghetti",
-            average_rating: 4.5,
-            num_rates: 20,
-          },
-          {
-            dish_name: "Burger",
-            average_rating: 4.2,
-            num_rates: 15,
-          },
-          {
-            dish_name: "Pizza",
-            average_rating: 4.7,
-            num_rates: 18,
-          },
-          {
-            dish_name: "Salad",
-            average_rating: 4.0,
-            num_rates: 12,
-          },
-          {
-            dish_name: "Sushi",
-            average_rating: 4.8,
-            num_rates: 25,
-          },
-          {
-            dish_name: "Steak",
-            average_rating: 4.6,
-            num_rates: 22,
-          },
-          {
-            dish_name: "Pasta",
-            average_rating: 4.3,
-            num_rates: 17,
-          },
-          {
-            dish_name: "Chicken Sandwich",
-            average_rating: 4.4,
-            num_rates: 19,
-          },
-          {
-            dish_name: "Tacos",
-            average_rating: 4.1,
-            num_rates: 14,
-          },
-          {
-            dish_name: "Sushi Rolls",
-            average_rating: 4.9,
-            num_rates: 28,
-          },
-        ],
-        top_ten_allergies: [
-          {
-            allergy: "Peanuts",
-            num_users: 10,
-            percentage: 0.20,
-          },
-          {
-            allergy: "Dairy",
-            num_users: 8,
-            percentage: 0.16,
-          },
-          {
-            allergy: "Gluten",
-            num_users: 12,
-            percentage: 0.24,
-          },
-          {
-            allergy: "Eggs",
-            num_users: 7,
-            percentage: 0.14,
-          },
-          {
-            allergy: "Soy",
-            num_users: 9,
-            percentage: 0.18,
-          },
-          {
-            allergy: "Fish",
-            num_users: 5,
-            percentage: 0.10,
-          },
-          {
-            allergy: "Shellfish",
-            num_users: 6,
-            percentage: 0.12,
-          },
-          {
-            allergy: "Tree Nuts",
-            num_users: 11,
-            percentage: 0.22,
-          },
-          {
-            allergy: "Wheat",
-            num_users: 9,
-            percentage: 0.18,
-          },
-          {
-            allergy: "Sesame",
-            num_users: 4,
-            percentage: 0.08,
-          },
-        ],
-        foodPreferences: [
-          {
-            food_preference: "Halal",
-            percentage: 10,
-          },
-          {
-            food_preference: "Vegetarian",
-            percentage: 20,
-          },
-          {
-            food_preference: "Gluten Free",
-            percentage: 15,
-          },
-          {
-            food_preference: "Balanced",
-            percentage: 10,
-          },
-          {
-            food_preference: "Vegan",
-            percentage: 25,
-          },
-          {
-            food_preference: "Pescatarian",
-            percentage: 20,
-          },
-        ],
-      },
-      {
-        report_month: "2023-10",
-        top_ten_rated_food: [
-          {
-            dish_name: "Chicken Parmesan",
-            average_rating: 4.7,
-            num_rates: 21,
-          },
-          {
-            dish_name: "Tofu Stir-Fry",
-            average_rating: 4.3,
-            num_rates: 17,
-          },
-          {
-            dish_name: "Grilled Cheese",
-            average_rating: 4.2,
-            num_rates: 15,
-          },
-          {
-            dish_name: "Pancakes",
-            average_rating: 4.6,
-            num_rates: 20,
-          },
-          {
-            dish_name: "Beef Stir-Fry",
-            average_rating: 4.5,
-            num_rates: 19,
-          },
-          {
-            dish_name: "Mashed Potatoes",
-            average_rating: 4.0,
-            num_rates: 12,
-          },
-          {
-            dish_name: "Caesar Salad",
-            average_rating: 4.4,
-            num_rates: 18,
-          },
-          {
-            dish_name: "Shrimp Scampi",
-            average_rating: 4.8,
-            num_rates: 23,
-          },
-          {
-            dish_name: "Chili",
-            average_rating: 4.1,
-            num_rates: 14,
-          },
-          {
-            dish_name: "Chicken Tenders",
-            average_rating: 4.9,
-            num_rates: 26,
-          },
-        ],
-        top_ten_allergies: [
-          {
-            allergy: "Peanuts",
-            num_users: 11,
-            percentage: 0.22,
-          },
-          {
-            allergy: "Dairy",
-            num_users: 9,
-            percentage: 0.18,
-          },
-          {
-            allergy: "Gluten",
-            num_users: 13,
-            percentage: 0.26,
-          },
-          {
-            allergy: "Eggs",
-            num_users: 8,
-            percentage: 0.16,
-          },
-          {
-            allergy: "Soy",
-            num_users: 10,
-            percentage: 0.20,
-          },
-          {
-            allergy: "Fish",
-            num_users: 6,
-            percentage: 0.12,
-          },
-          {
-            allergy: "Shellfish",
-            num_users: 7,
-            percentage: 0.14,
-          },
-          {
-            allergy: "Tree Nuts",
-            num_users: 12,
-            percentage: 0.24,
-          },
-          {
-            allergy: "Wheat",
-            num_users: 10,
-            percentage: 0.20,
-          },
-          {
-            allergy: "Sesame",
-            num_users: 5,
-            percentage: 0.10,
-          },
-        ],
-        foodPreferences: [
-          {
-            food_preference: "Halal",
-            percentage: 10,
-          },
-          {
-            food_preference: "Vegetarian",
-            percentage: 20,
-          },
-          {
-            food_preference: "Gluten Free",
-            percentage: 15,
-          },
-          {
-            food_preference: "Balanced",
-            percentage: 10,
-          },
-          {
-            food_preference: "Vegan",
-            percentage: 25,
-          },
-          {
-            food_preference: "Pescatarian",
-            percentage: 20,
-          },
-        ],
-      },
-      {
-        report_month: "2023-09",
-        top_ten_rated_food: [
-          {
-            dish_name: "Taco Salad",
-            average_rating: 4.4,
-            num_rates: 18,
-          },
-          {
-            dish_name: "BBQ Ribs",
-            average_rating: 4.8,
-            num_rates: 23,
-          },
-          {
-            dish_name: "Veggie Burger",
-            average_rating: 4.2,
-            num_rates: 16,
-          },
-          {
-            dish_name: "French Fries",
-            average_rating: 4.0,
-            num_rates: 12,
-          },
-          {
-            dish_name: "Chicken Noodle Soup",
-            average_rating: 4.6,
-            num_rates: 20,
-          },
-          {
-            dish_name: "Fried Rice",
-            average_rating: 4.3,
-            num_rates: 17,
-          },
-          {
-            dish_name: "Caesar Wrap",
-            average_rating: 4.5,
-            num_rates: 19,
-          },
-          {
-            dish_name: "Tiramisu",
-            average_rating: 4.9,
-            num_rates: 25,
-          },
-          {
-            dish_name: "Hot Wings",
-            average_rating: 4.7,
-            num_rates: 21,
-          },
-          {
-            dish_name: "Cheesecake",
-            average_rating: 4.1,
-            num_rates: 14,
-          },
-        ],
-        top_ten_allergies: [
-          {
-            allergy: "Peanuts",
-            num_users: 9,
-            percentage: 0.18,
-          },
-          {
-            allergy: "Dairy",
-            num_users: 7,
-            percentage: 0.14,
-          },
-          {
-            allergy: "Gluten",
-            num_users: 11,
-            percentage: 0.22,
-          },
-          {
-            allergy: "Eggs",
-            num_users: 6,
-            percentage: 0.12,
-          },
-          {
-            allergy: "Soy",
-            num_users: 8,
-            percentage: 0.16,
-          },
-          {
-            allergy: "Fish",
-            num_users: 4,
-            percentage: 0.08,
-          },
-          {
-            allergy: "Shellfish",
-            num_users: 5,
-            percentage: 0.10,
-          },
-          {
-            allergy: "Tree Nuts",
-            num_users: 10,
-            percentage: 0.20,
-          },
-          {
-            allergy: "Wheat",
-            num_users: 8,
-            percentage: 0.16,
-          },
-          {
-            allergy: "Sesame",
-            num_users: 3,
-            percentage: 0.06,
-          },
-        ],
-        foodPreferences: [
-          {
-            food_preference: "Halal",
-            percentage: 10,
-          },
-          {
-            food_preference: "Vegetarian",
-            percentage: 20,
-          },
-          {
-            food_preference: "Gluten Free",
-            percentage: 15,
-          },
-          {
-            food_preference: "Balanced",
-            percentage: 10,
-          },
-          {
-            food_preference: "Vegan",
-            percentage: 25,
-          },
-          {
-            food_preference: "Pescatarian",
-            percentage: 20,
-          },
-        ],
-      },
-    ],
-  };
-  
