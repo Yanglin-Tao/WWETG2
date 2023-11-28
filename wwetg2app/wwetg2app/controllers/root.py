@@ -1293,7 +1293,52 @@ class RootController(BaseController):
             report_list.append(report)
 
         return {"reports": report_list}
+    
+    @expose('json')
+    def getDietGoalReports(self):
+        data = request.json_body
+        userID = data.get("userID")
+        goals = session.query(DietGoal).filter_by(userID = userID).all()
+        reports = []
+        for goal in goals:
+            dailyCalorieIntakeMaximum = goal.maxCal
+            dailyCalorieIntakeMinimum = goal.minCal
+            startDate = goal.startDate
+            endDate = goal.endDate
+            fullfilledDays = 0
+            NoDataDays = 0
+            notFullfilledDays = 0
+            currTime = datetime.combine(startDate, datetime.min.time())
+            end = datetime.combine(endDate, datetime.max.time())
+            while currTime <= end:
+                startTime = currTime.replace(hour=0, minute=0, second=0).replace(microsecond=0)
+                endTime = currTime.replace(hour=23, minute=59, second=59).replace(microsecond=999)
+                total_calories = session.query(func.sum(Dish.calorie * MealTracking.quantity)).\
+                join(MealTracking, MealTracking.dishID == Dish.dishID).\
+                filter(MealTracking.userID == userID).\
+                filter(MealTracking.date >= startTime).\
+                filter(MealTracking.date < endTime).scalar()
+                total_calories = total_calories or 0
+                currTime += timedelta(days=1)
+                if total_calories == 0:
+                    NoDataDays += 1
+                elif total_calories <= dailyCalorieIntakeMaximum and total_calories >= dailyCalorieIntakeMinimum:
+                    fullfilledDays += 1
+                else:
+                    notFullfilledDays += 1
 
+            report = {
+                'startDate': startDate,
+                'endDate': endDate,
+                'dailyCalorieIntakeMaximum': dailyCalorieIntakeMaximum,
+                'dailyCalorieIntakeMinimum': dailyCalorieIntakeMinimum,
+                'daysFullfilledGoal': fullfilledDays,
+                'daysNotFullfilledGoal': notFullfilledDays,
+                'daysWithoutData': NoDataDays,
+                'progressPercentage': fullfilledDays / (fullfilledDays + notFullfilledDays + NoDataDays)
+            }
+            reports.append(report)
+        return {'reports': reports}
     
 
 # OUTSIDE THE CONTROLLER
