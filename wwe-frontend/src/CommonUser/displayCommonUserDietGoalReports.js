@@ -12,20 +12,21 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import { Chart, CategoryScale, LinearScale, BarController, BarElement } from 'chart.js';
+import { PieChart, pieArcLabelClasses } from '@mui/x-charts/PieChart';
 /* TODO: This component should display common user's diet goal reports.
 */
 
 Chart.register(CategoryScale, LinearScale, BarController, BarElement);
 
 export default function DisplayCommonUserDietGoalReports({ userId }) {
-  // const [dietGoalReports, setDietGoaReports] = useState([]);
+  const [dietGoalReports, setDietGoaReports] = useState([]);
   const [selectedReport, setSelectedReport] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const getCommonUserDietGoalReports = async () => {
       const token = Cookies.get('token');
-      const apiUrl = `http://127.0.0.1:8080/getCommonUserDietGoalReports`;
+      const apiUrl = `http://127.0.0.1:8080/getDietGoalReports`;
       console.log(userId);
       const requestOptions = {
         method: 'POST',
@@ -45,7 +46,7 @@ export default function DisplayCommonUserDietGoalReports({ userId }) {
         }
         const data = await response.json();
         console.log(data);
-        // setDietGoaReports(data.reports);
+        setDietGoaReports(data.reports);
       } catch (error) {
         console.error(
           'There was a problem fetching dining hall diet goal reports:',
@@ -53,7 +54,7 @@ export default function DisplayCommonUserDietGoalReports({ userId }) {
         );
       }
     };
-    // getCommonUserDietGoalReports();
+    getCommonUserDietGoalReports();
   }, [userId]);
 
   const handleViewDetailsClick = (report) => {
@@ -76,7 +77,7 @@ export default function DisplayCommonUserDietGoalReports({ userId }) {
           gap: '16px', 
         }}
       >
-        {dietGoalReports.reports.map((report) => (
+        {dietGoalReports.map((report) => (
           <Card key={report.id} sx={{ maxWidth: 275 }}>
             <CardContent>
               <Typography variant="h5" component="div" gutterBottom>
@@ -118,11 +119,38 @@ export default function DisplayCommonUserDietGoalReports({ userId }) {
               <Typography variant="h6">
                 Report progress: {selectedReport.progressPercentage} 
               </Typography>
-              <Typography variant="h6">
-                Days fullfilled goal: {selectedReport.daysFullfilledGoal} <br />
-                Days not fullfilled goal: {selectedReport.daysNotFullfilledGoal} <br />
-                Days without data: {selectedReport.daysWithoutData}
-              </Typography>
+              <Typography variant="h6">Days Breakdown:</Typography>
+              <div style={{ height: 300 }}>
+                <PieChart series={[
+                  {
+                    arcLabel: (item) => `${item.label} (${item.value} days)`,
+                    arcLabelMinAngle: 0,
+                    data: [
+                      {
+                        value: selectedReport.daysFullfilledGoal,
+                        label: 'Fulfilled',
+                      },
+                      {
+                        value: selectedReport.daysNotFullfilledGoal,
+                        label: 'Not Fulfilled',
+                      },
+                      {
+                        value: selectedReport.daysWithoutData,
+                        label: 'No Data',
+                      },
+                    ],
+                  },
+                ]} 
+                sx={{
+                  [`& .${pieArcLabelClasses.root}`]: {
+                    fill: 'white',
+                    fontWeight: 'bold',
+                  },
+                }}
+                width={800}
+                height={400}
+                 />
+              </div>
             </div>
           )}
         </DialogContent>
@@ -134,39 +162,4 @@ export default function DisplayCommonUserDietGoalReports({ userId }) {
       </Dialog>
     </React.Fragment>
   );
-}
-
-const dietGoalReports = {
-  reports: [
-    {
-    startDate: '2023-10-01',
-    endDate: '2023-10-30',
-    dailyCalorieIntakeMaximum: 2000,
-    dailyCalorieIntakeMinimum: 1000,
-    daysFullfilledGoal: 15,
-    daysNotFullfilledGoal: 10,		
-    daysWithoutData: 5,	
-    progressPercentage: 0.5
-    },
-    {
-    startDate: '2023-09-11',
-    endDate: '2023-10-10',
-    dailyCalorieIntakeMaximum: 2000,
-    dailyCalorieIntakeMinimum: 1000,
-    daysFullfilledGoal: 15,
-    daysNotFullfilledGoal: 10,		
-    daysWithoutData: 5,	
-    progressPercentage: 0.5
-    },
-    {
-    startDate: '2023-07-01',
-    endDate: '2023-07-30',
-    dailyCalorieIntakeMaximum: 2000,
-    dailyCalorieIntakeMinimum: 1000,
-    daysFullfilledGoal: 15,
-    daysNotFullfilledGoal: 10,		
-    daysWithoutData: 5,	
-    progressPercentage: 0.5
-    }
-]
 }
