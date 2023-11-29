@@ -1217,7 +1217,28 @@ class RootController(BaseController):
             else:
                 return {"message":"Invalid start date and end date."}
         return {"message":"User not found."}
-    
+    @expose('json')
+    def getPersonalDietGoal(self):
+        data = request.json_body
+        userID = data.get("userID")
+        today = dt_date.today()
+        userExist = session.query(UserProfile).filter_by(userID=userID).first()
+        if userExist:
+            currentGoal = (session.query(DietGoal)
+                       .filter_by(userID=userID)
+                       .filter(and_(DietGoal.startDate <= today, DietGoal.endDate > today))
+                       .first())
+            if currentGoal:
+                return {"startDate":currentGoal.startDate,
+                        "endDate": currentGoal.endDate,
+                        "dailyCalorieIntakeMaximum":currentGoal.maxCal,
+                        "dailyCalorieIntakeMinimum":currentGoal.minCal}
+            else:
+                return{"message":"Goal doesn't exist"}
+        else:
+            return {"message":"User doesn't exist"}
+
+
     @expose('json')
     def getDietGoalLiveProgress(self):
         data = request.json_body
@@ -1225,6 +1246,7 @@ class RootController(BaseController):
         today = dt_date.today()
         # today = datetime.date.today()
         # find the current goal
+        
         currentGoal = (session.query(DietGoal)
                        .filter_by(userID=userID)
                        .filter(and_(DietGoal.startDate <= today, DietGoal.endDate > today))
