@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { Navigate } from "react-router-dom";
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import Title from './Title';
@@ -16,15 +15,8 @@ function preventDefault(event) {
   window.open('/displayCommonUserGoals', '_self');
 }
 
-const dailyCalorieIntakeTotal = 1200;
 const todayDate = new Date();
 const formattedDate = todayDate.toLocaleDateString();
-const dietGoalProgress = {
-    daysFullfilledGoal: 15,
-    daysNotFullfilledGoal: 10,		
-    daysWithoutData: 5,	
-    progressPercentage: 50
-}
 
 function CircularProgressWithLabel(props) {
   return (
@@ -55,8 +47,8 @@ CircularProgressWithLabel.propTypes = {
 };
 
 export default function DailyCalorieIntake({ userId }) {
-  // const [dailyCalorieIntakeTotal, setDailyCalorieIntakeTotal] = useState("");
-  // const [dietGoal, setDietGoal] = useState({ daysFullfilledGoal: '', daysNotFullfilledGoal: '',	daysWithoutData: '', progressPercentage: '' });
+  const [dailyCalorieIntakeTotal, setDailyCalorieIntakeTotal] = useState("");
+  const [dietGoalProgress, setDietGoalProgress] = useState({ daysFullfilledGoal: '', daysNotFullfilledGoal: '',	daysWithoutData: '', progressPercentage: '' });
 
   useEffect(() => {
     const getDailyCalorieIntakeTotal = async () => {
@@ -81,16 +73,16 @@ export default function DailyCalorieIntake({ userId }) {
         }
         const data = await response.json();
         console.log(data);
-        // setDailyCalorieIntakeTotal(data.total_calorie_intake);
+        setDailyCalorieIntakeTotal(data.total_calorie_intake);
       } catch (error) {
         console.error('There was a problem fetching daily calorie intake total:', error);
       }
     };
-    // getDailyCalorieIntakeTotal(); 
+    getDailyCalorieIntakeTotal(); 
 
     const getDietGoalProgress = async () => {
       const token = Cookies.get('token');
-      const apiUrl = `http://127.0.0.1:8080/getDietGoalProgress`;
+      const apiUrl = `http://127.0.0.1:8080/getDietGoalLiveProgress`;
       console.log(userId);
       const requestOptions = {
         method: 'POST',
@@ -110,12 +102,12 @@ export default function DailyCalorieIntake({ userId }) {
         }
         const data = await response.json();
         console.log(data);
-        // setDietGoalProgress(data);
+        setDietGoalProgress(data);
       } catch (error) {
         console.error('There was a problem fetching diet goal progress:', error);
       }
     };
-    // getDietGoalProgress();
+    getDietGoalProgress();
 
   }, [userId]);
 
