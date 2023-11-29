@@ -11,7 +11,7 @@ import Cookies from 'js-cookie';
 /* This component should display top ten food allergies common users have. */
 
 export default function TopTenFoodAllergies({ userId }) {
-  // const [topTenFoodAllergies, setTopTenFoodAllergies] = useState([]);
+  const [topTenFoodAllergies, setTopTenFoodAllergies] = useState([]);
 
   useEffect(() => {
     const fetchTopTenFoodAllergies = async () => {
@@ -36,12 +36,12 @@ export default function TopTenFoodAllergies({ userId }) {
           }
           const data = await response.json();
           console.log(data);
-          // setTopTenFoodAllergies(data.topTenFoodAllergies)
+          setTopTenFoodAllergies(data.topTenPriorityFoodAllergies)
       } catch (error) {
           console.error('There was a problem fetching top ten food allergies:', error);
       }
     };
-    // fetchTopTenFoodAllergies();
+    fetchTopTenFoodAllergies();
 }, [userId]);
 
   return (
@@ -56,7 +56,7 @@ export default function TopTenFoodAllergies({ userId }) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {topTenFoodAllergies.top_ten_allergies.map((item, index) => (
+          {topTenFoodAllergies.map((item, index) => (
             <TableRow key={index}>
               <TableCell>{item.allergy}</TableCell>
               <TableCell>{item.num_users}</TableCell>
