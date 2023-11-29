@@ -1357,7 +1357,74 @@ class RootController(BaseController):
         return {'reports': reports}
     
 
+#-----------GET TOP RATED DISHES------------
+    @expose('json')
+    def getTopTenHighestRatedDishes(self):
+        data = request.json_body
+        diningHallID = data.get("diningHallID")
+        return {'topTenHighestRatedDishes': getTopTenRatedDishesHelper(diningHallID)}
+    
+#-------------GET TOP ALLERGIES-------------
+    @expose('json')
+    def getTopTenPriorityFoodAllergies(self):
+        data = request.json_body
+        diningHallID = data.get("diningHallID")
+        return {'topTenPriorityFoodAllergies': getTopAllergiesHelper(diningHallID)}
+
 # OUTSIDE THE CONTROLLER
+#-----------GET TOP RATED DISHES------------
+def getTopTenRatedDishesHelper(diningHallID):
+        topRates = session.query(
+        Dish.dishName,
+        func.avg(UserRating.rating).label('average_rating'),
+        func.count(UserRating.rating).label('rating_count')
+        ).join(
+            UserRating, Dish.dishID == UserRating.dishID,  # Assuming UserRating has a foreign key dish_id to Dish
+        ).filter(
+            Dish.diningHallID == diningHallID
+        ).group_by(
+            Dish.dishID
+        ).order_by(
+            func.avg(UserRating.rating).desc()
+        ).limit(10)  # Limit to top 10 dishes
+        top_ten_rated_food = []
+        for topRate in topRates:
+            top_ten_rated_food.append({"dish_name": topRate.dishName, "average_rating": float(round(topRate.average_rating,2)), "num_rates": topRate.rating_count})
+        return top_ten_rated_food
+
+#-----------GET TOP Allergies------------
+def getTopAllergiesHelper(diningHallID):
+    # Get Top 10 allergies and their percentage
+    total_users = session.query(
+    func.count(UserProfile.userID).label('total_users')
+    ).join(
+        DiningHall, DiningHall.institutionID == UserProfile.institutionID
+    ).filter(
+        DiningHall.diningHallID == diningHallID
+    ).scalar()
+
+    topAllergies = session.query(
+        Allergy.name,
+        func.count(UserAllergy.userID).label('user_count')
+    ).join(
+        UserAllergy, UserAllergy.allergyID == Allergy.allergyID
+    ).join(
+        UserProfile, UserProfile.userID == UserAllergy.userID
+    ).join(
+        DiningHall, DiningHall.institutionID == UserProfile.institutionID
+    ).filter(
+        DiningHall.diningHallID == diningHallID
+    ).group_by(
+        Allergy.name
+    ).order_by(
+        func.count(UserAllergy.userID).desc()
+    ).limit(10)
+
+    top_ten_allergies = []
+    for topAllergy in topAllergies:
+        top_ten_allergies.append({"allergy": topAllergy.name, "num_users": topAllergy.user_count, "percentage": round(topAllergy.user_count/ total_users,3)})
+    return top_ten_allergies
+
 #-----------Generate Reports----------------
 schedule.clear()
 
@@ -1408,57 +1475,19 @@ def generate_dining_report():
             # print(diningHallID)
 
             # Get Top 10 rated food
-            top_rated_list = []
-            topRates = session.query(
-            Dish.dishName,
-            func.avg(UserRating.rating).label('average_rating'),
-            func.count(UserRating.rating).label('rating_count')
-            ).join(
-                UserRating, Dish.dishID == UserRating.dishID,  # Assuming UserRating has a foreign key dish_id to Dish
-            ).filter(
-                Dish.diningHallID == diningHallID
-            ).group_by(
-                Dish.dishID
-            ).order_by(
-                func.avg(UserRating.rating).desc()
-            ).limit(10)  # Limit to top 10 dishes
-            top_ten_rated_food = []
-            for topRate in topRates:
-                top_ten_rated_food.append({"dish_name": topRate.dishName, "average_rating": float(round(topRate.average_rating,2)), "num_rates": topRate.rating_count})
-            # print(top_ten_rated_food)
+            top_ten_rated_food = getTopTenRatedDishesHelper(diningHallID)
 
             # Get Top 10 allergies and their percentage
+            top_ten_allergies = getTopAllergiesHelper(diningHallID)
+
+            # Get Top food preference percentage
             total_users = session.query(
-                func.count(UserProfile.userID).label('total_users')
+            func.count(UserProfile.userID).label('total_users')
             ).join(
                 DiningHall, DiningHall.institutionID == UserProfile.institutionID
             ).filter(
                 DiningHall.diningHallID == diningHallID
             ).scalar()
-
-            topAllergies = session.query(
-            Allergy.name,
-            func.count(UserAllergy.userID).label('user_count')
-            ).join(
-                UserAllergy, UserAllergy.allergyID == Allergy.allergyID
-            ).join(
-                UserProfile, UserProfile.userID == UserAllergy.userID
-            ).join(
-                DiningHall, DiningHall.institutionID == UserProfile.institutionID
-            ).filter(
-                DiningHall.diningHallID == diningHallID
-            ).group_by(
-                Allergy.name
-            ).order_by(
-                func.count(UserAllergy.userID).desc()
-            ).limit(10)
-
-            top_ten_allergies = []
-            for topAllergy in topAllergies:
-                top_ten_allergies.append({"allergy": topAllergy.name, "num_users": topAllergy.user_count, "percentage": round(topAllergy.user_count/ total_users,3)})
-            # print(top_ten_allergies)
-
-            # Get Top food preference percentage
             topPreferences = session.query(
             FoodPreferences.name,
             func.count(UserPreference.userID).label('user_count')
