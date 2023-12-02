@@ -1118,7 +1118,7 @@ class RootController(BaseController):
             period_intake = 0
             for meal in meals_in_time_period:
                 if meal.date.date() == today:
-                    dish_calorie = session.query(Dish).filter_by(dishID = meal.dishID).filter_by(diningHallID = meal.diningHallID).first().calorie
+                    dish_calorie = session.query(Dish).filter_by(dishID = meal.dishID).first().calorie
                     period_intake += dish_calorie * meal.quantity
             period = {
                 "time": "{0:02d}:00 - {1:02d}:00".format(i,i+2),
@@ -1144,7 +1144,7 @@ class RootController(BaseController):
         period_intake =0 
         for meal in meals_in_time_period:
             # if meal.date.date() == today:
-            dish_calorie = session.query(Dish).filter_by(dishID = meal.dishID).filter_by(diningHallID = meal.diningHallID).first().calorie
+            dish_calorie = session.query(Dish).filter_by(dishID = meal.dishID).first().calorie
             period_intake += dish_calorie * meal.quantity
         return period_intake
 
@@ -1165,7 +1165,10 @@ class RootController(BaseController):
     def getDailyCalorieIntakeTotal(self):
         data = request.json_body
         userID = data.get("userID")
-        calorieIntake = RootController.calcDailyCalorieIntakeByTime(userID)
+        userExist = session.query(UserProfile).filter_by(userID = userID).first()
+        if not userExist:
+            return {"messege" : "User doesn't exsit"}
+        calorieIntake = RootController.calcDailyCalorieIntakeByTime(userID)     
         total_calorie = 0
         for period in calorieIntake:
             total_calorie += period["calorie_intake"]
@@ -1183,26 +1186,50 @@ class RootController(BaseController):
         dailyCalorieIntakeMinimum = data.get("dailyCalorieIntakeMinimum")
         userExist = session.query(UserProfile).filter_by(userID=userID).first()
         if userExist:
-            overlap = (session.query(DietGoal)
-            .filter_by(userID=userID)
-            .filter(DietGoal.endDate >= startDate)
-            .all()
-            )
-            if overlap:
-                return {"message": "The periods of different goals can't overlap with each other."}
+            if startDate < endDate:
+                overlap = (session.query(DietGoal)
+                .filter_by(userID=userID)
+                .filter(DietGoal.endDate >= startDate)
+                .all()
+                )
+                if overlap:
+                    return {"message": "The periods of different goals can't overlap with each other."}
 
-            newGoal = DietGoal(
-                userID = userID,
-                startDate = startDate,
-                endDate = endDate,
-                minCal = dailyCalorieIntakeMaximum,
-                maxCal = dailyCalorieIntakeMinimum
-            )
-            session.add(newGoal)
-            session.commit()
-            return {"message":"The goal is sucessfully created"}
+                newGoal = DietGoal(
+                    userID = userID,
+                    startDate = startDate,
+                    endDate = endDate,
+                    minCal = dailyCalorieIntakeMaximum,
+                    maxCal = dailyCalorieIntakeMinimum
+                )
+                session.add(newGoal)
+                session.commit()
+                return {"message":"The goal is sucessfully created."}
+            else:
+                return {"message":"Invalid start date and end date."}
         return {"message":"User not found."}
-    
+    @expose('json')
+    def getPersonalDietGoal(self):
+        data = request.json_body
+        userID = data.get("userID")
+        today = dt_date.today()
+        userExist = session.query(UserProfile).filter_by(userID=userID).first()
+        if userExist:
+            currentGoal = (session.query(DietGoal)
+                       .filter_by(userID=userID)
+                       .filter(and_(DietGoal.startDate <= today, DietGoal.endDate > today))
+                       .first())
+            if currentGoal:
+                return {"startDate":currentGoal.startDate,
+                        "endDate": currentGoal.endDate,
+                        "dailyCalorieIntakeMaximum":currentGoal.maxCal,
+                        "dailyCalorieIntakeMinimum":currentGoal.minCal}
+            else:
+                return{"message":"Goal doesn't exist"}
+        else:
+            return {"message":"User doesn't exist"}
+
+
     @expose('json')
     def getDietGoalLiveProgress(self):
         data = request.json_body
@@ -1210,6 +1237,7 @@ class RootController(BaseController):
         today = dt_date.today()
         # today = datetime.date.today()
         # find the current goal
+        
         currentGoal = (session.query(DietGoal)
                        .filter_by(userID=userID)
                        .filter(and_(DietGoal.startDate <= today, DietGoal.endDate > today))
@@ -1217,23 +1245,32 @@ class RootController(BaseController):
         if currentGoal:
             # goalProgress = [0] * (currentGoal.endDate - currentGoal.startDate).days
             goalProgress = []
-            totalDays = (currentGoal.endDate - currentGoal.startDate).days
+            calorieRecord = [] # used for testing
+            totalDays = (currentGoal.endDate - currentGoal.startDate).days + 1
             # if on a given day the intake fullfill the goal, record 1; exceeds the goal, record 2; no data, record 0.
             currentDate = currentGoal.startDate
             while currentDate <= currentGoal.endDate:
                 if currentDate <= today:
                     time = datetime(currentDate.year, currentDate.month, currentDate.day)
                     dailyIntake = RootController.calcTotalCalorieIntakeByDate(userID, time)
-                    if dailyIntake > currentGoal.maxCal or dailyIntake < currentGoal.minCal:
-                        goalProgress.append(2)
+                    calorieRecord.append(dailyIntake)
+                    if dailyIntake == 0:
+                        goalProgress.append(0) # no data, not eating in the dining halls
+                    elif (dailyIntake > currentGoal.maxCal or dailyIntake < currentGoal.minCal):
+                        goalProgress.append(2) # not fullfill the daily goal
                     else:
-                        goalProgress.append(1)
+                        goalProgress.append(1) # fullfill the goal
                 else:
-                    goalProgress.append(0)
-                current_date += timedelta(days=1)
+                    calorieRecord.append(-1)
+                    goalProgress.append(0) # haven't arrive to that day
+                currentDate += timedelta(days=1)
             # check
             if len(goalProgress) != totalDays:
-                return {"message":"There are some problem when claculating the live progress"}
+                return {"message":"There are some problem when claculating the live progress",
+                        "goalProgress":goalProgress,
+                        "totalDays": totalDays,
+                        "startDate:": currentGoal.startDate,
+                        "endDate" : currentGoal.endDate}
             # sum up
             daysFullfilledGoal = goalProgress.count(1)
             daysNotFullfilledGoal=goalProgress.count(2)
@@ -1242,7 +1279,8 @@ class RootController(BaseController):
             return {"daysFullfilledGoal":daysFullfilledGoal,
                     "daysNotFullfilledGoal":daysNotFullfilledGoal,
                     "daysWithoutData":daysWithoutData,
-                    "progressPercentage":progressPercentage}
+                    "progressPercentage":progressPercentage
+                    }
 
         else:
             return {"message":"Current goal doesn't exist."}
@@ -1284,10 +1322,122 @@ class RootController(BaseController):
             report_list.append(report)
 
         return {"reports": report_list}
+    
+    @expose('json')
+    def getDietGoalReports(self):
+        data = request.json_body
+        userID = data.get("userID")
+        goals = session.query(DietGoal).filter_by(userID = userID).all()
+        reports = []
+        for goal in goals:
+            dailyCalorieIntakeMaximum = goal.maxCal
+            dailyCalorieIntakeMinimum = goal.minCal
+            startDate = goal.startDate
+            endDate = goal.endDate
+            fullfilledDays = 0
+            NoDataDays = 0
+            notFullfilledDays = 0
+            currTime = datetime.combine(startDate, datetime.min.time())
+            end = datetime.combine(endDate, datetime.max.time())
+            while currTime <= end:
+                startTime = currTime.replace(hour=0, minute=0, second=0).replace(microsecond=0)
+                endTime = currTime.replace(hour=23, minute=59, second=59).replace(microsecond=999)
+                total_calories = session.query(func.sum(Dish.calorie * MealTracking.quantity)).\
+                join(MealTracking, MealTracking.dishID == Dish.dishID).\
+                filter(MealTracking.userID == userID).\
+                filter(MealTracking.date >= startTime).\
+                filter(MealTracking.date < endTime).scalar()
+                total_calories = total_calories or 0
+                currTime += timedelta(days=1)
+                if total_calories == 0:
+                    NoDataDays += 1
+                elif total_calories <= dailyCalorieIntakeMaximum and total_calories >= dailyCalorieIntakeMinimum:
+                    fullfilledDays += 1
+                else:
+                    notFullfilledDays += 1
 
+            report = {
+                'startDate': startDate,
+                'endDate': endDate,
+                'dailyCalorieIntakeMaximum': dailyCalorieIntakeMaximum,
+                'dailyCalorieIntakeMinimum': dailyCalorieIntakeMinimum,
+                'daysFullfilledGoal': fullfilledDays,
+                'daysNotFullfilledGoal': notFullfilledDays,
+                'daysWithoutData': NoDataDays,
+                'progressPercentage': fullfilledDays / (fullfilledDays + notFullfilledDays + NoDataDays)
+            }
+            reports.append(report)
+        return {'reports': reports}
     
 
+#-----------GET TOP RATED DISHES------------
+    @expose('json')
+    def getTopTenHighestRatedDishes(self):
+        data = request.json_body
+        diningHallID = data.get("diningHallID")
+        return {'topTenHighestRatedDishes': getTopTenRatedDishesHelper(diningHallID)}
+    
+#-------------GET TOP ALLERGIES-------------
+    @expose('json')
+    def getTopTenPriorityFoodAllergies(self):
+        data = request.json_body
+        diningHallID = data.get("diningHallID")
+        return {'topTenPriorityFoodAllergies': getTopAllergiesHelper(diningHallID)}
+
 # OUTSIDE THE CONTROLLER
+#-----------GET TOP RATED DISHES------------
+def getTopTenRatedDishesHelper(diningHallID):
+        topRates = session.query(
+        Dish.dishName,
+        func.avg(UserRating.rating).label('average_rating'),
+        func.count(UserRating.rating).label('rating_count')
+        ).join(
+            UserRating, Dish.dishID == UserRating.dishID,  # Assuming UserRating has a foreign key dish_id to Dish
+        ).filter(
+            Dish.diningHallID == diningHallID
+        ).group_by(
+            Dish.dishID
+        ).order_by(
+            func.avg(UserRating.rating).desc()
+        ).limit(10)  # Limit to top 10 dishes
+        top_ten_rated_food = []
+        for topRate in topRates:
+            top_ten_rated_food.append({"dish_name": topRate.dishName, "average_rating": float(round(topRate.average_rating,2)), "num_rates": topRate.rating_count})
+        return top_ten_rated_food
+
+#-----------GET TOP Allergies------------
+def getTopAllergiesHelper(diningHallID):
+    # Get Top 10 allergies and their percentage
+    total_users = session.query(
+    func.count(UserProfile.userID).label('total_users')
+    ).join(
+        DiningHall, DiningHall.institutionID == UserProfile.institutionID
+    ).filter(
+        DiningHall.diningHallID == diningHallID
+    ).scalar()
+
+    topAllergies = session.query(
+        Allergy.name,
+        func.count(UserAllergy.userID).label('user_count')
+    ).join(
+        UserAllergy, UserAllergy.allergyID == Allergy.allergyID
+    ).join(
+        UserProfile, UserProfile.userID == UserAllergy.userID
+    ).join(
+        DiningHall, DiningHall.institutionID == UserProfile.institutionID
+    ).filter(
+        DiningHall.diningHallID == diningHallID
+    ).group_by(
+        Allergy.name
+    ).order_by(
+        func.count(UserAllergy.userID).desc()
+    ).limit(10)
+
+    top_ten_allergies = []
+    for topAllergy in topAllergies:
+        top_ten_allergies.append({"allergy": topAllergy.name, "num_users": topAllergy.user_count, "percentage": round(topAllergy.user_count/ total_users,3)})
+    return top_ten_allergies
+
 #-----------Generate Reports----------------
 schedule.clear()
 
@@ -1338,57 +1488,19 @@ def generate_dining_report():
             # print(diningHallID)
 
             # Get Top 10 rated food
-            top_rated_list = []
-            topRates = session.query(
-            Dish.dishName,
-            func.avg(UserRating.rating).label('average_rating'),
-            func.count(UserRating.rating).label('rating_count')
-            ).join(
-                UserRating, Dish.dishID == UserRating.dishID,  # Assuming UserRating has a foreign key dish_id to Dish
-            ).filter(
-                Dish.diningHallID == diningHallID
-            ).group_by(
-                Dish.dishID
-            ).order_by(
-                func.avg(UserRating.rating).desc()
-            ).limit(10)  # Limit to top 10 dishes
-            top_ten_rated_food = []
-            for topRate in topRates:
-                top_ten_rated_food.append({"dish_name": topRate.dishName, "average_rating": float(round(topRate.average_rating,2)), "num_rates": topRate.rating_count})
-            # print(top_ten_rated_food)
+            top_ten_rated_food = getTopTenRatedDishesHelper(diningHallID)
 
             # Get Top 10 allergies and their percentage
+            top_ten_allergies = getTopAllergiesHelper(diningHallID)
+
+            # Get Top food preference percentage
             total_users = session.query(
-                func.count(UserProfile.userID).label('total_users')
+            func.count(UserProfile.userID).label('total_users')
             ).join(
                 DiningHall, DiningHall.institutionID == UserProfile.institutionID
             ).filter(
                 DiningHall.diningHallID == diningHallID
             ).scalar()
-
-            topAllergies = session.query(
-            Allergy.name,
-            func.count(UserAllergy.userID).label('user_count')
-            ).join(
-                UserAllergy, UserAllergy.allergyID == Allergy.allergyID
-            ).join(
-                UserProfile, UserProfile.userID == UserAllergy.userID
-            ).join(
-                DiningHall, DiningHall.institutionID == UserProfile.institutionID
-            ).filter(
-                DiningHall.diningHallID == diningHallID
-            ).group_by(
-                Allergy.name
-            ).order_by(
-                func.count(UserAllergy.userID).desc()
-            ).limit(10)
-
-            top_ten_allergies = []
-            for topAllergy in topAllergies:
-                top_ten_allergies.append({"allergy": topAllergy.name, "num_users": topAllergy.user_count, "percentage": round(topAllergy.user_count/ total_users,3)})
-            # print(top_ten_allergies)
-
-            # Get Top food preference percentage
             topPreferences = session.query(
             FoodPreferences.name,
             func.count(UserPreference.userID).label('user_count')
