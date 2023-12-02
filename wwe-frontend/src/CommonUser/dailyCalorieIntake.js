@@ -49,6 +49,7 @@ CircularProgressWithLabel.propTypes = {
 export default function DailyCalorieIntake({ userId }) {
   const [dailyCalorieIntakeTotal, setDailyCalorieIntakeTotal] = useState("");
   const [dietGoalProgress, setDietGoalProgress] = useState({ daysFullfilledGoal: '', daysNotFullfilledGoal: '',	daysWithoutData: '', progressPercentage: '' });
+  const [noCurrentGoal, setNoCurrentGoal] = useState(false);
 
   useEffect(() => {
     const getDailyCalorieIntakeTotal = async () => {
@@ -102,7 +103,12 @@ export default function DailyCalorieIntake({ userId }) {
         }
         const data = await response.json();
         console.log(data);
-        setDietGoalProgress(data);
+        if (data.message === "Current goal doesn't exist.") {
+          setNoCurrentGoal(true);
+        } else {
+          setDietGoalProgress(data);
+        }
+        console.log(noCurrentGoal)
       } catch (error) {
         console.error('There was a problem fetching diet goal progress:', error);
       }
@@ -120,9 +126,15 @@ export default function DailyCalorieIntake({ userId }) {
       <Typography color="text.secondary" sx={{ flex: 1 }}>
         on {formattedDate}
       </Typography>
-      <div>
-        <CircularProgressWithLabel value={dietGoalProgress.progressPercentage} />
-      </div>
+      {noCurrentGoal ? 
+        <Typography>
+        No active diet goal yet
+        </Typography>
+        : 
+        <div>
+            <CircularProgressWithLabel value={dietGoalProgress.progressPercentage} />
+        </div>
+      }
       <div>
         <Link color="primary" href="#" onClick={preventDefault}>
           View My Goals
