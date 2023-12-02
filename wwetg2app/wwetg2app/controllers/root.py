@@ -1193,6 +1193,8 @@ class RootController(BaseController):
         dailyCalorieIntakeMinimum = data.get("dailyCalorieIntakeMinimum")
         userExist = session.query(UserProfile).filter_by(userID=userID).first()
         if userExist:
+            if startDate == endDate:
+                return {"message":"Period too short."}
             if startDate < endDate:
                 overlap = (session.query(DietGoal)
                 .filter_by(userID=userID)
