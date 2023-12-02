@@ -1224,7 +1224,7 @@ class RootController(BaseController):
         if userExist:
             currentGoal = (session.query(DietGoal)
                        .filter_by(userID=userID)
-                       .filter(and_(DietGoal.startDate <= today, DietGoal.endDate > today))
+                       .filter(and_(DietGoal.startDate <= today, DietGoal.endDate >= today))
                        .first())
             if currentGoal:
                 return {"startDate":currentGoal.startDate,
