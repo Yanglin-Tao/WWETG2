@@ -9,7 +9,6 @@ import Divider from '@mui/material/Divider';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
-import Link from '@mui/material/Link';
 import Title from './Title';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
@@ -36,12 +35,13 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 
 function DisplayCommonUserGoals({userId}) {
   const [isEditable, setIsEditable] = useState(false);
-  const [startDate, setStartDate] = useState(dayjs('2023-01-01'));
-  const [endDate, setEndDate] = useState(dayjs('2023-12-31'));
-  const [maxCalories, setMaxCalories] = useState(2000);
-  const [minCalories, setMinCalories] = useState(1000);
+  const [startDate, setStartDate] = useState(dayjs());
+  const [endDate, setEndDate] = useState(dayjs());
+  const [maxCalories, setMaxCalories] = useState('');
+  const [minCalories, setMinCalories] = useState('');
   const [alertMessage, setAlertMessage] = useState('');
   const [alertSeverity, setAlertSeverity] = useState('info');
+  const [noCurrentGoal, setNoCurrentGoal] = useState(false);
   const [open, setOpen] = useState(false);
 
   const handleClose = (event, reason) => {
@@ -54,14 +54,14 @@ function DisplayCommonUserGoals({userId}) {
   const toggleEdit = () => {
     setIsEditable(!isEditable);
     if (isEditable) {
-      updateCommonUserGoals();
+      setPersonalDietGoal();
     }
   };
 
   useEffect(() => {
-    const fetchCommonUserGoals = async () => {
+    const fetchPersonalDietGoal = async () => {
         const token = Cookies.get('token'); 
-        const apiUrl = `http://127.0.0.1:8080/getCommonUserGoals`; 
+        const apiUrl = `http://127.0.0.1:8080/getPersonalDietGoal`; 
         const requestOptions = {
             method: 'POST',
             headers: {
@@ -80,21 +80,29 @@ function DisplayCommonUserGoals({userId}) {
             }
             const data = await response.json();
             console.log(data);
-            setStartDate(data.startDate);
-            setEndDate(data.endDate);
-            setMaxCalories(data.dailyCalorieIntakeMaximum);
-            setMinCalories(data.dailyCalorieIntakeMinimum);
+            if (data.message === "Goal doesn't exist") {
+              setNoCurrentGoal(true);
+            } else {
+              setStartDate(dayjs(data.startDate));
+              setEndDate(dayjs(data.endDate));
+              setMaxCalories(data.dailyCalorieIntakeMaximum);
+              setMinCalories(data.dailyCalorieIntakeMinimum);
+            }
         } catch (error) {
             console.error('There was a problem fetching the user goals:', error);
         }
     };
-    fetchCommonUserGoals();
+    fetchPersonalDietGoal();
   }, [userId]); 
 
-  const updateCommonUserGoals = async () => {
+  const setPersonalDietGoal = async () => {
+    if (!validateGoal()) {
+      setIsEditable(true);
+      return;
+  }
     try {
         const token = Cookies.get('token'); 
-        const response = await fetch('http://127.0.0.1:8080/updateCommonUserGoals', {
+        const response = await fetch('http://127.0.0.1:8080/setPersonalDietGoal', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -109,24 +117,37 @@ function DisplayCommonUserGoals({userId}) {
             }),
         });
 
+        console.log(startDate);
+        console.log(endDate);
+
         if (!response.ok) {
             throw new Error('Network response was not ok');
         } 
 
         const responseData = await response.json();
         console.log('Update successful', responseData);
-        if (responseData.Message === "Successfully updated diet goals info into your profile.") {
+        if (responseData.message === "The goal is sucessfully created.") {
           setAlertSeverity('success');
-          setAlertMessage(responseData.Message);
+          setAlertMessage(responseData.message);
           setOpen(true);
         } else {
           setAlertSeverity('error');
-          setAlertMessage(responseData.Message);
+          setAlertMessage(responseData.message);
           setOpen(true);
         }
     } catch (error) {
-        console.error('There was a problem updating common user goals:', error.message);
+        console.error('There was a problem creating personal diet goal:', error.message);
     }
+  };
+
+  const validateGoal = () => {
+    if (!maxCalories || !minCalories || !startDate || !endDate) {
+      setAlertMessage('All fields are required');
+      setAlertSeverity('error');
+      setOpen(true);
+      return false;
+    }
+    return true;
   };
 
   return (
@@ -161,7 +182,7 @@ function DisplayCommonUserGoals({userId}) {
               <Grid container spacing={3}>
                 <Grid item xs={12}>
                   <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                    <Title>Current Goals</Title>
+                    <Title>Current Diet Goal</Title>
                     <Box sx={{ width: '100%', maxWidth: 500, bgcolor: 'background.paper' }}>
                       <Box sx={{ my: 3, mx: 2 }}>
                         <Grid container alignItems="center">
@@ -179,9 +200,15 @@ function DisplayCommonUserGoals({userId}) {
                                 onChange={(e) => setMaxCalories(e.target.value)}
                               />
                             ) : (
-                              <Typography gutterBottom variant="h6" component="div">
-                                {maxCalories} max per day
-                              </Typography>
+                              !noCurrentGoal ? (
+                                <Typography gutterBottom variant="h6" component="div">
+                                  {maxCalories} max per day
+                                </Typography>
+                              ) : (
+                                <Typography gutterBottom variant="h6" component="div">
+                                  N/A max per day
+                                </Typography>
+                              )
                             )}
                             {isEditable ? (
                               <TextField
@@ -192,9 +219,15 @@ function DisplayCommonUserGoals({userId}) {
                                 style={{ marginLeft: '10px' }}
                               />
                             ) : (
+                              !noCurrentGoal ? (
                               <Typography gutterBottom variant="h6" component="div">
                                 {minCalories} min per day
                               </Typography>
+                              ) : (
+                                <Typography gutterBottom variant="h6" component="div">
+                                  N/A min per day
+                                </Typography>
+                              )
                             )}
                           </Grid>
                         </Grid>
@@ -228,25 +261,41 @@ function DisplayCommonUserGoals({userId}) {
                           <Typography gutterBottom variant="body1">
                             Start Date
                           </Typography>
-                          <Chip label={startDate.format('YYYY-MM-DD')} />
+                          { !noCurrentGoal ? (
+                            <Chip label={startDate.format('YYYY-MM-DD')} />
+                          ) : (
+                            <Typography>
+                            N/A
+                            </Typography>
+                          )
+                          }
                         </Box>
                         <Box sx={{ m: 2 }}>
                           <Typography gutterBottom variant="body1">
                             End Date
                           </Typography>
-                          <Chip label={endDate.format('YYYY-MM-DD')} />
+                          { !noCurrentGoal ? (
+                            <Chip label={endDate.format('YYYY-MM-DD')} />
+                          ) : (
+                            <Typography>
+                            N/A
+                            </Typography>
+                          )
+                          }
                         </Box>
                       </>
                     )}
-                    <Button
-                      type="submit"
-                      fullWidth
-                      variant="contained"
-                      sx={{ mt: 3, mb: 2 }}
-                      onClick={toggleEdit}
-                    >
-                      {isEditable ? 'Save My Goals' : 'Edit My Goals'}
-                    </Button>
+                    {noCurrentGoal ? 
+                      <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        sx={{ mt: 3, mb: 2 }}
+                        onClick={toggleEdit}
+                      >
+                        {isEditable ? 'Save Diet Goal' : 'Create Diet Goal'}
+                      </Button>
+                    : "Good luck with your current diet goal!"}
                   </Paper>
                 </Grid>
               </Grid>

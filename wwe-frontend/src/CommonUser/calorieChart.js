@@ -9,23 +9,6 @@ import Cookies from 'js-cookie';
 This component is optional to have.  
 */
 
-const calorieIntakeByTime = {
-  calorie_intake: [
-    { time: '12am - 2am', calories_intake: 200 },
-    { time: '2am - 4am', calories_intake: 150 },
-    { time: '4am - 6am', calories_intake: 250 },
-    { time: '6am - 8am', calories_intake: 400 },
-    { time: '8am - 10am', calories_intake: 550 },
-    { time: '10am - 12pm', calories_intake: 600 },
-    { time: '12pm - 2pm', calories_intake: 700 },
-    { time: '2pm - 4pm', calories_intake: 650 },
-    { time: '4pm - 6pm', calories_intake: 500 },
-    { time: '6pm - 8pm', calories_intake: 450 },
-    { time: '8pm - 10pm', calories_intake: 300 },
-    { time: '10pm - 12am', calories_intake: 250 },
-  ],
-};
-
 export default function CalorieChart({ userId }) {
   const theme = useTheme();
 
