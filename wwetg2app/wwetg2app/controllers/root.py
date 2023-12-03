@@ -28,7 +28,7 @@ from wwetg2app.controllers.error import ErrorController
 import psycopg2
 import json
 
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Date, Float, DateTime, func, desc
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, Date, Float, DateTime, func, desc, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy import and_
@@ -132,6 +132,7 @@ class UserProfile(Base):
     email = Column(String)
     password = Column(String)
     institutionID = Column(Integer, ForeignKey('institutions.institutionID'))
+    allowDataCollect = Column(Boolean)
 
 class DietGoal(Base):
     __tablename__ = 'diet_goal'
@@ -1147,9 +1148,6 @@ class RootController(BaseController):
             dish_calorie = session.query(Dish).filter_by(dishID = meal.dishID).first().calorie
             period_intake += dish_calorie * meal.quantity
         return period_intake
-
-
-
         
 
     @expose('json')
@@ -1186,6 +1184,8 @@ class RootController(BaseController):
         dailyCalorieIntakeMinimum = data.get("dailyCalorieIntakeMinimum")
         userExist = session.query(UserProfile).filter_by(userID=userID).first()
         if userExist:
+            if startDate == endDate:
+                return {"message":"Period too short."}
             if startDate < endDate:
                 overlap = (session.query(DietGoal)
                 .filter_by(userID=userID)
@@ -1217,7 +1217,7 @@ class RootController(BaseController):
         if userExist:
             currentGoal = (session.query(DietGoal)
                        .filter_by(userID=userID)
-                       .filter(and_(DietGoal.startDate <= today, DietGoal.endDate > today))
+                       .filter(and_(DietGoal.startDate <= today, DietGoal.endDate >= today))
                        .first())
             if currentGoal:
                 return {"startDate":currentGoal.startDate,
@@ -1383,6 +1383,25 @@ class RootController(BaseController):
         data = request.json_body
         diningHallID = data.get("diningHallID")
         return {'topTenPriorityFoodAllergies': getTopAllergiesHelper(diningHallID)}
+    
+#-------------PRIVACY SETTINGS--------------
+    @expose('json')
+    def setPrivacySetting(self):
+        data = request.json_body
+        userID = data.get("userID")
+        allowToCollectData = data.get("allowToCollectData")
+        user_to_update = session.query(UserProfile).filter_by(userID = userID).first()
+        user_to_update.allowDataCollect = allowToCollectData
+        session.commit()
+        return {'message':'Privacy setting updated seccessfully.'}
+
+    @expose('json')
+    def getPrivacySetting(self):
+        data = request.json_body
+        userID = data.get("userID")
+        user_info = session.query(UserProfile).filter_by(userID = userID).first()
+        allowToCollectData = user_info.allowDataCollect
+        return {'allowToCollectData':allowToCollectData}
 
 # OUTSIDE THE CONTROLLER
 #-----------GET TOP RATED DISHES------------
@@ -1413,7 +1432,8 @@ def getTopAllergiesHelper(diningHallID):
     ).join(
         DiningHall, DiningHall.institutionID == UserProfile.institutionID
     ).filter(
-        DiningHall.diningHallID == diningHallID
+        and_(DiningHall.diningHallID == diningHallID, 
+        UserProfile.allowDataCollect == True)
     ).scalar()
 
     topAllergies = session.query(
@@ -1426,7 +1446,8 @@ def getTopAllergiesHelper(diningHallID):
     ).join(
         DiningHall, DiningHall.institutionID == UserProfile.institutionID
     ).filter(
-        DiningHall.diningHallID == diningHallID
+        and_(DiningHall.diningHallID == diningHallID, 
+        UserProfile.allowDataCollect == True)
     ).group_by(
         Allergy.name
     ).order_by(
@@ -1499,7 +1520,8 @@ def generate_dining_report():
             ).join(
                 DiningHall, DiningHall.institutionID == UserProfile.institutionID
             ).filter(
-                DiningHall.diningHallID == diningHallID
+                and_(DiningHall.diningHallID == diningHallID, 
+                UserProfile.allowDataCollect == True)
             ).scalar()
             topPreferences = session.query(
             FoodPreferences.name,
@@ -1511,7 +1533,8 @@ def generate_dining_report():
             ).join(
                 DiningHall, DiningHall.institutionID == UserProfile.institutionID
             ).filter(
-                DiningHall.diningHallID == diningHallID
+                and_(DiningHall.diningHallID == diningHallID, 
+                UserProfile.allowDataCollect == True)
             ).group_by(
                 FoodPreferences.name
             ).order_by(

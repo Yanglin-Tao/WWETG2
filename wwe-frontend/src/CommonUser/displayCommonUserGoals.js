@@ -125,7 +125,6 @@ function DisplayCommonUserGoals({userId}) {
         } 
 
         const responseData = await response.json();
-        console.log('Update successful', responseData);
         if (responseData.message === "The goal is sucessfully created.") {
           setAlertSeverity('success');
           setAlertMessage(responseData.message);

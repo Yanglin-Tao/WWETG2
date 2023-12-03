@@ -19,7 +19,6 @@ import Cookies from 'js-cookie';
 function DisplayCommonUserAccount({userId}) {
 
     const [userData, setUserData] = useState({email: '', institutionName: ''});
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchUserData = async () => {

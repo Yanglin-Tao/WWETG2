@@ -225,14 +225,14 @@ INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (23,10);
 INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (24,10);
 
 -- All common user passwords before hash: Abc123!!
-INSERT INTO "user_profiles" ("userID", "email", "password", "institutionID") VALUES (1, 'user1@nyu.edu', 
-'09d723dcba27c57054faa197e630226df6a40eb322bf565ff532b74bf81e2952', 1);
-INSERT INTO "user_profiles" ("userID", "email", "password", "institutionID") VALUES (2, 'user2@nyu.edu', 
-'09d723dcba27c57054faa197e630226df6a40eb322bf565ff532b74bf81e2952', 1);
-INSERT INTO "user_profiles" ("userID", "email", "password", "institutionID") VALUES (3, 'user3@bu.edu', 
-'09d723dcba27c57054faa197e630226df6a40eb322bf565ff532b74bf81e2952', 2);
-INSERT INTO "user_profiles" ("userID", "email", "password", "institutionID") VALUES (4, 'user4@nyu.edu', 
-'09d723dcba27c57054faa197e630226df6a40eb322bf565ff532b74bf81e2952', 1);
+INSERT INTO "user_profiles" ("userID", "email", "password", "institutionID", "allowDataCollect") VALUES (1, 'user1@nyu.edu', 
+'09d723dcba27c57054faa197e630226df6a40eb322bf565ff532b74bf81e2952', 1, True);
+INSERT INTO "user_profiles" ("userID", "email", "password", "institutionID", "allowDataCollect") VALUES (2, 'user2@nyu.edu', 
+'09d723dcba27c57054faa197e630226df6a40eb322bf565ff532b74bf81e2952', 1, True);
+INSERT INTO "user_profiles" ("userID", "email", "password", "institutionID", "allowDataCollect") VALUES (3, 'user3@bu.edu', 
+'09d723dcba27c57054faa197e630226df6a40eb322bf565ff532b74bf81e2952', 2, True);
+INSERT INTO "user_profiles" ("userID", "email", "password", "institutionID", "allowDataCollect") VALUES (4, 'user4@nyu.edu', 
+'09d723dcba27c57054faa197e630226df6a40eb322bf565ff532b74bf81e2952', 1, False);
 
 INSERT INTO "user_preference" ("userID", "preferenceID") VALUES (1,1);
 INSERT INTO "user_preference" ("userID", "preferenceID") VALUES (2,2);
