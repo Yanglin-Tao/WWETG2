@@ -48,7 +48,7 @@ CircularProgressWithLabel.propTypes = {
 
 export default function DailyCalorieIntake({ userId }) {
   const [dailyCalorieIntakeTotal, setDailyCalorieIntakeTotal] = useState("");
-  const [dietGoalProgress, setDietGoalProgress] = useState({ daysFullfilledGoal: '', daysNotFullfilledGoal: '', daysWithoutData: '', progressPercentage: '' });
+  const [dietGoalProgress, setDietGoalProgress] = useState({ daysFullfilledGoal: 0, daysNotFullfilledGoal: 0,	daysWithoutData: 0, progressPercentage: 0 });
   const [noCurrentGoal, setNoCurrentGoal] = useState(false);
 
   useEffect(() => {
