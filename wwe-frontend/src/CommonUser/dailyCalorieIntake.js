@@ -48,7 +48,7 @@ CircularProgressWithLabel.propTypes = {
 
 export default function DailyCalorieIntake({ userId }) {
   const [dailyCalorieIntakeTotal, setDailyCalorieIntakeTotal] = useState("");
-  const [dietGoalProgress, setDietGoalProgress] = useState({ daysFullfilledGoal: '', daysNotFullfilledGoal: '',	daysWithoutData: '', progressPercentage: '' });
+  const [dietGoalProgress, setDietGoalProgress] = useState({ daysFullfilledGoal: '', daysNotFullfilledGoal: '', daysWithoutData: '', progressPercentage: '' });
   const [noCurrentGoal, setNoCurrentGoal] = useState(false);
 
   useEffect(() => {
@@ -79,7 +79,7 @@ export default function DailyCalorieIntake({ userId }) {
         console.error('There was a problem fetching daily calorie intake total:', error);
       }
     };
-    getDailyCalorieIntakeTotal(); 
+    getDailyCalorieIntakeTotal();
 
     const getDietGoalProgress = async () => {
       const token = Cookies.get('token');
@@ -126,13 +126,13 @@ export default function DailyCalorieIntake({ userId }) {
       <Typography color="text.secondary" sx={{ flex: 1 }}>
         on {formattedDate}
       </Typography>
-      {noCurrentGoal ? 
+      {noCurrentGoal ?
         <Typography>
-        No active diet goal yet
+          No active diet goal yet
         </Typography>
-        : 
+        :
         <div>
-            <CircularProgressWithLabel value={dietGoalProgress.progressPercentage} />
+          <CircularProgressWithLabel value={dietGoalProgress.progressPercentage*100} />
         </div>
       }
       <div>

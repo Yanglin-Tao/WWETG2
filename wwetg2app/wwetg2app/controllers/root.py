@@ -1279,7 +1279,8 @@ class RootController(BaseController):
             return {"daysFullfilledGoal":daysFullfilledGoal,
                     "daysNotFullfilledGoal":daysNotFullfilledGoal,
                     "daysWithoutData":daysWithoutData,
-                    "progressPercentage":progressPercentage
+                    "progressPercentage":progressPercentage,
+                    "totalDays":totalDays
                     }
 
         else:

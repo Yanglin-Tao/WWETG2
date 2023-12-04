@@ -12,6 +12,7 @@ import DailyCalorieIntake from './dailyCalorieIntake';
 import RecentMeals from './recentMeals';
 import DisplayCommonUserMontlyReport from './displayCommonUserMonthlyReport'
 import DisplayCommonUserDietGoalReports from './displayCommonUserDietGoalReports';
+import ComponentLoading from '../ComponentLoading';
 import Copyright from '../Copyright';
 
 /* TODO: This component should display common user's dashboard. It should navigate the common users to
@@ -35,6 +36,11 @@ function DisplayCommonUserDashboard({ userId }) {
   const [open, setOpen] = React.useState(true);
   const [auth, setAuth] = React.useState(true);
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [isDataLoaded, setIsDataLoaded] = React.useState(true);
+
+  const handleDataLoaded = () => {
+    setIsDataLoaded(true);
+  };
 
   const handleChange = (event) => {
     setAuth(event.target.checked);
@@ -61,69 +67,73 @@ function DisplayCommonUserDashboard({ userId }) {
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
         <DashboardLayout title='What We Eat Dashboard' userId={userId} />
-        <Box
-          component="main"
-          sx={{
-            backgroundColor: (theme) =>
-              theme.palette.mode === 'light'
-                ? theme.palette.grey[100]
-                : theme.palette.grey[900],
-            flexGrow: 1,
-            height: '100vh',
-            overflow: 'auto',
-          }}
-        >
-          <Toolbar />
-          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-            <Grid container spacing={3}>
-              {/* calorieChart */}
-              <Grid item xs={12} md={8} lg={9}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: 400,
-                  }}
-                >
-                  <CalorieChart userId={userId}/>
-                </Paper>
+        {!isDataLoaded ? (
+          <ComponentLoading />
+        ) : (
+          <Box
+            component="main"
+            sx={{
+              backgroundColor: (theme) =>
+                theme.palette.mode === 'light'
+                  ? theme.palette.grey[100]
+                  : theme.palette.grey[900],
+              flexGrow: 1,
+              height: '100vh',
+              overflow: 'auto',
+            }}
+          >
+            <Toolbar />
+            <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+              <Grid container spacing={3}>
+                {/* calorieChart */}
+                <Grid item xs={12} md={8} lg={9}>
+                  <Paper
+                    sx={{
+                      p: 2,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      height: 400,
+                    }}
+                  >
+                    <CalorieChart userId={userId} onDataLoaded={handleDataLoaded} />
+                  </Paper>
+                </Grid>
+                {/* Daily calorie intake */}
+                <Grid item xs={12} md={4} lg={3}>
+                  <Paper
+                    sx={{
+                      p: 2,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      height: 400,
+                    }}
+                  >
+                    <DailyCalorieIntake userId={userId} />
+                  </Paper>
+                </Grid>
+                {/* Recent Meals */}
+                <Grid item xs={12}>
+                  <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+                    <RecentMeals userId={userId} />
+                  </Paper>
+                </Grid>
+                {/* Monthly Reports */}
+                <Grid item xs={12}>
+                  <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+                    <DisplayCommonUserMontlyReport userId={userId} />
+                  </Paper>
+                </Grid>
+                {/* Diet Goal Reports */}
+                <Grid item xs={12}>
+                  <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+                    <DisplayCommonUserDietGoalReports userId={userId} />
+                  </Paper>
+                </Grid>
               </Grid>
-              {/* Daily calorie intake */}
-              <Grid item xs={12} md={4} lg={3}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: 400,
-                  }}
-                >
-                  <DailyCalorieIntake userId={userId} />
-                </Paper>
-              </Grid>
-              {/* Recent Meals */}
-              <Grid item xs={12}>
-                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  <RecentMeals userId={userId} />
-                </Paper>
-              </Grid>
-              {/* Monthly Reports */}
-              <Grid item xs={12}>
-                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  <DisplayCommonUserMontlyReport userId={userId}/>
-                </Paper>
-              </Grid>
-              {/* Diet Goal Reports */}
-              <Grid item xs={12}>
-                <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  <DisplayCommonUserDietGoalReports userId={userId} />
-                </Paper>
-              </Grid>
-            </Grid>
-            <Copyright sx={{ pt: 4 }} />
-          </Container>
-        </Box>
+              <Copyright sx={{ pt: 4 }} />
+            </Container>
+          </Box>
+        )}
       </Box>
     </ThemeProvider >
   );

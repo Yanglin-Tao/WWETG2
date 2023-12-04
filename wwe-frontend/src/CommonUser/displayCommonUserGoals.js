@@ -287,16 +287,7 @@ function DisplayCommonUserGoals({ userId }) {
                         </Box>
                       </>
                     )}
-                    <Button
-                      type="submit"
-                      fullWidth
-                      variant="contained"
-                      sx={{ mt: 3, mb: 2 }}
-                      onClick={toggleEdit}
-                    >
-                      {isEditable ? 'Save Diet Goal' : 'Create Diet Goal'}
-                    </Button>
-                    {/* {noCurrentGoal ?
+                    {noCurrentGoal ?
                       <Button
                         type="submit"
                         fullWidth
@@ -306,7 +297,7 @@ function DisplayCommonUserGoals({ userId }) {
                       >
                         {isEditable ? 'Save Diet Goal' : 'Create Diet Goal'}
                       </Button>
-                      : "Good luck with your current diet goal!"} */}
+                      : "Good luck with your current diet goal!"}
                   </Paper>
                 </Grid>
               </Grid>
