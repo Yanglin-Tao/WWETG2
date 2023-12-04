@@ -16,16 +16,16 @@ export default function CalorieChart({ userId }) {
 
   useEffect(() => {
     const getDailyCalorieIntakeByTime = async () => {
-      const token = Cookies.get('token'); 
-      const apiUrl = `http://127.0.0.1:8080/getDailyCalorieIntakeByTime`; 
+      const token = Cookies.get('token');
+      const apiUrl = `http://127.0.0.1:8080/getDailyCalorieIntakeByTime`;
       console.log(userId);
       const requestOptions = {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': token, 
+          'Authorization': token,
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           userID: userId,
         }),
       };
@@ -43,13 +43,15 @@ export default function CalorieChart({ userId }) {
       }
     };
 
-    getDailyCalorieIntakeByTime(); 
+    getDailyCalorieIntakeByTime();
   }, [userId]);
 
   const chartData = calorieIntakeByTime.map((entry, index) => ({
     ...entry,
     key: `calorie-intake-${index}`,
   }));
+
+  console.log("chartData: ", chartData);
 
   return (
     <React.Fragment>
@@ -70,6 +72,7 @@ export default function CalorieChart({ userId }) {
             style={theme.typography.body2}
           />
           <YAxis
+            dataKey="calorie_intake"
             stroke={theme.palette.text.secondary}
             style={theme.typography.body2}
           >
@@ -87,7 +90,7 @@ export default function CalorieChart({ userId }) {
           </YAxis>
           <Line
             key="calorie-intake-line"
-            dataKey="calories_intake"
+            dataKey="calorie_intake"
             stroke={theme.palette.primary.main}
             dot={false}
           />

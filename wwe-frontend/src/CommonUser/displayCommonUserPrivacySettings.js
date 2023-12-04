@@ -28,7 +28,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 
 function DisplayCommonUserPrivacySettings({userId}) {
     const [isEditable, setIsEditable] = useState(false);
-    const [privacySetting, setPrivacySetting] = useState(true);
+    const [privacySetting, setPrivacySetting] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
     const [alertSeverity, setAlertSeverity] = useState('info');
     const [open, setOpen] = useState(false);
