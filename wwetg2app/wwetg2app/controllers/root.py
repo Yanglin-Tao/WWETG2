@@ -1199,8 +1199,8 @@ class RootController(BaseController):
                     userID = userID,
                     startDate = startDate,
                     endDate = endDate,
-                    minCal = dailyCalorieIntakeMaximum,
-                    maxCal = dailyCalorieIntakeMinimum
+                    maxCal = dailyCalorieIntakeMaximum,
+                    minCal = dailyCalorieIntakeMinimum
                 )
                 session.add(newGoal)
                 session.commit()
