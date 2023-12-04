@@ -58,8 +58,8 @@ export default function RecentMeals({ userId }) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {recentMeals.map((meal) => (
-            <TableRow key={meal.key}>
+          {recentMeals.map((meal, index) => (
+            <TableRow key={index}>
               <TableCell>{meal.date}</TableCell>
               <TableCell>{meal.time}</TableCell>
               <TableCell>{meal.dining_hall}</TableCell>

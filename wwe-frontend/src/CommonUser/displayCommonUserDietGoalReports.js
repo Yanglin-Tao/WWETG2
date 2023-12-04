@@ -77,8 +77,8 @@ export default function DisplayCommonUserDietGoalReports({ userId }) {
           gap: '16px', 
         }}
       >
-        {dietGoalReports.map((report) => (
-          <Card key={report.id} sx={{ maxWidth: 275 }}>
+        {dietGoalReports.map((report, index) => (
+          <Card key={index} sx={{ maxWidth: 275 }}>
             <CardContent>
               <Typography variant="h5" component="div" gutterBottom>
                 {report.startDate} to {report.endDate} Report
