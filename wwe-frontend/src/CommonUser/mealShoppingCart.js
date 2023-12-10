@@ -227,7 +227,7 @@ function MealShoppingCart({ userId }) {
                                                                             sx={{
                                                                                 pt: '56.25%',
                                                                             }}
-                                                                            image={`https://source.unsplash.com/random?food`}
+                                                                            image={item.imageUrl}
                                                                         />
                                                                         <CardContent sx={{ flexGrow: 1 }}>
                                                                             <Typography variant="h5" component="div">

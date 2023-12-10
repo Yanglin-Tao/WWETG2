@@ -158,25 +158,6 @@ function DisplayDiningHallAccount({ userId }) {
                   {userData.diningHallName}
                   <Title>Contact Email</Title>
                   {userData.email}
-                  <Title>Address</Title>
-                  { isEditable ? (
-                      <input 
-                          type="text"
-                          value={userData}
-                          onChange={handleUserDataChange}
-                      />
-                  ) : (
-                      userData.address
-                  )}
-                  <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    sx={{ mt: 3, mb: 2 }}
-                    onClick={toggleEdit}
-                  >
-                    {isEditable ? 'Save Changes' : 'Edit Dining Hall Profile'}
-                  </Button>
                   </Paper>
                 </Grid>
               </Grid>

@@ -235,7 +235,7 @@ function DisplayMenuItem({ userId }) {
                         <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
                             {dishes.map((dish, index) => (
                                 <Grid container spacing={3} key={index}>
-                                    <Grid item xs={12} >
+                                    <Grid item xs={12} mt={2}>
                                         <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                                             <CardMedia
                                                 component="img"
@@ -247,7 +247,8 @@ function DisplayMenuItem({ userId }) {
                                                 {isEditMode && editableDish.dishID === dish.dishID ? (<div>
                                                     <TextField
                                                         required
-                                                        label="Dish Name"
+                                                        label="Food Name"
+                                                        sx={{ width: '300px', marginRight: '10px', marginBottom: '10px' }}
                                                         value={editableDish.dishName}
                                                         onChange={(e) => handleChange(e, 'dishName')}
                                                     />
@@ -255,22 +256,18 @@ function DisplayMenuItem({ userId }) {
                                                         required
                                                         label="Calories"
                                                         type="number"
+                                                        sx={{ width: '300px', marginRight: '10px', marginBottom: '10px' }}
                                                         value={editableDish.calorie}
                                                         onChange={(e) => handleChange(e, 'calorie')}
                                                     />
                                                     <TextField
                                                         required
-                                                        label="Ingredients"
-                                                        value={editableDish.ingredients}
-                                                        onChange={(e) => handleChange(e, 'ingredients')}
-                                                    />
-                                                    <TextField
-                                                        required
                                                         label="Serving Size"
+                                                        sx={{ width: '300px', marginRight: '10px', marginBottom: '10px' }}
                                                         value={editableDish.servingSize}
                                                         onChange={(e) => handleChange(e, 'servingSize')}
                                                     />
-                                                    <FormControl fullWidth >
+                                                    <FormControl variant="outlined" sx={{ width: 400, marginRight: '10px', marginBottom: '10px' }}>
                                                         <InputLabel>Categories</InputLabel>
                                                         <Select
                                                             multiple
@@ -284,8 +281,7 @@ function DisplayMenuItem({ userId }) {
                                                             ))}
                                                         </Select>
                                                     </FormControl>
-
-                                                    <FormControl fullWidth >
+                                                    <FormControl  variant="outlined" sx={{ width: 200, marginBottom: '10px' }} >
                                                         <InputLabel>Type</InputLabel>
                                                         <Select
                                                             label="Type"
@@ -297,6 +293,15 @@ function DisplayMenuItem({ userId }) {
                                                             ))}
                                                         </Select>
                                                     </FormControl>
+                                                    <TextField
+                                                        required
+                                                        label="Ingredients"
+                                                        sx={{ width: '1120px' }}
+                                                        multiline
+                                                        rows={4}
+                                                        value={editableDish.ingredients}
+                                                        onChange={(e) => handleChange(e, 'ingredients')}
+                                                    />
                                                 </div>) : (
                                                     // Display fields
                                                     <div>
@@ -346,6 +351,7 @@ function DisplayMenuItem({ userId }) {
                                             <TextField
                                                 required
                                                 label="Dish Name"
+                                                sx={{ width: '300px', marginRight: '10px', marginBottom: '10px' }}
                                                 value={newDish.dishName}
                                                 onChange={(e) => handleNewDishChange(e, 'dishName')}
                                             />
@@ -353,22 +359,18 @@ function DisplayMenuItem({ userId }) {
                                                 required
                                                 label="Calories"
                                                 type="number"
+                                                sx={{ width: '300px', marginRight: '10px', marginBottom: '10px' }}
                                                 value={newDish.calorie}
                                                 onChange={(e) => handleNewDishChange(e, 'calorie')}
                                             />
                                             <TextField
                                                 required
-                                                label="Ingredients"
-                                                value={newDish.ingredients}
-                                                onChange={(e) => handleNewDishChange(e, 'ingredients')}
-                                            />
-                                            <TextField
-                                                required
                                                 label="Serving Size"
+                                                sx={{ width: '300px', marginRight: '10px', marginBottom: '10px' }}
                                                 value={newDish.servingSize}
                                                 onChange={(e) => handleNewDishChange(e, 'servingSize')}
                                             />
-                                            <FormControl fullWidth >
+                                            <FormControl variant="outlined" sx={{ width: 400, marginRight: '10px', marginBottom: '10px' }}>
                                                 <InputLabel>Categories</InputLabel>
                                                 <Select
                                                     multiple
@@ -382,7 +384,7 @@ function DisplayMenuItem({ userId }) {
                                                     ))}
                                                 </Select>
                                             </FormControl>
-                                            <FormControl fullWidth >
+                                            <FormControl  variant="outlined" sx={{ width: 200, marginBottom: '10px' }} >
                                                 <InputLabel>Type</InputLabel>
                                                 <Select
                                                     label="Type"
@@ -394,7 +396,15 @@ function DisplayMenuItem({ userId }) {
                                                     ))}
                                                 </Select>
                                             </FormControl>
-
+                                            <TextField
+                                                required
+                                                label="Ingredients"
+                                                sx={{ width: '1120px' }}
+                                                multiline
+                                                rows={4}
+                                                value={newDish.ingredients}
+                                                onChange={(e) => handleNewDishChange(e, 'ingredients')}
+                                            />
                                         </CardContent>
                                         <CardActions sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                                             <Button onClick={() => addNewDish()}>Submit New Dish</Button>

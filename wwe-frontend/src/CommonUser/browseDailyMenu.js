@@ -165,7 +165,7 @@ function BrowseDailyMenu({ userId }) {
         newCartItems = [...prevCartItems];
         newCartItems[itemIndex].count += 1;
       } else {
-        newCartItems = [...prevCartItems, { ...foodItem, count: 1 }];
+        newCartItems = [...prevCartItems, { ...foodItem, count: 1, imageUrl: `https://source.unsplash.com/random?food&${foodItem.dishID}` }];
       }
       console.log('New Cart Items:', newCartItems);
       Cookies.set(`cart_${userId}`, JSON.stringify(newCartItems), { expires: 1 });
