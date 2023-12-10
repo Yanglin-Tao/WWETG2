@@ -32,10 +32,10 @@ function DisplayMenuItem({ userId }) {
     });
     const [newDish, setNewDish] = useState({
         dishName: '',
-        calorie: '',
+        calorie: 0,
         ingredients: '',
         categories: [],
-        servingSize: '',
+        servingSize: 0,
         type: '',
         imageUrl: 'https://source.unsplash.com/random?food'
     });
@@ -85,6 +85,9 @@ function DisplayMenuItem({ userId }) {
 
     const handleChange = (e, key) => {
         let value = e.target.value;
+        if (key === 'calorie') {
+            value = value === '' ? '' : parseInt(value, 10);
+        }
         if (key === 'categories' && !Array.isArray(value)) {
             value = [value];
         }
@@ -201,7 +204,7 @@ function DisplayMenuItem({ userId }) {
     const handleNewDishChange = (e, key) => {
         let value = e.target.value;
         if (key === 'calorie' || key === 'servingSize') {
-            value = parseInt(value, 10) || ''; // Convert to integer, or empty string if NaN
+            value = value === '' ? '' : parseInt(value, 10); // Convert to integer, or empty string if NaN
         }
         if (key === 'categories' && Array.isArray(value)) {
             value = value.map((item) => item); // Convert the selection to array

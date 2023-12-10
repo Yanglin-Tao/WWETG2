@@ -495,9 +495,9 @@ INSERT INTO "user_reports" ("userID", "date", "actualIntake", "dailyAverageIntak
 
 
 
-INSERT INTO "daily_menu" ("menuID", "date", "diningHallID") VALUES (11, '2023-12-4', 1);
+INSERT INTO "daily_menu" ("menuID", "date", "diningHallID") VALUES (11, '2023-12-9', 1);
 
-INSERT INTO "daily_menu" ("menuID", "date", "diningHallID") VALUES (12, '2023-12-3', 1);
+INSERT INTO "daily_menu" ("menuID", "date", "diningHallID") VALUES (12, '2023-12-10', 1);
 
 INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (1,11);
 INSERT INTO "menu_dish" ("dishID", "menuID") VALUES (3,11);
