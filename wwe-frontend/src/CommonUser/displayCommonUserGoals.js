@@ -26,7 +26,6 @@ import MuiAlert from '@mui/material/Alert';
 /* TODO: This component should display common user's dietary goals
 */
 
-// TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
 const Alert = React.forwardRef(function Alert(props, ref) {

@@ -10,6 +10,9 @@ import Copyright from '../Copyright';
 import DisplayDiningHallMonthlyReport from './displayDiningHallMonthlyReport';
 import Paper from '@mui/material/Paper';
 
+/* TODO: This component should display dining hall's monthly reports on a separate page
+*/
+
 export default function DisplayDiningHallReports({ userId }) {
     return (
         <ThemeProvider theme={createTheme()}>

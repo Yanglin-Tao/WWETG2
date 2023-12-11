@@ -15,6 +15,9 @@ import { Bar } from 'react-chartjs-2';
 import { PieChart, pieArcLabelClasses } from '@mui/x-charts/PieChart';
 import { Chart, CategoryScale, LinearScale, BarController, BarElement, ArcElement } from 'chart.js';
 
+/* TODO: This component should display dining hall's monthly reports
+*/
+
 Chart.register(CategoryScale, LinearScale, BarController, BarElement, ArcElement);
 
 export default function DisplayDiningHallMonthlyReport({ userId }) {

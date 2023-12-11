@@ -5,8 +5,7 @@ import Title from './Title';
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 
-/* TODO: This component should show a line chart of common user's calories in take in the day. 
-This component is optional to have.  
+/* TODO: This component should show a line chart of common user's calories intake in 24 hours.  
 */
 
 export default function CalorieChart({ userId }) {

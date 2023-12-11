@@ -15,7 +15,7 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import Cookies from 'js-cookie';
-import { mainListItems, secondaryListItems } from './navigateCommonUserDashboard'; // adjust the import path as needed
+import { mainListItems, secondaryListItems } from './navigateCommonUserDashboard';
 
 const drawerWidth = 240;
 

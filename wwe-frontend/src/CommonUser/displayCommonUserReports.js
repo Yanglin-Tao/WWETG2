@@ -11,7 +11,9 @@ import Copyright from '../Copyright';
 import DisplayCommonUserMontlyReport from './displayCommonUserMonthlyReport'
 import DisplayCommonUserDietGoalReports from './displayCommonUserDietGoalReports';
 
-// TODO remove, this demo shouldn't need to reset the theme.
+/* TODO: This component should display common user's monthly and diet goal reports
+*/
+
 const defaultTheme = createTheme();
 
 export default function DisplayCommonUserReports({ userId }) {

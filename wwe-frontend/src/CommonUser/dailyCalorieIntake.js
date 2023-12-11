@@ -8,7 +8,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import PropTypes from 'prop-types';
 
-/* TODO: This component should show common user's total calories intake in the day.  
+/* TODO: This component should show common user's daily total calories intake and current goal progress.  
 */
 
 function preventDefault(event) {

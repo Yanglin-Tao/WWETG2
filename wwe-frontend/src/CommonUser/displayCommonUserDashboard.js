@@ -20,12 +20,12 @@ different use cases.
 Dashboard -> displayCommonUserDashboard
 Browse Menu -> browseDailyMenu
 My Meal Cart -> mealShoppingCart
-My Goals -> displayCommonUserGoals / editCommonUserGoals
-My Reports -> displayCommonUserMonthlyReport
-Allergies -> displayCommonUserAllergy / editCommonUserAllgery
-Preferences -> displayCommonUserFoodPreference / editCommonUserFoodPreference
+My Goals -> displayCommonUserGoals 
+My Reports -> displayCommonUserReports 
+Allergies -> displayCommonUserAllergy
+Preferences -> displayCommonUserFoodPreference
 My Account -> displayCommonUserAccount
-Privacy Settings -> displayCommonUserPrivacySettings / editCommonUserPrivacySettings
+Privacy Settings -> displayCommonUserPrivacySettings
 */
 
 // TODO remove, this demo shouldn't need to reset the theme.

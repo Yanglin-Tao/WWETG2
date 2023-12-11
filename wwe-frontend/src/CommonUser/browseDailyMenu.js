@@ -28,7 +28,6 @@ import Cookies from 'js-cookie';
 /* TODO: This component should let common user browse a list of menuItems in dailyMenu. 
     Each item displays a name, customer rating, food warning/recommendation and a button to add 
     the menuItem to shopping cart. 
-    When click on the menuItem to view details, it should show displayMenuItem component. 
 */
 
 function BrowseDailyMenu({ userId }) {
